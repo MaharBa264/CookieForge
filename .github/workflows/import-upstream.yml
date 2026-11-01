@@ -1,0 +1,33 @@
+name: Import upstream baseline
+
+on:
+  push:
+    paths:
+      - '.github/workflows/import-upstream.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Import upstream source without upstream CI or private planning files
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --depth 1 https://github.com/razorglyon/cookie-cutter-designer.git /tmp/cookie-cutter-designer
+          cp /tmp/cookie-cutter-designer/README.md UPSTREAM_README.md
+          rsync -a --exclude='.git/' --exclude='.github/' --exclude='.hermes/' --exclude='README.md' /tmp/cookie-cutter-designer/ ./
+          git -C /tmp/cookie-cutter-designer rev-parse HEAD > UPSTREAM_COMMIT.txt
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m 'chore: import Cookie Cutter Designer MIT baseline'
+            git push
+          fi
