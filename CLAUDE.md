@@ -1,161 +1,174 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+> Instrucciones para asistentes de programación que trabajan con el código de este repositorio. Traducción del documento original; algunas rutas y descripciones reflejan una arquitectura anterior y deben comprobarse contra el código actual antes de hacer cambios.
 
-## Project Overview
+Este archivo orienta a Claude Code (`claude.ai/code`) al trabajar con el repositorio.
 
-Cookie Cutter Designer is a web application for designing custom 3D-printable cookie cutters and stamps from vector (SVG) or raster (PNG/JPG) images. The app provides real-time 3D preview, extensive customization options, and exports to STL format.
+## Descripción del proyecto
 
-## Development Commands
+Cookie Cutter Designer es una aplicación web para crear cortantes y sellos personalizados imprimibles en 3D a partir de imágenes vectoriales (SVG) o raster (PNG/JPG). Ofrece vista previa 3D en tiempo real, múltiples opciones de personalización y exportación STL.
 
-### Package Manager
-This project uses **pnpm** (not npm or yarn).
+## Comandos de desarrollo
 
-### Common Commands
+### Gestor de paquetes
+
+Este proyecto utiliza **pnpm**, no npm ni yarn.
+
+### Comandos habituales
+
 ```bash
-# Install dependencies
+# Instalar dependencias
 pnpm install
 
-# Start development server (http://localhost:5173/)
+# Iniciar servidor de desarrollo (http://localhost:5173/)
 pnpm run dev
 
-# Build for production
+# Compilar para producción
 pnpm run build
 
-# Preview production build
+# Previsualizar la compilación de producción
 pnpm run preview
 
-# Type checking
+# Comprobar tipos
 pnpm run check
 ```
 
-## Tech Stack
+## Tecnologías
 
-- **Framework**: Svelte 5 (with runes and modern reactive syntax)
-- **Language**: TypeScript (strict mode)
-- **Build Tool**: Vite 7
-- **3D Rendering**: Three.js (0.181.x)
-- **Vector Operations**: js-angusj-clipper (Clipper.js WebAssembly)
-- **Image Vectorization**: imagetracer
-- **Geometric Operations**: @jscad/modeling, paper, tess2
+- **Interfaz:** Svelte 5 (runas y sintaxis reactiva moderna).
+- **Lenguaje:** TypeScript (modo estricto).
+- **Compilación:** Vite 7.
+- **Visualización 3D:** Three.js (0.181.x).
+- **Operaciones vectoriales:** js-angusj-clipper (Clipper.js WebAssembly).
+- **Vectorización de imágenes:** imagetracer.
+- **Operaciones geométricas:** @jscad/modeling, paper y tess2.
 
-## Architecture
+## Arquitectura
 
-### State Management
+### Gestión del estado
 
-The app uses Svelte stores for centralized state management:
+La aplicación utiliza almacenes de Svelte para centralizar el estado:
 
-- **cookieCutterStore.ts**: Main store containing:
-  - `params`: Cookie cutter parameters (reactive)
-  - `uploadedFile`: Current uploaded file
-  - `pathData`: Extracted SVG path data
-  - `model`: Generated 3D model
-  - `isProcessing`: Loading state
-  - `error`: Error messages
-  - `printability`: Derived store for real-time validation
+- **`cookieCutterStore.ts`:** almacén principal que contiene:
+  - `params`: parámetros reactivos del cortante.
+  - `uploadedFile`: archivo cargado.
+  - `pathData`: datos de trazados SVG extraídos.
+  - `model`: modelo tridimensional generado.
+  - `isProcessing`: estado de procesamiento.
+  - `error`: mensajes de error.
+  - `printability`: almacén derivado para validación en tiempo real.
+- **`historyStore.ts`:** funciones Deshacer/Rehacer para la edición de trazados.
 
-- **historyStore.ts**: Undo/redo functionality for path editing
+### Proceso principal
 
-### Core Pipeline
+La aplicación sigue este flujo de datos:
 
-The app follows this data flow:
+1. **Carga de archivos → `FileUpload.svelte`**
+   - Acepta SVG, PNG y JPG (máximo 10 MB).
+   - Verifica tipo y tamaño.
 
-1. **File Upload** → `FileUpload.svelte`
-   - Accepts SVG, PNG, JPG (max 10MB)
-   - Validates file type and size
+2. **Procesamiento de imágenes → `imageProcessor.ts` y `imageProcessor.worker.ts`**
+   - Las imágenes raster se vectorizan mediante Web Workers sin bloquear la interfaz.
+   - Los archivos SVG se procesan directamente.
 
-2. **Image Processing** → `imageProcessor.ts` + `imageProcessor.worker.ts`
-   - Raster images vectorized using Web Workers (non-blocking)
-   - SVG files extracted directly
+3. **Operaciones sobre trazados → `pathOperations.ts`**
+   - Utiliza Clipper.js para desplazamientos de contorno y operaciones booleanas precisas.
+   - Crea paredes interiores y exteriores con espesor definido.
+   - Admite unión, diferencia e intersección.
 
-3. **Path Operations** → `pathOperations.ts`
-   - Uses Clipper.js for precise offset/boolean operations
-   - Creates inner/outer walls with exact thickness
-   - Supports union, difference, intersection
+4. **Generación 3D → `cookieCutterGenerator.ts`**
+   - Convierte trazados 2D en mallas 3D mediante Three.js.
+   - Aplica extrusión, ángulo de salida, agarres y relieve.
+   - Incluye los modos `cutter` (cortante) y `stamp` (sello).
 
-4. **3D Generation** → `cookieCutterGenerator.ts`
-   - Converts 2D paths to 3D meshes using Three.js
-   - Applies extrusion, taper, handles, embossing
-   - Two modes: 'cutter' or 'stamp'
+5. **Representación → `ThreeViewer.svelte`**
+   - Vista previa WebGL en tiempo real con OrbitControls.
+   - Centrado y posicionamiento automático de cámara.
+   - Grilla e iluminación.
 
-5. **Rendering** → `ThreeViewer.svelte`
-   - Real-time WebGL preview with OrbitControls
-   - Auto-centering and camera positioning
-   - Grid and lighting
+6. **Exportación → `stlExporter.ts`**
+   - Exporta en formato STL binario.
+   - Admite metadatos opcionales.
 
-6. **Export** → `stlExporter.ts`
-   - Exports to binary STL format
-   - Includes optional metadata
+### Funciones avanzadas
 
-### Advanced Features
+#### Compatibilidad con varias capas
+- **Tipos de capa:** Cutter, Stamp, Emboss (consultar `Layer.ts`).
+- **`LayerManager.svelte`:** interfaz para gestionar varias capas.
+- **`multiLayerGenerator.ts`:** combina capas en un STL único o en archivos separados.
+- Cada capa posee profundidad, visibilidad y datos SVG independientes.
 
-#### Multi-Layer Support
-- **Layer Types**: Cutter, Stamp, Emboss (see `Layer.ts`)
-- **LayerManager.svelte**: UI for managing multiple layers
-- **multiLayerGenerator.ts**: Combines layers into single or separate STL files
-- Each layer has independent depth, visibility, and SVG data
+#### Operaciones booleanas
+- **`BooleanOperations.svelte`:** interfaz para unir, sustraer e intersectar.
+- **`booleanOperations.ts`:** implementa operaciones con Clipper.js.
+- Permite cargar formas secundarias y combinarlas con el diseño principal.
 
-#### Boolean Operations
-- **BooleanOperations.svelte**: UI for union/subtract/intersect
-- **booleanOperations.ts**: Implements operations using Clipper.js
-- Upload secondary shapes and combine with main design
+#### Texto en relieve
+- **`TextEmbosser.svelte`:** incorpora texto personalizado a los diseños.
+- Incluye nueve tipografías (Arial, Impact, Times New Roman, etc.).
+- Tamaño configurable de 6–30 mm y profundidad de 0,5–5 mm.
+- Opción de espejado para sellos.
 
-#### Text Embossing
-- **TextEmbosser.svelte**: Add custom text to designs
-- 9 fonts available (Arial, Impact, Times New Roman, etc.)
-- Configurable size (6-30mm), depth (0.5-5mm)
-- Mirror option for stamps
+#### Gestión de proyectos
+- **`Project.ts`:** definiciones de tipos del formato `.ccd.json`.
+- **`projectManager.ts`:** importación/exportación mediante `localStorage`.
+- **`ProjectManager.svelte` y `DesignGallery.svelte`:** interfaz para guardar y abrir diseños.
+- Los proyectos incluyen metadatos, miniaturas y versión.
 
-#### Project Management
-- **Project.ts**: Type definitions for .ccd.json format
-- **projectManager.ts**: Import/export logic with localStorage
-- **ProjectManager.svelte** + **DesignGallery.svelte**: UI for saving/loading designs
-- Projects include metadata, thumbnails, and version info
-
-#### Path Editing
-- **PathEditor.svelte**: Interactive canvas for editing vector paths
-- **bezierEditor.ts**: Utilities for Bezier curve manipulation
-- Three modes: Select, Add, Delete points
+#### Edición de trazados
+- **`PathEditor.svelte`:** lienzo interactivo para editar trazados vectoriales.
+- **`bezierEditor.ts`:** utilidades para manipular curvas de Bézier.
+- Tres modos: seleccionar, agregar y eliminar puntos.
 
 #### Web Workers
-- **workerManager.ts**: Manages worker lifecycle
-- **imageProcessor.worker.ts**: Offloads image vectorization to prevent UI blocking
-- Handles errors and cleanup automatically
+- **`workerManager.ts`:** administra el ciclo de vida de los workers.
+- **`imageProcessor.worker.ts`:** ejecuta vectorización sin bloquear la interfaz.
+- Gestiona errores y libera recursos automáticamente.
 
-## Key Design Patterns
+## Patrones de diseño principales
 
-### Svelte 5 Runes
-The codebase uses Svelte 5's runes syntax:
-- `$state()` for component-level reactive state
-- `$derived()` for computed values
-- `$effect()` for side effects
-- Stores still use `writable()` and `derived()` from svelte/store
+### Runas de Svelte 5
 
-### TypeScript Interfaces
-All parameters and data structures are strongly typed:
-- `CookieCutterParams`: All customization options
-- `Point2D`, `Path2D`: 2D geometry primitives
-- `Layer`, `Project`: Multi-layer and project types
-- Always reference these types when modifying features
+El código utiliza la sintaxis de runas de Svelte 5:
 
-### Path Precision
-- **Critical**: Use Clipper.js (`pathOperations.ts`) for any path offsetting or boolean operations
-- Native JavaScript operations lack precision for manufacturing tolerances
-- Clipper.js uses integer scaling internally for exact arithmetic
+- `$state()`: estado reactivo del componente.
+- `$derived()`: valores calculados.
+- `$effect()`: efectos secundarios.
+- Los almacenes también utilizan `writable()` y `derived()` de `svelte/store`.
 
-### 3D Model Updates
-When modifying parameters:
-1. Update the store with `updateParam(key, value)`
-2. Store reactivity triggers regeneration in `ThreeViewer.svelte`
-3. New mesh replaces old mesh in the Three.js scene
-4. No manual `requestAnimationFrame` needed
+### Interfaces de TypeScript
 
-## File Organization
+Los parámetros y estructuras de datos tienen tipos explícitos:
 
-```
+- `CookieCutterParams`: opciones de personalización.
+- `Point2D` y `Path2D`: primitivas geométricas 2D.
+- `Layer` y `Project`: tipos para capas y proyectos.
+
+Utilizá estos tipos al modificar funcionalidades.
+
+### Precisión de los trazados
+
+- **Importante:** usar Clipper.js (`pathOperations.ts`) para desplazamientos y operaciones booleanas.
+- Las operaciones numéricas simples de JavaScript pueden resultar insuficientes para tolerancias de fabricación.
+- Clipper.js utiliza escalado a enteros internamente para sus cálculos.
+
+### Actualización del modelo 3D
+
+Al modificar parámetros, el flujo descrito originalmente es:
+
+1. Actualizar el almacén mediante `updateParam(key, value)`.
+2. La reactividad del almacén activa la regeneración en `ThreeViewer.svelte`.
+3. La malla nueva reemplaza la anterior en la escena Three.js.
+4. No hace falta llamar manualmente a `requestAnimationFrame`.
+
+**Atención:** antes de implementar cambios en CookieForge, comprobar la sesión canónica y el flujo actual; esta descripción proviene de una etapa anterior.
+
+## Organización de archivos
+
+```text
 src/lib/
 ├── components/
-│   ├── ui/              # All UI components (23 files)
+│   ├── ui/              # Componentes de interfaz (23 en el inventario original)
 │   │   ├── FileUpload.svelte
 │   │   ├── ParameterPanel.svelte
 │   │   ├── BooleanOperations.svelte
@@ -164,61 +177,64 @@ src/lib/
 │   │   ├── PathEditor.svelte
 │   │   ├── ProjectManager.svelte
 │   │   ├── DesignGallery.svelte
-│   │   └── ... (pattern generators, material managers, etc.)
+│   │   └── ... (generadores de patrones, gestores de materiales, etc.)
 │   └── viewer/
 │       └── ThreeViewer.svelte
-├── stores/              # Svelte stores
+├── stores/              # Almacenes Svelte
 │   ├── cookieCutterStore.ts
 │   └── historyStore.ts
-├── types/               # TypeScript type definitions
+├── types/               # Definiciones de tipos TypeScript
 │   ├── CookieCutter.ts
 │   ├── Layer.ts
 │   └── Project.ts
-└── utils/               # Business logic (28 files)
-    ├── cookieCutterGenerator.ts  # Core 3D generation
-    ├── pathOperations.ts         # Clipper.js operations
-    ├── imageProcessor.ts         # Image vectorization
-    ├── stlExporter.ts           # STL export
-    ├── multiLayerGenerator.ts   # Multi-layer STL
-    └── ... (specialized utilities)
+└── utils/               # Lógica de aplicación (28 archivos en el inventario)
+    ├── cookieCutterGenerator.ts  # Generación 3D principal
+    ├── pathOperations.ts         # Operaciones de Clipper.js
+    ├── imageProcessor.ts         # Vectorización de imágenes
+    ├── stlExporter.ts           # Exportación STL
+    ├── multiLayerGenerator.ts   # STL con varias capas
+    └── ... (utilidades especializadas)
 ```
 
-## Important Constraints
+## Restricciones importantes
 
-### 3D Printing Requirements
-The app enforces printability through validation (`checkPrintability` in cookieCutterStore.ts):
-- Wall thickness: 0.8-2.0mm (1.0mm recommended)
-- Cutting height: 8-25mm (10-15mm ideal)
-- Taper angle: 0-15° (5-10° recommended)
-- Print orientation: upside down (cutting edge up)
+### Requisitos de impresión 3D
 
-When adding new parameters, ensure they respect these physical constraints.
+Según el documento original, la aplicación aplicaba comprobaciones de imprimibilidad mediante `checkPrintability` en `cookieCutterStore.ts`:
 
-### Performance Considerations
-- Use Web Workers for CPU-intensive operations (>100ms)
-- Clipper.js operations scale with path complexity - consider simplification for very detailed paths
-- Three.js meshes should be disposed when replaced to prevent memory leaks
-- LocalStorage has ~5-10MB limit - compress thumbnails if needed
+- Espesor de pared: 0,8–2,0 mm (recomendado: 1,0 mm).
+- Altura de corte: 8–25 mm (ideal: 10–15 mm).
+- Ángulo de salida: 0–15° (recomendado: 5–10°).
+- Orientación de impresión: modelo invertido, con el filo hacia arriba.
 
-### SVG Handling
-- SVGs are parsed using Three.js SVGLoader (not browser native parsing)
-- Complex paths with many points should be simplified using `pathOperations.ts`
-- Text in SVG must be converted to paths before processing
+Al agregar parámetros, respetar las restricciones geométricas efectivamente vigentes y verificar el resultado en el laminador. Estos valores no garantizan resistencia mecánica ni aptitud alimentaria.
 
-## Testing Recommendations
+### Rendimiento
+- Utilizar Web Workers para operaciones intensivas de CPU (más de 100 ms, como referencia).
+- El costo de Clipper.js aumenta con la complejidad del trazado; considerar simplificación cuando haya demasiados puntos.
+- Liberar las mallas Three.js sustituidas para evitar pérdidas de memoria.
+- `localStorage` suele tener cuotas aproximadas de 5–10 MB; comprimir miniaturas si hace falta.
 
-When making changes:
-1. Test with simple shapes (test-star.svg in public/)
-2. Test with complex SVGs (many paths, curves)
-3. Test with large raster images (>5MB)
-4. Verify STL exports in slicer software (PrusaSlicer, Cura)
-5. Check printability warnings update correctly
-6. Test project save/load with localStorage
+### Tratamiento SVG
+- El documento original describe el uso de Three.js SVGLoader para interpretar SVG.
+- Los trazados con muchos puntos pueden requerir simplificación mediante `pathOperations.ts`.
+- Convertir los textos SVG en trazados antes de procesarlos cuando el flujo utilizado no admita texto.
 
-## Code Style
+## Pruebas recomendadas
 
-- Use TypeScript strict mode - no `any` types unless interfacing with untyped libraries
-- Prefer async/await over promises
-- Component files should handle UI only - delegate logic to utils/
-- Extract magic numbers to constants or parameters
-- Add JSDoc comments to exported functions
+Al realizar cambios:
+
+1. Probar formas simples (`public/test-star.svg`).
+2. Probar SVG complejos con muchos trazados y curvas.
+3. Probar imágenes raster grandes (más de 5 MB).
+4. Verificar los STL en un laminador como PrusaSlicer o Cura.
+5. Comprobar que las advertencias de imprimibilidad se actualicen correctamente.
+6. Probar guardado y recuperación de proyectos en almacenamiento local.
+
+## Estilo de código
+
+- Utilizar TypeScript en modo estricto; evitar `any` salvo al interoperar con bibliotecas sin tipos.
+- Preferir `async/await` para el código asíncrono.
+- Mantener la lógica de interfaz en los componentes y delegar la lógica de negocio en utilidades.
+- Sustituir números mágicos por constantes o parámetros.
+- Agregar comentarios JSDoc a las funciones exportadas.
