@@ -1,44 +1,44 @@
-# Plan d’implémentation Codex — Refactorisation produit
+# Plan de implementación Codex — Refactorización del producto
 
-> **Pour Codex :** exécuter les tâches dans l’ordre. Ne pas implémenter plusieurs recettes métier avant que le registry, les migrations et les tests Cutter/Stamp soient stables.
+> **Plan histórico del proyecto original.** Las autorizaciones y prioridades que aparecen aquí no son órdenes vigentes para CookieForge. Verificar la situación actual antes de retomar tareas.
 
-**Objectif :** transformer l’application monolithique Cutter/Stamp en plateforme extensible de recettes métier sans régression print-ready.
+**Objetivo:** convertir la aplicación monolítica Cortante/Sello en una plataforma extensible de recetas de generación, sin regresiones en las garantías de impresión.
 
-**Architecture :** un document versionné contient source, sketch et paramètres. Un registry résout la recette de génération. Un orchestrateur annulable produit des artefacts validés consommés par le viewer et les exports.
+**Arquitectura:** un documento versionado contiene fuente, boceto y parámetros. Un registro resuelve la receta de generación. Un orquestador cancelable produce artefactos validados que utilizan el visor y los exportadores.
 
-**Stack :** Svelte 5, TypeScript strict, Three.js, Vitest, Web Workers, pnpm.
+**Tecnologías:** Svelte 5, TypeScript estricto, Three.js, Vitest, Web Workers y pnpm.
 
 ---
 
-## Règles d’exécution
+## Reglas de ejecución
 
-### Synchronisation vérifiée avec REA — 2026-10-11
+### Sincronización verificada con REA — 11/10/2026
 
-La feuille de route REA (`.hermes/plans/2026-10-09_214154-rea-product-improvements.md`, depuis la racine du dépôt) distingue désormais lots livrés et extensions. Main intégré : `bafc4246d5c5789a385f844ea5ff3a1d2d7e99dd` ; dernière PR #71 fusionnée et Pages vérifié. Les fondations document/codec/registry/orchestration, projets locaux, récupération, import unifié, atelier minimal, presets/photo guidée, ponts et profils simples sont intégrés. La recette multi-cutter est livrée **uniquement pour des copies homogènes séparées**, avec V3, disposition, histoire et reprise.
+La hoja de ruta REA (`.hermes/plans/2026-10-09_214154-rea-product-improvements.md`, desde la raíz del repositorio) distinguía lotes entregados y ampliaciones. Integración en `main`: `bafc4246d5c5789a385f844ea5ff3a1d2d7e99dd`; última PR #71 fusionada y Pages verificado. Ya se habían integrado los fundamentos de documentos/códec/registro/orquestación, proyectos locales, recuperación, importación unificada, taller mínimo, perfiles de vectorización/foto guiada, puentes y perfiles sencillos. La receta de cortantes múltiples se entregó **solo para copias homogéneas separadas**, con documento V3, distribución, historial y recuperación.
 
-Preuves : `../SKETCH_WORKSPACE_VALIDATION.md`, `../PHOTO_IMPORT_VALIDATION.md`, `../MANUAL_ISLAND_BRIDGES_VALIDATION.md`, `../WALL_PROFILES_VALIDATION.md`, `../CUTTER_SERIES_VALIDATION.md`. Invariants : `../PROJECT_INVARIANTS.md` (compagnon inclus dans ce lot documentaire).
+Evidencias: `../SKETCH_WORKSPACE_VALIDATION.md`, `../PHOTO_IMPORT_VALIDATION.md`, `../MANUAL_ISLAND_BRIDGES_VALIDATION.md`, `../WALL_PROFILES_VALIDATION.md` y `../CUTTER_SERIES_VALIDATION.md`. Invariantes: `../PROJECT_INVARIANTS.md`.
 
-**Ne pas considérer toutes les phases de ce plan comme terminées.** Les recettes élargies, catalogue/recherche, presets métier versionnés, atelier avancé, PWA et exports multi-artefacts restent des propositions à auditer/détailler avant exécution, pas des absences intégralement revérifiées dans ce lot documentaire. Les copies reliées/monobloc et la paroi à zones indépendantes ne sont pas livrées. La bibliothèque projet livrée ne clôt pas automatiquement la phase des presets métier.
+**No considerar terminadas todas las fases de este plan.** Las recetas ampliadas, catálogo/búsqueda, perfiles funcionales versionados, taller avanzado, PWA y exportaciones de múltiples artefactos seguían siendo propuestas pendientes de auditoría y definición, no ausencias completamente verificadas en aquella revisión. No estaban entregados los cortantes unidos/monobloque ni las paredes con zonas independientes. La biblioteca de proyectos entregada no cerraba automáticamente la fase de perfiles funcionales.
 
-Les tâches détaillées ci-dessous sont la spécification d’origine : vérifier leur raccordement et le périmètre déjà livré avant de les reprendre. Les anciennes PR empilées sont supersédées. Accord actuel : mise à jour documentaire, commit et push uniquement, sans PR/merge/deploy ni nouvelle fonction ; les accords de livraison antérieurs ne s’étendent pas à ce lot.
+Las tareas detalladas abajo son la especificación original: comprobar el alcance ya implementado antes de retomarlas. Las PR antiguas encadenadas habían quedado sustituidas. La autorización de aquel momento alcanzaba solo actualización documental, commit y push, sin PR, fusión, despliegue ni función nueva; permisos anteriores no se extendían a ese lote.
 
-- Branche dédiée, jamais `main`.
-- Un commit local cohérent par tâche ou petit groupe de tâches.
-- Aucun push sans validation humaine.
-- TDD sur migrations, recettes et validations.
-- Ne pas supprimer les tests historiques pour faire passer une migration.
-- Ne pas élargir les seuils géométriques pour masquer une régression.
-- Préserver les imports dynamiques des fonctions lourdes.
-- Ne créer aucun compte, abonnement, paiement, paywall, backend métier ou stockage cloud.
-- Implémenter projets, presets et bibliothèque exclusivement en local avec export/import manuel.
+- Trabajar en una rama específica, nunca directamente en `main`.
+- Un commit local coherente por tarea o grupo pequeño.
+- No publicar cambios sin validación humana.
+- Desarrollo guiado por pruebas (TDD) para migraciones, recetas y controles.
+- No borrar pruebas históricas para hacer pasar una migración.
+- No relajar umbrales geométricos para ocultar regresiones.
+- Conservar importaciones dinámicas de funciones pesadas.
+- No crear cuentas, suscripciones, pagos, muros de pago, backend de negocio ni almacenamiento en nube.
+- Proyectos, perfiles y biblioteca exclusivamente locales, con importación/exportación manual.
 
-## Phase 0 — Baseline
+## Fase 0 — Versión de referencia
 
-### Tâche 0.1 — Capturer l’état initial
+### Tarea 0.1 — Registrar el estado inicial
 
-**Fichiers :** aucun.
+**Archivos:** ninguno.
 
-Exécuter :
+Ejecutar:
 
 ```sh
 pnpm install --frozen-lockfile
@@ -48,24 +48,24 @@ pnpm run test:smoke
 pnpm run build
 ```
 
-Attendu : baseline documentée. Si un échec existe déjà, arrêter et le consigner avant toute modification.
+**Esperado:** versión de referencia documentada. Si ya hay fallas, detener los cambios y registrarlas antes de modificar nada.
 
-### Tâche 0.2 — Ajouter les fixtures de compatibilité
+### Tarea 0.2 — Agregar casos de compatibilidad
 
-**Créer :**
+**Crear:**
 
 ```text
 src/lib/domain/__tests__/fixtures/legacy-cutter.json
 src/lib/domain/__tests__/fixtures/legacy-stamp.json
 ```
 
-Capturer uniquement des paramètres non sensibles et des résultats mesurables déterministes : dimensions, nombre de coques, volume signé et hash logique des triangles normalisés si stable.
+Guardar únicamente parámetros no sensibles y resultados deterministas medibles: dimensiones, número de envolventes, volumen con signo y hash lógico de triángulos normalizados cuando sea estable.
 
-## Phase 1 — Domaine versionné
+## Fase 1 — Dominio versionado
 
-### Tâche 1.1 — Définir les types de document
+### Tarea 1.1 — Definir tipos de documento
 
-**Créer :**
+**Crear:**
 
 ```text
 src/lib/domain/designKind.ts
@@ -74,31 +74,23 @@ src/lib/domain/designParameters.ts
 src/lib/domain/generatedArtifact.ts
 ```
 
-**Modifier :**
+**Modificar:** `src/lib/types/CookieCutter.ts`.
 
-```text
-src/lib/types/CookieCutter.ts
-```
+Acciones:
 
-Actions :
+1. Incorporar `DesignKind` con todas las recetas del documento de requisitos.
+2. Agregar `DesignDocumentV1`.
+3. Separar parámetros comunes, de Cortante y de Sello.
+4. Mantener temporalmente `CookieCutterParams` como tipo heredado.
+5. Prohibir `any` y uniones sin discriminante.
 
-1. Ajouter `DesignKind` avec toutes les recettes du PRD.
-2. Ajouter `DesignDocumentV1`.
-3. Séparer paramètres communs, Cutter et Stamp.
-4. Garder temporairement `CookieCutterParams` comme type legacy.
-5. Interdire `any` et les unions non discriminées.
+**Pruebas:** `src/lib/domain/__tests__/designDocument.test.ts`.
 
-**Tests :**
+Comprobar discriminantes, valores predeterminados e imposibilidad de mezclar parámetros de Sello y Cortante.
 
-```text
-src/lib/domain/__tests__/designDocument.test.ts
-```
+### Tarea 1.2 — Agregar validación y migración
 
-Vérifier : discriminants, defaults, impossibilité de mélanger paramètres Stamp et Cutter.
-
-### Tâche 1.2 — Ajouter validation et migration
-
-**Créer :**
+**Crear:**
 
 ```text
 src/lib/domain/documentValidation.ts
@@ -108,19 +100,19 @@ src/lib/domain/__tests__/documentValidation.test.ts
 src/lib/domain/__tests__/migrations.test.ts
 ```
 
-La migration `v0 → v1` doit convertir :
+La migración `v0 → v1` convierte:
 
 ```ts
 mode: 'cutter' -> kind: 'cutter'
 mode: 'stamp' -> kind: 'stamp'
-scale: 1 -> targetSize: 75 // uniquement pour l’ancien format connu
+scale: 1 -> targetSize: 75 // Solo para el formato antiguo conocido
 ```
 
-Refuser les versions futures inconnues sans modifier le document source.
+Rechazar versiones futuras desconocidas sin modificar el documento de origen.
 
-### Tâche 1.3 — Créer le format projet portable
+### Tarea 1.3 — Crear formato de proyecto portable
 
-**Créer :**
+**Crear:**
 
 ```text
 src/lib/projects/projectCodec.ts
@@ -128,20 +120,20 @@ src/lib/projects/projectStorage.ts
 src/lib/projects/__tests__/projectCodec.test.ts
 ```
 
-Règles :
+Reglas:
 
-- JSON versionné ;
-- pas d’objet Three.js ;
-- source SVG nettoyée ;
-- export/import round-trip ;
-- checksum optionnel des blobs raster ;
-- IndexedDB derrière une interface testable.
+- JSON versionado;
+- sin objetos de Three.js;
+- SVG de origen saneado;
+- ida y vuelta de exportar/importar;
+- suma de comprobación opcional de datos raster;
+- IndexedDB detrás de una interfaz comprobable.
 
-## Phase 2 — Registry et orchestration
+## Fase 2 — Registro y orquestación
 
-### Tâche 2.1 — Définir le contrat de recette
+### Tarea 2.1 — Definir el contrato de receta
 
-**Créer :**
+**Crear:**
 
 ```text
 src/lib/generation/generationRecipe.ts
@@ -149,23 +141,23 @@ src/lib/generation/recipeRegistry.ts
 src/lib/generation/__tests__/recipeRegistry.test.ts
 ```
 
-Le registry :
+El registro:
 
-- refuse les doublons ;
-- retourne une erreur structurée pour une recette inconnue ;
-- expose defaults, validation et génération ;
-- permet un import dynamique.
+- rechaza duplicados;
+- devuelve un error estructurado para recetas desconocidas;
+- expone valores predeterminados, validación y generación;
+- admite importación dinámica.
 
-### Tâche 2.2 — Adapter Cutter
+### Tarea 2.2 — Adaptar Cortante
 
-**Créer :**
+**Crear:**
 
 ```text
 src/lib/generation/recipes/cutterRecipe.ts
 src/lib/generation/recipes/__tests__/cutterRecipe.test.ts
 ```
 
-**Réutiliser sans dupliquer :**
+**Reutilizar sin duplicar:**
 
 ```text
 src/lib/utils/cookieCutterGenerator.ts
@@ -173,22 +165,22 @@ src/lib/utils/cutterGeometry.ts
 src/lib/utils/geometryValidation.ts
 ```
 
-Le test compare la recette à la fixture legacy : dimensions, topologie et orientation fabrication.
+La prueba compara la receta con el caso heredado: dimensiones, topología y orientación de fabricación.
 
-### Tâche 2.3 — Adapter Stamp
+### Tarea 2.3 — Adaptar Sello
 
-**Créer :**
+**Crear:**
 
 ```text
 src/lib/generation/recipes/stampRecipe.ts
 src/lib/generation/recipes/__tests__/stampRecipe.test.ts
 ```
 
-Conserver l’import dynamique de JSCAD et la réparation locale strictement bornée du Heart.
+Conservar importación dinámica de JSCAD y reparación local estrictamente acotada de la figura Corazón.
 
-### Tâche 2.4 — Extraire l’orchestrateur
+### Tarea 2.4 — Extraer el orquestador
 
-**Créer :**
+**Crear:**
 
 ```text
 src/lib/generation/generationOrchestrator.ts
@@ -196,48 +188,44 @@ src/lib/generation/generationState.ts
 src/lib/generation/__tests__/generationOrchestrator.test.ts
 ```
 
-**Modifier :**
+**Modificar:**
 
 ```text
 src/App.svelte
 src/lib/stores/cookieCutterStore.ts
 ```
 
-L’orchestrateur gère :
+El orquestador administra:
 
-- debounce ;
-- révision ;
-- `AbortController` ;
-- génération ;
-- validation ;
-- publication atomique ;
-- conservation du dernier résultat valide ;
-- disposal du résultat remplacé.
+- agrupación temporal de cambios (*debounce*);
+- revisión;
+- `AbortController`;
+- generación;
+- validación;
+- publicación atómica;
+- conservación del último resultado válido;
+- liberación del resultado reemplazado.
 
-Tests obligatoires : réponse obsolète, annulation, erreur, publication atomique et disposal unique.
+Pruebas obligatorias: respuestas obsoletas, cancelación, error, publicación atómica y liberación única.
 
-## Phase 3 — UI pilotée par schéma
+## Fase 3 — Interfaz dirigida por esquemas
 
-### Tâche 3.1 — Créer le store document
+### Tarea 3.1 — Crear el almacén de documentos
 
-**Créer :**
+**Crear:**
 
 ```text
 src/lib/stores/designDocumentStore.ts
 src/lib/stores/__tests__/designDocumentStore.test.ts
 ```
 
-**Déprécier progressivement :**
+**Dejar obsoleto gradualmente:** `src/lib/stores/cookieCutterStore.ts`.
 
-```text
-src/lib/stores/cookieCutterStore.ts
-```
+El almacén ofrece modificaciones tipadas, nunca alteraciones anidadas directas.
 
-Le store expose des mutations typées, jamais de mutation directe imbriquée.
+### Tarea 3.2 — Dividir el panel de parámetros
 
-### Tâche 3.2 — Découper le panneau de paramètres
-
-**Créer :**
+**Crear:**
 
 ```text
 src/lib/components/parameters/CommonSizeSection.svelte
@@ -248,17 +236,13 @@ src/lib/components/parameters/AdvancedSection.svelte
 src/lib/components/parameters/ParameterAccordion.svelte
 ```
 
-**Modifier :**
+**Modificar:** `src/lib/components/ui/ParameterPanel.svelte`.
 
-```text
-src/lib/components/ui/ParameterPanel.svelte
-```
+Cada campo debe tener etiqueta, unidad, mínimo/máximo, explicación y error. Los controles táctiles mantienen 44 px.
 
-Chaque champ doit avoir label, unité, min/max, aide et erreur. Les contrôles tactiles restent à 44 px.
+### Tarea 3.3 — Incorporar catálogo y búsqueda
 
-### Tâche 3.3 — Ajouter catalogue et recherche
-
-**Créer :**
+**Crear:**
 
 ```text
 src/lib/components/design/DesignKindPicker.svelte
@@ -266,13 +250,13 @@ src/lib/components/parameters/ParameterSearch.svelte
 src/lib/domain/designKindMetadata.ts
 ```
 
-Ne pas afficher comme stable une recette sans implémentation enregistrée. Les futures recettes peuvent apparaître sous badge « planned » uniquement dans un écran roadmap non actionnable.
+No mostrar como estable una receta sin implementación registrada. Las recetas futuras pueden aparecer con una etiqueta «planificada» únicamente en una vista de hoja de ruta no interactiva.
 
-## Phase 4 — Import et édition 2D
+## Fase 4 — Importación y edición 2D
 
-### Tâche 4.1 — Ajouter WebP et collage
+### Tarea 4.1 — Incorporar WebP y pegado
 
-**Modifier :**
+**Modificar:**
 
 ```text
 src/lib/components/ui/FileUpload.svelte
@@ -280,18 +264,18 @@ src/lib/utils/imageProcessor.ts
 src/App.svelte
 ```
 
-**Tests :**
+**Pruebas:**
 
 ```text
 src/lib/utils/__tests__/imageProcessor.test.ts
 src/lib/components/ui/__tests__/FileUpload.test.ts
 ```
 
-Vérifier MIME, extension, clipboard sans fichier, image trop grande et annulation.
+Comprobar MIME, extensión, portapapeles sin archivo, imágenes demasiado grandes y cancelación.
 
-### Tâche 4.2 — Unifier le document de sketch
+### Tarea 4.2 — Unificar el documento de boceto
 
-**Créer :**
+**Crear:**
 
 ```text
 src/lib/sketch/sketchDocument.ts
@@ -300,7 +284,7 @@ src/lib/sketch/sketchValidation.ts
 src/lib/sketch/__tests__/sketchOperations.test.ts
 ```
 
-**Adapter :**
+**Adaptar:**
 
 ```text
 src/lib/components/ui/PathEditor.svelte
@@ -310,22 +294,22 @@ src/lib/utils/pathOperations.ts
 src/lib/utils/booleanOperations.ts
 ```
 
-Un seul document doit alimenter aperçu 2D, historique et génération.
+Un solo documento debe alimentar vista previa 2D, historial y generación.
 
-### Tâche 4.3 — Intégrer l’éditeur
+### Tarea 4.3 — Integrar el editor
 
-**Créer :**
+**Crear:**
 
 ```text
 src/lib/components/editor/SketchEditor.svelte
 src/lib/components/editor/EditorToolbar.svelte
 ```
 
-Fonctions P1 : sélectionner, déplacer, dupliquer, supprimer, éditer points/Bézier, undo/redo, restaurer l’original.
+Funciones P1: seleccionar, mover, duplicar, borrar, editar puntos/Bézier, deshacer/rehacer y restaurar original.
 
-### Tâche 4.4 — Ajouter primitives, grille et transformations
+### Tarea 4.4 — Agregar primitivas, grilla y transformaciones
 
-**Créer :**
+**Crear:**
 
 ```text
 src/lib/sketch/primitives.ts
@@ -338,24 +322,24 @@ src/lib/sketch/__tests__/snapping.test.ts
 src/lib/sketch/__tests__/transforms.test.ts
 ```
 
-Implémenter rectangle, ellipse, polygone régulier et étoile. Le snapping doit être une fonction pure prenant points candidats, seuil en pixels converti dans l’espace document et préférences actives. Tester zoom, valeurs négatives, égalité de candidats et désactivation.
+Implementar rectángulo, elipse, polígono regular y estrella. El ajuste magnético debe ser una función pura que reciba puntos candidatos, umbral en píxeles convertido a coordenadas del documento y preferencias activas. Probar zoom, valores negativos, empate entre candidatos y desactivación.
 
-### Tâche 4.5 — Finaliser les calques
+### Tarea 4.5 — Completar las capas
 
-**Adapter :**
+**Adaptar:**
 
 ```text
 src/lib/components/ui/LayerManager.svelte
 src/lib/types/Layer.ts
 ```
 
-Ajouter visibilité, verrouillage, renommage et ordre. La génération ignore les calques invisibles selon une règle documentée et refuse un document sans contour générable.
+Incorporar visibilidad, bloqueo, cambio de nombre y orden. La generación ignora capas invisibles conforme a una regla documentada y rechaza documentos sin contornos generables.
 
-## Phase 5 — Recettes P1
+## Fase 5 — Recetas P1
 
-### Tâche 5.1 — Imprint Cutter
+### Tarea 5.1 — Cortante con impresión interior
 
-**Créer :**
+**Crear:**
 
 ```text
 src/lib/generation/recipes/imprintCutterRecipe.ts
@@ -363,11 +347,11 @@ src/lib/generation/recipes/__tests__/imprintCutterRecipe.test.ts
 src/lib/components/parameters/ImprintSection.svelte
 ```
 
-Cas de test : trou, îlot, profondeur zéro, relief non connecté, dessin concave.
+Casos de prueba: hueco, isla, profundidad cero, relieve desconectado y dibujo cóncavo.
 
-### Tâche 5.2 — Cutter + Stamp
+### Tarea 5.2 — Cortante + sello
 
-**Créer :**
+**Crear:**
 
 ```text
 src/lib/generation/recipes/cutterAndStampRecipe.ts
@@ -375,11 +359,11 @@ src/lib/generation/recipes/__tests__/cutterAndStampRecipe.test.ts
 src/lib/components/parameters/CutterAndStampSection.svelte
 ```
 
-La recette compose Cutter et Stamp sans fusionner leurs artefacts. Tester tolérance, miroir, noms et export 3MF multi-objets.
+La receta compone Cortante y Sello sin fusionar sus artefactos. Probar tolerancia, espejado, nombres y exportación 3MF con varios objetos.
 
-### Tâche 5.3 — Multi Cutter
+### Tarea 5.3 — Múltiples cortantes
 
-**Créer :**
+**Crear:**
 
 ```text
 src/lib/generation/recipes/multiCutterRecipe.ts
@@ -387,17 +371,13 @@ src/lib/generation/layout/gridLayout.ts
 src/lib/generation/recipes/__tests__/multiCutterRecipe.test.ts
 ```
 
-Réutiliser le rollback de :
+Reutilizar la reversión atómica de `src/lib/utils/batchProcessor.ts`.
 
-```text
-src/lib/utils/batchProcessor.ts
-```
+Probar grilla, rechazo de espaciados negativos cuando generen colisión, plataforma pequeña, cancelación y reversión total.
 
-Tester grille, espacement négatif refusé si collision, plateau trop petit, annulation et rollback.
+### Tarea 5.4 — Plantilla (Stencil)
 
-### Tâche 5.4 — Stencil
-
-**Créer :**
+**Crear:**
 
 ```text
 src/lib/generation/recipes/stencilRecipe.ts
@@ -405,20 +385,20 @@ src/lib/generation/recipes/__tests__/stencilRecipe.test.ts
 src/lib/components/parameters/StencilSection.svelte
 ```
 
-**Réutiliser après audit :**
+**Reutilizar tras auditar:**
 
 ```text
 src/lib/utils/patternGenerator.ts
 src/lib/components/ui/PatternGenerator.svelte
 ```
 
-Tester détails flottants, ponts, grille diagonale, dimensions extérieures et topologie finale.
+Probar detalles flotantes, puentes, grilla diagonal, dimensiones exteriores y topología final.
 
-## Phase 6 — Presets et bibliothèque locale
+## Fase 6 — Perfiles y biblioteca local
 
-### Tâche 6.1 — Presets versionnés
+### Tarea 6.1 — Perfiles versionados
 
-**Créer :**
+**Crear:**
 
 ```text
 src/lib/presets/presetStore.ts
@@ -427,11 +407,11 @@ src/lib/components/presets/PresetPicker.svelte
 src/lib/presets/__tests__/presetStore.test.ts
 ```
 
-Un preset est lié à une recette et une version de schéma.
+Un perfil se vincula con una receta y una versión de esquema.
 
-### Tâche 6.2 — Bibliothèque locale
+### Tarea 6.2 — Biblioteca local
 
-**Adapter/remplacer :**
+**Adaptar o reemplazar:**
 
 ```text
 src/lib/utils/projectManager.ts
@@ -439,31 +419,31 @@ src/lib/components/ui/ProjectManager.svelte
 src/lib/components/ui/CloudGallery.svelte
 ```
 
-**Créer :**
+**Crear:**
 
 ```text
 src/lib/components/library/LocalProjectLibrary.svelte
 src/lib/projects/__tests__/projectStorage.test.ts
 ```
 
-Déprécier le concept `CloudGallery` et migrer son éventuelle logique réutilisable vers `LocalProjectLibrary`. Aucun backend n’est prévu.
+Abandonar gradualmente `CloudGallery` y trasladar cualquier lógica reutilizable a `LocalProjectLibrary`. No se prevé backend.
 
-## Phase 7 — Recettes P2
+## Fase 7 — Recetas P2
 
-Chaque recette suit le même cycle : types → validation paramètres → tests rouges → génération → validation géométrique → UI → exports → documentation.
+Cada receta sigue el mismo ciclo: tipos → validación de parámetros → pruebas que fallan → generación → validación geométrica → interfaz → exportaciones → documentación.
 
-Ordre recommandé :
+Orden propuesto:
 
-1. profils de lame et seconde lame ;
-2. barres centrales ;
-3. texte de paroi et name plates ;
-4. grip/socket ;
-5. Sandwich Cutter ;
-6. Cake Topper ;
-7. Cutter Set ;
-8. PDF/SVG contour.
+1. perfiles de filo y segundo filo;
+2. barras centrales;
+3. texto en paredes y placas con nombre;
+4. agarre/encastre;
+5. cortante de sándwich;
+6. adorno para torta;
+7. conjunto de cortantes;
+8. contorno PDF/SVG.
 
-Chemins recommandés :
+Rutas sugeridas:
 
 ```text
 src/lib/generation/profiles/
@@ -474,13 +454,13 @@ src/lib/text/
 src/lib/export/pdfOutlineExporter.ts
 ```
 
-Ne pas démarrer Cake Pop Mold avant tests physiques de clearance.
+No empezar el molde de cake pops sin pruebas físicas de holguras.
 
-## Phase 8 — Exports multi-artefacts
+## Fase 8 — Exportaciones de múltiples artefactos
 
-### Tâche 8.1 — Normaliser les exports
+### Tarea 8.1 — Normalizar exportaciones
 
-**Créer :**
+**Crear:**
 
 ```text
 src/lib/export/exportRequest.ts
@@ -489,7 +469,7 @@ src/lib/export/fileNaming.ts
 src/lib/export/__tests__/exportService.test.ts
 ```
 
-**Adapter :**
+**Adaptar:**
 
 ```text
 src/lib/utils/stlExporter.ts
@@ -497,62 +477,62 @@ src/lib/utils/advancedExporter.ts
 src/lib/utils/manufacturingCoordinates.ts
 ```
 
-Tester :
+Probar:
 
-- artefact unique ;
-- plusieurs STL ;
-- OBJ ;
-- 3MF multi-objets ;
-- noms déterministes ;
-- Z-up ;
-- `Z = 0` ;
-- blocage si une pièce est invalide.
+- artefacto único;
+- varios STL;
+- OBJ;
+- 3MF de múltiples objetos;
+- nombres deterministas;
+- eje Z vertical;
+- `Z = 0`;
+- bloqueo si alguna pieza es inválida.
 
-## Phase 9 — Sécurité et performance
+## Fase 9 — Seguridad y rendimiento
 
-### Tâche 9.1 — Durcir le SVG
+### Tarea 9.1 — Endurecer el tratamiento SVG
 
-**Modifier :**
+**Modificar:**
 
 ```text
 src/lib/utils/imageProcessor.ts
 src/lib/utils/contourExtraction.ts
 ```
 
-Ajouter corpus : scripts, événements, `foreignObject`, URL distante, entités, SVG surdimensionné.
+Agregar casos de prueba con scripts, eventos, `foreignObject`, URL externa, entidades y SVG excesivamente grandes.
 
-### Tâche 9.2 — Généraliser les Workers
+### Tarea 9.2 — Generalizar los Workers
 
-Profiler avant déplacement. Ne déplacer que les opérations mesurées comme bloquantes. Définir protocoles avec `requestId`, annulation et erreurs structurées.
+Perfilar antes de mover operaciones. Trasladar solo las tareas que realmente bloqueen según mediciones. Definir protocolos con `requestId`, cancelación y errores estructurados.
 
-### Tâche 9.3 — Budgets mémoire et bundle
+### Tarea 9.3 — Presupuestos de memoria y JavaScript
 
-Ajouter un test ou script borné :
+Agregar prueba o script acotado:
 
 ```text
 scripts/check-bundle-budget.mjs
 src/lib/utils/__tests__/generationLifecycle.test.ts
 ```
 
-Scénario mémoire : 20 générations, bascule heatmap et remplacement de modèle sans croissance non bornée des géométries actives.
+Escenario de memoria: 20 generaciones, alternancia del mapa térmico y reemplazo de modelos sin crecimiento descontrolado de geometrías activas.
 
-### Tâche 9.4 — Benchmark de l’éditeur 2D
+### Tarea 9.4 — Prueba de rendimiento del editor 2D
 
-**Créer :**
+**Crear:**
 
 ```text
 src/lib/sketch/__tests__/editorPerformance.benchmark.test.ts
 ```
 
-Générer une fixture déterministe de 10 000 points. Mesurer sélection, transformation et snapping séparément. Enregistrer la machine et les durées ; utiliser ce benchmark comme signal de régression, pas comme promesse universelle de FPS.
+Generar un caso determinista de 10.000 puntos. Medir por separado selección, transformación y ajuste magnético. Registrar equipo y duraciones. Usar el resultado para detectar regresiones, no como promesa universal de cuadros por segundo.
 
-## Phase 9 bis — PWA locale optionnelle
+## Fase 9 bis — PWA local opcional
 
-### Tâche 9.5 — Ajouter le mode hors ligne
+### Tarea 9.5 — Agregar modo sin conexión
 
-À réaliser uniquement après stabilisation du format projet.
+Solo después de estabilizar el formato de proyecto.
 
-**Créer :**
+**Crear:**
 
 ```text
 public/manifest.webmanifest
@@ -560,11 +540,11 @@ src/lib/pwa/updateManager.ts
 src/lib/pwa/__tests__/updateManager.test.ts
 ```
 
-Ajouter un service worker via un plugin Vite maintenu seulement si son coût et sa politique de mise à jour sont validés. Ne jamais mettre en cache les requêtes IA. Tester installation, nouvelle version, cache obsolète et démarrage sans réseau.
+Agregar un service worker mediante un plugin Vite mantenido, únicamente después de validar su costo y política de actualizaciones. Nunca almacenar en caché solicitudes de IA. Probar instalación, versión nueva, caché obsoleta e inicio sin red.
 
-## Phase 10 — Validation finale
+## Fase 10 — Validación final
 
-Exécuter :
+Ejecutar:
 
 ```sh
 pnpm exec vitest run --maxWorkers=1
@@ -576,27 +556,27 @@ pnpm audit --audit-level=moderate
 git diff --check
 ```
 
-Validation manuelle minimale :
+Validación manual mínima:
 
-- SVG avec trou ;
-- raster ;
-- Cutter ;
-- Stamp ;
-- Imprint Cutter ;
-- Cutter + Stamp ;
-- Multi Cutter ;
-- Stencil ;
-- thèmes clair/sombre ;
-- viewport mobile ;
-- export STL/OBJ/3MF ouvert dans un slicer.
+- SVG con hueco;
+- imagen raster;
+- Cortante;
+- Sello;
+- Cortante con impresión interior;
+- Cortante + Sello;
+- Múltiples cortantes;
+- Plantilla;
+- temas claro/oscuro;
+- pantalla móvil;
+- STL/OBJ/3MF abierto en un laminador.
 
-## Critères de livraison
+## Criterios de entrega
 
-- aucune régression du corpus historique ;
-- migrations testées ;
-- aucune fonctionnalité factice visible ;
-- chaque recette retourne des artefacts validés ;
-- UI non bloquante et résultats obsolètes rejetés ;
-- documentation synchronisée ;
-- diff sans secret ;
-- branche prête pour review, sans push implicite.
+- Sin regresiones respecto del conjunto histórico.
+- Migraciones probadas.
+- Ninguna funcionalidad ficticia visible.
+- Cada receta devuelve artefactos validados.
+- Interfaz sin bloqueos, resultados obsoletos descartados.
+- Documentación sincronizada.
+- Diferencias sin secretos.
+- Rama lista para revisión, sin publicación implícita.
