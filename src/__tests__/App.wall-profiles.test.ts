@@ -97,7 +97,7 @@ it.each([1, 2] as const)('V%s profiles use one history step and the same documen
     const binary = stl();
     expect(binary.byteLength).toBe(84 + 50 * new DataView(binary.buffer).getUint32(80, true));
     const codec = encodeProject(current);
-    await click('Annuler');
+    await click('Deshacer');
     expect(encodeProject(session.getDocument())).toBe(previousCodec);
     await ready(session);
     await click('Rehacer');
