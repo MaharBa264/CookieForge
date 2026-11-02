@@ -77,7 +77,7 @@ it('collision auto-fix cannot move canonical contours, even through a forced cli
   expect(mesh.children).toHaveLength(2);
   const snapshot = session.getDocument(), epoch = session.getSessionEpoch();
   const positions = mesh.children.map(child => child.position.toArray());
-  button('Projets locaux').click(); await tick(); button('Enregistrer le projet').click();
+  button('Proyectos locales').click(); await tick(); button('Guardar proyecto').click();
   await vi.waitFor(() => expect(document.querySelector('.project-manager [role="status"]')?.textContent).toBe('Enregistré localement'));
   const history = get(historyStore), historyIndex = get(historyStore.currentIndex);
   button('Matériaux et optimisation').click();
@@ -96,7 +96,7 @@ it('collision auto-fix cannot move canonical contours, even through a forced cli
   expect(get(model)!.mesh).toBe(mesh);
   expect(get(historyStore)).toBe(history);
   expect(get(historyStore.currentIndex)).toBe(historyIndex);
-  button('Projets locaux').click(); await tick();
+  button('Proyectos locales').click(); await tick();
   expect(document.querySelector('.project-manager [role="status"]')?.textContent).toBe('Enregistré localement');
   const exportAction = await exportPanel();
   exportAction.click();
@@ -158,8 +158,8 @@ it('cancelling B cannot turn retained A into an eligible result merely by return
 });
 it('project JSON export stays enabled independently while geometry generation is pending', async () => {
   const session = setup(); await ready(); session.updateParameters('cutter', { totalHeight: 33 });
-  button('Projets locaux').click(); await tick(); expect(get(generationState).phase).toBe('scheduled');
-  expect(button('Exporter le projet').disabled).toBe(false);
+  button('Proyectos locales').click(); await tick(); expect(get(generationState).phase).toBe('scheduled');
+  expect(button('Exportar proyecto').disabled).toBe(false);
 });
 it('a current real batch remains exportable with captured metadata, not later legacy edits', async () => {
   const session = setup(); await ready(); button('Production en série').click();
@@ -170,7 +170,7 @@ it('a current real batch remains exportable with captured metadata, not later le
   const batchMesh = get(model)!.mesh, captured = { ...DEFAULT_PARAMS };
   const action = await exportPanel('3mf'); setParams({ ...DEFAULT_PARAMS, totalHeight: 39 }); action.click();
   expect(downloads.mf.mock.calls[0][0]).toBe(batchMesh); expect(downloads.mf.mock.calls[0][2]).toEqual(captured);
-  button('Projets locaux').click(); await tick(); expect(button('Exporter le projet').disabled).toBe(true);
+  button('Proyectos locales').click(); await tick(); expect(button('Exportar proyecto').disabled).toBe(true);
   session.updateSketch(svg.replace('r="20"', 'r="25"')); await tick();
   const stale = await exportPanel(); stale.dispatchEvent(new MouseEvent('click', { bubbles: true })); expect(downloads.stl).not.toHaveBeenCalled(); expect(stale.disabled).toBe(true);
 });
@@ -218,7 +218,7 @@ it.each(['heterogeneous', 'legacy-unknown'])('omits global geometry claims for %
   const xml = strFromU8(unzipSync(serialize3MF(batch, metadata))['3D/3dmodel.model']);
   expect(xml).not.toContain('ccd:WallThickness'); expect(xml).not.toContain('ccd:CuttingHeight'); expect(xml).toContain('unit="millimeter"');
   for (const format of ['obj', 'stl']) {
-    button('Projets locaux').click(); await tick();
+    button('Proyectos locales').click(); await tick();
     const meshExport = await exportPanel(format); expect(meshExport.disabled).toBe(false); meshExport.click();
   }
   expect(downloads.obj.mock.calls[0][0]).toBe(batch); expect(downloads.stl.mock.calls[0][0]).toBe(batch);
