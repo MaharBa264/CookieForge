@@ -3,8 +3,8 @@ import type { VectorizationOptions } from '../utils/imageWorkerProtocol';
 export type TracingPresetId = 'contrast' | 'photo';
 export const DEFAULT_TRACING_PRESET: TracingPresetId = 'contrast';
 export const TRACING_PRESETS = Object.freeze([
-  Object.freeze({ id: 'contrast' as const, label: 'Dessin contrasté', description: 'Réglages historiques : détails conservés, sans lissage.' }),
-  Object.freeze({ id: 'photo' as const, label: 'Photo — préparation guidée', description: 'Recadrage, seuil et aperçu à confirmer. Les trous sont conservés ; leur remplissage reste un choix explicite.' })
+  Object.freeze({ id: 'contrast' as const, label: 'Dibujo contrastado', description: 'Ajustes tradicionales: conserva los detalles sin suavizado.' }),
+  Object.freeze({ id: 'photo' as const, label: 'Foto — preparación guiada', description: 'Recorte, umbral y vista previa para confirmar. Se conservan los huecos y solo se rellenan si lo elegís.' })
 ]);
 const contrast: VectorizationOptions = Object.freeze({
   ltres: 1, qtres: 1, pathomit: 8, colorsampling: 0, numberofcolors: 2,
@@ -18,6 +18,6 @@ export function tracingOptions(preset: TracingPresetId = DEFAULT_TRACING_PRESET)
   switch (preset) {
     case 'contrast': return contrast;
     case 'photo': return photo;
-    default: throw new Error('Unknown vectorization preset.');
+    default: throw new Error('Perfil de vectorización desconocido.');
   }
 }
