@@ -21,7 +21,7 @@ Los documentos ya traducidos se identifican a continuación. Los restantes se co
 
 ### Validación y pruebas
 
-- `docs/CUTTER_SERIES_VALIDATION.md`
+- [CUTTER_SERIES_VALIDATION.md](CUTTER_SERIES_VALIDATION.md) — traducido
 - [LOCAL_PROJECT_RECOVERY_VALIDATION.md](LOCAL_PROJECT_RECOVERY_VALIDATION.md) — traducido
 - [LOCAL_PROJECT_WORKFLOW_VALIDATION.md](LOCAL_PROJECT_WORKFLOW_VALIDATION.md) — traducido
 - `docs/MANUAL_ISLAND_BRIDGES_VALIDATION.md`
@@ -31,7 +31,7 @@ Los documentos ya traducidos se identifican a continuación. Los restantes se co
 - `docs/STAMP_QUALIFICATION.md`
 - [TRACING_PRESETS_VALIDATION.md](TRACING_PRESETS_VALIDATION.md) — traducido
 - [UNIFIED_IMAGE_IMPORT_VALIDATION.md](UNIFIED_IMAGE_IMPORT_VALIDATION.md) — traducido
-- `docs/VIEWER_RENDERING_VALIDATION.md`
+- [VIEWER_RENDERING_VALIDATION.md](VIEWER_RENDERING_VALIDATION.md) — traducido
 - `docs/WALL_PROFILES_VALIDATION.md`
 
 ### Investigación y planificación heredadas
