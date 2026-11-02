@@ -1,220 +1,205 @@
-# Gemini AI Features Setup Guide
+# Guía de configuración de las funciones de IA con Gemini
 
-This document explains how to configure and use the AI features powered by Google's Gemini 2.5 Flash model.
+> **Documento histórico del proyecto original.** Los límites gratuitos, precios, tiempos de respuesta y capacidades de Gemini pueden haber cambiado. Consultá la documentación vigente de Google antes de configurar pagos o compartir datos. Las funciones de IA son opcionales: CookieForge está pensado para funcionar sin conexión en sus funciones principales.
 
-## Overview
+Esta guía explica cómo configurar y utilizar las funciones de IA que originalmente se integraron con el modelo Gemini 2.5 Flash de Google.
 
-Cookie Cutter Designer integrates with Google's Gemini 2.5 Flash API to provide intelligent design assistance:
+## Descripción general
 
-- 🎨 **SVG Optimization**: Automatically simplify and optimize complex paths
-- 💡 **Design Suggestions**: Get AI-powered recommendations for better 3D printing
-- 🔄 **Design Variations**: Generate creative alternatives based on descriptions
-- 🤖 **Smart Recommendations**: Parameter optimization for your specific design
+Cookie Cutter Designer integra la API Gemini 2.5 Flash para ofrecer asistencia al diseño:
 
-## Getting Your Free API Key
+- 🎨 **Optimización SVG:** simplificar y optimizar trazados complejos.
+- 💡 **Sugerencias de diseño:** recomendaciones para mejorar la impresión 3D.
+- 🔄 **Variaciones de diseño:** alternativas creativas a partir de descripciones.
+- 🤖 **Recomendaciones inteligentes:** sugerencias de parámetros para cada diseño.
 
-### Step 1: Visit Google AI Studio
+## Obtener una clave API
 
-Go to [Google AI Studio](https://aistudio.google.com/app/apikey)
+### Paso 1: Abrir Google AI Studio
 
-### Step 2: Sign In
+Ingresá a [Google AI Studio](https://aistudio.google.com/app/apikey).
 
-Sign in with your Google account (personal or workspace account)
+### Paso 2: Iniciar sesión
 
-### Step 3: Create API Key
+Accedé con tu cuenta de Google, personal o de trabajo.
 
-1. Click **"Create API Key"** button
-2. Select **"Create API key in new project"** (or choose an existing project)
-3. Copy the generated API key (starts with `AIzaSy...`)
+### Paso 3: Crear la clave
 
-**Important**: Keep your API key secure and don't share it publicly!
+1. Presioná **«Create API Key»** (Crear clave API).
+2. Elegí **«Create API key in new project»** (Crear clave en un proyecto nuevo) o seleccioná un proyecto existente.
+3. Copiá la clave generada, cuyo formato históricamente comenzaba con `AIzaSy...`.
 
-### Step 4: Configure in the App
+**Importante:** protegé la clave y no la compartas públicamente.
 
-1. Open Cookie Cutter Designer
-2. Look for the **"🤖 Gemini AI Configuration"** section
-3. Paste your API key
-4. Click **"Save & Validate"**
+### Paso 4: Configurar la aplicación
 
-The app will test your key and confirm it's working.
+1. Abrí Cookie Cutter Designer.
+2. Buscá la sección **«🤖 Gemini AI Configuration»** (Configuración de Gemini).
+3. Pegá tu clave.
+4. Presioná **«Save & Validate»** (Guardar y validar).
 
-## API Quota & Pricing
+La aplicación intenta verificar la clave y confirmar su funcionamiento.
 
-### Free Tier
+## Cuotas y precios de API
 
-Gemini 2.5 Flash offers a generous free tier:
+### Nivel gratuito histórico
 
-- **15 requests per minute**
-- **1,500 requests per day**
-- **1 million requests per month**
+El documento original atribuía a Gemini 2.5 Flash los siguientes límites:
 
-This is more than enough for personal use!
+- **15 solicitudes por minuto.**
+- **1.500 solicitudes por día.**
+- **1 millón de solicitudes por mes.**
 
-### Rate Limits
+Estas cifras se conservan como registro histórico, **no como cuotas vigentes garantizadas**. El texto original las consideraba suficientes para uso personal.
 
-If you exceed the rate limits, you'll see an error message. Simply wait a minute and try again.
+### Límites de frecuencia
 
-## Using AI Features
+Si superás el límite, aparecerá un error. Esperá el intervalo indicado por el proveedor y volvé a intentar.
 
-### 1. Design Suggestions
+## Usar las funciones de IA
 
-Get AI-powered recommendations to improve your design:
+### 1. Sugerencias de diseño
 
-1. Upload and design your cookie cutter
-2. Click **"🤖 AI Assistant"**
-3. Go to **"💡 Suggestions"** tab
-4. Click **"Get Suggestions"**
+1. Importá una ilustración y configurá el cortante.
+2. Abrí **«🤖 AI Assistant»** (Asistente de IA).
+3. Elegí **«💡 Suggestions»** (Sugerencias).
+4. Presioná **«Get Suggestions»** (Obtener sugerencias).
 
-The AI will analyze:
+La IA analiza espesor de pared, integridad estructural, dificultades de impresión 3D, estética y posibles mejoras funcionales.
 
-- Wall thickness and structural integrity
-- 3D printability concerns
-- Design aesthetics
-- Functional improvements
+### 2. Optimización SVG
 
-### 2. SVG Optimization
+1. Cargá un archivo SVG.
+2. Abrí **«🤖 AI Assistant»**.
+3. Elegí **«⚡ Optimize»** (Optimizar).
+4. Presioná **«Optimize SVG»** (Optimizar SVG).
 
-Simplify complex SVG paths while maintaining shape accuracy:
+La IA intenta simplificar trazados complejos, eliminar elementos innecesarios, combinar trazados cuando corresponda y mantener las dimensiones originales. Revisá el resultado antes de utilizarlo para fabricar.
 
-1. Upload your SVG file
-2. Click **"🤖 AI Assistant"**
-3. Go to **"⚡ Optimize"** tab
-4. Click **"Optimize SVG"**
+### 3. Variaciones de diseño
 
-The AI will:
+1. Abrí **«🤖 AI Assistant»**.
+2. Elegí **«🎨 Variations»** (Variaciones).
+3. Presioná **«Generate Variations»** (Generar variaciones).
+4. Ingresá una descripción, por ejemplo «cortante de galletita con forma de estrella».
 
-- Simplify complex paths
-- Remove unnecessary elements
-- Combine paths where possible
-- Maintain original dimensions
+La integración original proponía cinco enfoques de diseño diferentes.
 
-### 3. Design Variations
-
-Generate creative alternatives:
-
-1. Click **"🤖 AI Assistant"**
-2. Go to **"🎨 Variations"** tab
-3. Click **"Generate Variations"**
-4. Enter a description (e.g., "star cookie cutter")
-
-The AI will suggest 5 different design approaches.
-
-## Model Information
+## Información del modelo
 
 ### Gemini 2.5 Flash
 
-- **Model ID**: `gemini-2.5-flash`
-- **Speed**: Fast responses (typically <2 seconds)
-- **Quality**: High-quality suggestions optimized for coding and technical tasks
-- **Context**: 1 million token context window
-- **Strengths**: Code generation, technical analysis, structured output
+- **Identificador:** `gemini-2.5-flash`.
+- **Velocidad:** el documento original indicaba respuestas normalmente inferiores a 2 segundos; no es una garantía.
+- **Calidad:** sugerencias para programación y tareas técnicas.
+- **Contexto:** el documento original indicaba una ventana de un millón de tokens.
+- **Fortalezas:** generación de código, análisis técnico y respuestas estructuradas.
 
-### Why Flash vs Pro?
+### ¿Por qué Flash y no Pro?
 
-We use **Gemini 2.5 Flash** instead of Pro because:
+El proyecto original eligió Flash por considerar que ofrecía:
 
-- ✅ **Free tier is generous** (1.5M requests/month)
-- ✅ **Much faster responses** (important for interactive UI)
-- ✅ **Excellent for technical tasks** (SVG optimization, code analysis)
-- ✅ **Lower cost** if you upgrade to paid tier
-- ✅ **More than capable** for design suggestions
+- un nivel gratuito amplio (en otra sección del documento original se citaban **1,5 millones de solicitudes mensuales**, cifra distinta de la indicada arriba);
+- respuestas más rápidas para una interfaz interactiva;
+- buen rendimiento en optimización SVG y análisis técnico;
+- menor costo en planes pagos;
+- capacidad suficiente para sugerencias de diseño.
 
-## Privacy & Security
+Estas razones y cuotas reflejan la documentación histórica, no una comparación actualizada.
 
-### Local Storage
+## Privacidad y seguridad
 
-- Your API key is stored **locally in your browser** using `localStorage`
-- The key **never leaves your device** except for API calls to Google
-- No server stores your API key
+### Almacenamiento local
 
-### Data Sent to Gemini API
+- La clave API se almacena **localmente en el navegador** mediante `localStorage`.
+- Se envía a Google cuando se realizan llamadas a su API.
+- El servidor del proyecto original no almacena la clave.
 
-When you use AI features, the following data is sent to Google:
+**Precaución:** una clave guardada en `localStorage` puede quedar expuesta a scripts que se ejecuten en el mismo origen. Para una aplicación pública, es preferible un backend que proteja credenciales y aplique restricciones.
 
-- **SVG content** (for optimization)
-- **Design parameters** (wall thickness, height, etc.)
-- **Text descriptions** (for generating variations)
+### Datos enviados a Gemini
 
-**No personal information is sent.**
+Al utilizar estas funciones, pueden enviarse a Google:
 
-### Clearing Your API Key
+- **contenido SVG** para optimización;
+- **parámetros de diseño**, como espesor y altura;
+- **descripciones de texto** para variaciones.
 
-To remove your API key:
+El documento original afirmaba que no se enviaba información personal; sin embargo, **un SVG o una descripción pueden contener datos personales**. Revisá los contenidos antes de enviarlos.
 
-1. Open Gemini AI Configuration
-2. Click **"Clear Key"**
-3. The key is permanently deleted from browser storage
+### Eliminar la clave API
 
-## Troubleshooting
+1. Abrí la configuración de Gemini.
+2. Presioná **«Clear Key»** (Eliminar clave).
+3. La aplicación elimina la clave del almacenamiento del navegador.
 
-### "Invalid API key" Error
+## Solución de problemas
 
-**Cause**: The API key is incorrect or expired
+### Error «Invalid API key» (Clave API inválida)
 
-**Solution**:
+**Causa:** clave incorrecta o vencida.
 
-1. Double-check you copied the entire key (should start with `AIzaSy`)
-2. Generate a new API key from Google AI Studio
-3. Make sure there are no extra spaces
+**Solución:**
 
-### "Rate limit exceeded" Error
+1. Comprobá que copiaste la clave completa.
+2. Generá una nueva desde Google AI Studio.
+3. Verificá que no haya espacios adicionales.
 
-**Cause**: You've made too many requests too quickly
+### Error «Rate limit exceeded» (Límite de solicitudes superado)
 
-**Solution**:
+**Causa:** demasiadas solicitudes en poco tiempo.
 
-- Wait 60 seconds and try again
-- Free tier: 15 requests/minute, 1,500/day
+**Solución:** esperá y reintentá de acuerdo con los límites actuales. El documento histórico recomendaba 60 segundos y citaba 15 solicitudes por minuto y 1.500 por día.
 
-### "Failed to validate API key" Error
+### Error «Failed to validate API key» (No se pudo validar la clave)
 
-**Cause**: Network issue or API service temporarily unavailable
+**Causa:** problema de conexión o interrupción temporal del servicio.
 
-**Solution**:
+**Solución:**
 
-1. Check your internet connection
-2. Visit [Google Cloud Status](https://status.cloud.google.com/) to check for outages
-3. Try again in a few minutes
+1. Comprobá Internet.
+2. Consultá el [estado de Google Cloud](https://status.cloud.google.com/).
+3. Volvé a intentar unos minutos después.
 
-### API Key Not Saving
+### La clave API no se guarda
 
-**Cause**: Browser localStorage might be disabled
+**Causa:** `localStorage` podría estar deshabilitado.
 
-**Solution**:
+**Solución:**
 
-1. Check browser settings allow local storage
-2. Try a different browser
-3. Disable private/incognito mode
+1. Permití almacenamiento local en la configuración del navegador.
+2. Probá otro navegador.
+3. Probá fuera del modo privado o incógnito.
 
-## API Usage Best Practices
+## Buenas prácticas de uso
 
-### 1. Use Sparingly
+### 1. Utilizar la IA cuando aporte valor
 
-AI features consume API quota. Use them when you need intelligent suggestions, not for every small change.
+Cada consulta consume cuota. Reservala para sugerencias útiles, no para cada modificación pequeña.
 
-### 2. Cache Results
+### 2. Conservar resultados
 
-If you get good suggestions, save them! The app doesn't cache AI responses to respect your quota.
+Guardá las sugerencias que te sirvan. La aplicación original no almacenaba en caché las respuestas de IA.
 
-### 3. Batch Operations
+### 3. Agrupar operaciones
 
-Instead of optimizing multiple SVGs one by one, combine them first if possible.
+Cuando tenga sentido, combiná varios SVG antes de optimizarlos, en lugar de hacer consultas individuales.
 
-### 4. Monitor Usage
+### 4. Supervisar el consumo
 
-Check your API usage at [Google AI Studio](https://aistudio.google.com/app/apikey) if you're approaching limits.
+Consultá las métricas de uso en [Google AI Studio](https://aistudio.google.com/app/apikey).
 
-## Technical Details
+## Detalles técnicos
 
-### API Endpoint
+### Endpoint de API
 
-```
+```text
 https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent
 ```
 
-### Request Format
+### Formato de solicitud
 
-The app sends POST requests with:
+La aplicación envía solicitudes POST con una estructura como esta:
 
 ```json
 {
@@ -230,45 +215,47 @@ The app sends POST requests with:
 }
 ```
 
-### Safety Settings
+### Configuración de seguridad
 
-All requests include content safety filters:
+El documento original indicaba filtros de contenido en todas las solicitudes:
 
-- Harassment: BLOCK_MEDIUM_AND_ABOVE
-- Hate Speech: BLOCK_MEDIUM_AND_ABOVE
-- Sexually Explicit: BLOCK_MEDIUM_AND_ABOVE
-- Dangerous Content: BLOCK_MEDIUM_AND_ABOVE
+- Acoso: `BLOCK_MEDIUM_AND_ABOVE`.
+- Discurso de odio: `BLOCK_MEDIUM_AND_ABOVE`.
+- Contenido sexual explícito: `BLOCK_MEDIUM_AND_ABOVE`.
+- Contenido peligroso: `BLOCK_MEDIUM_AND_ABOVE`.
 
-## Upgrading to Paid Tier
+Los nombres de constantes se mantienen sin traducir para respetar la API histórica.
 
-If you need more quota, you can upgrade to paid tier:
+## Pasar a un nivel pago
 
-1. Visit [Google Cloud Console](https://console.cloud.google.com/)
-2. Enable billing for your project
-3. Gemini 2.5 Flash pricing: **$0.075 per 1M input tokens, $0.30 per 1M output tokens**
+Si necesitás más cuota:
 
-Very affordable for most use cases!
+1. Visitá [Google Cloud Console](https://console.cloud.google.com/).
+2. Habilitá la facturación del proyecto.
+3. Consultá los precios actuales de Gemini 2.5 Flash. **El documento original citaba USD 0,075 por millón de tokens de entrada y USD 0,30 por millón de tokens de salida**, cifras históricas que no deben usarse como cotización vigente.
 
-## Alternatives
+El documento original consideraba estos valores accesibles para la mayoría de los usos.
 
-If you prefer not to use Google's API:
+## Alternativas
 
-- The app works perfectly fine **without AI features**
-- All core functionality (SVG upload, 3D preview, STL export) is **client-side only**
-- AI features are **optional enhancements**
+Si preferís no usar la API de Google:
 
-## Support
+- La aplicación funciona sin las funciones de IA.
+- Las funciones principales —importación SVG, vista previa 3D y exportación STL— se ejecutan del lado del cliente.
+- La IA es una mejora opcional.
 
-### Questions About API Keys
+## Ayuda
 
-- Google AI Studio: https://aistudio.google.com/
-- Gemini API Docs: https://ai.google.dev/gemini-api/docs
+### Consultas sobre claves API
 
-### Questions About the App
+- [Google AI Studio](https://aistudio.google.com/).
+- [Documentación de la API Gemini](https://ai.google.dev/gemini-api/docs).
 
-- GitHub Issues: https://github.com/razorglyon/cookie-cutter-designer/issues
-- CONTRIBUTING.md for contribution guidelines
+### Consultas sobre la aplicación original
+
+- [Incidencias en GitHub del proyecto original](https://github.com/razorglyon/cookie-cutter-designer/issues).
+- [CONTRIBUTING.md](CONTRIBUTING.md), instrucciones para colaborar.
 
 ---
 
-**Enjoy intelligent design assistance with Gemini 2.5 Flash!** 🤖✨
+**¡Disfrutá de la asistencia de diseño con Gemini 2.5 Flash!** 🤖✨
