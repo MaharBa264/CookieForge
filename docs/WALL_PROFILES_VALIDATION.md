@@ -1,52 +1,54 @@
-# Validation locale — profils simples de paroi (lot 6)
+# Validación local — Perfiles sencillos de pared (lote 6)
 
-## État qualifié
+> Informe **histórico** del proyecto de origen. Los resultados siguientes no son pruebas nuevas realizadas sobre CookieForge.
 
-Validation du **11 octobre 2026**, sur `feature/simple-wall-profiles`, dans le clone `cookie-cutter-designer`. Base Git : `c98e63855e7263aba2dc7de151b03daad251c24b`, squash de la PR #69. Le snapshot de qualification était **local, non commité et non publié** : ce SHA identifie la base, pas un commit contenant les profils. Rza a ensuite autorisé le **commit local uniquement** le 11 octobre 2026 ; le commit de livraison se relit avec `git log -1` sur cette branche. Aucun accord de publication.
+## Estado calificado
 
-L’ancienne branche `feature/manual-island-bridges` est conservée à `23759cd1dcb1a58ef283e69c0120fa69bc00b3f6`, sans rebase ni suppression. La modification locale préalable de `AGENT_CONTEXT.md` a été conservée intégralement au changement de branche, puis enrichie. Les états historiques de la feuille de route ne remplacent pas ce contexte vérifié.
+Validación del **11 de octubre de 2026** en `feature/simple-wall-profiles`, dentro del clon `cookie-cutter-designer`. Base Git: `c98e63855e7263aba2dc7de151b03daad251c24b`, squash de la PR #69. La versión examinada era **local, sin confirmar ni publicar**; ese SHA identifica la base, no un commit que contenga los perfiles. Rza autorizó después **únicamente el commit local** el 11/10/2026; el commit entregado puede consultarse mediante `git log -1` en aquella rama. No se autorizó publicación.
 
-## Contrat de cette première tranche
+La rama anterior `feature/manual-island-bridges` se conservó en `23759cd1dcb1a58ef283e69c0120fa69bc00b3f6`, sin rebase ni eliminación. La modificación local previa de `AGENT_CONTEXT.md` se conservó íntegra al cambiar de rama y luego se amplió. Los estados históricos de la hoja de ruta no sustituyen ese contexto comprobado.
 
-| Profil | `wallThickness` | `taperAngle` |
+## Contrato de la primera etapa
+
+| Perfil | `wallThickness` | `taperAngle` |
 |---|---:|---:|
-| Fin | 0,8 mm | 5° |
-| Standard | 1 mm | 7° |
-| Robuste | 1,5 mm | 10° |
+| Fino | 0,8 mm | 5° |
+| Estándar | 1 mm | 7° |
+| Robusto | 1,5 mm | 10° |
 
-- Le catalogue immuable est dans `src/lib/domain/wallProfiles.ts`.
-- `CutterSection.svelte` applique les deux valeurs ensemble via `updateParams`, le port existant vers la session. Le document courant reste propriétaire des paramètres ; les stores legacy ne deviennent pas une seconde référence persistante.
-- Le choix actif est dérivé de l’égalité exacte de l’épaisseur et de l’angle. Hors catalogue, le statut affiche **Personnalisé**. Un clic sur le profil déjà actif ne crée pas de modification.
-- Les valeurs restent ajustables. Les libellés et valeurs accessibles des contrôles montrent les valeurs physiques actuelles, sans arrondir les décimales d’un ancien projet.
-- Taille, hauteurs, poignée, identité, source, sketch et ponts ne sont pas remplacés par le profil. Le choix constitue une seule étape Undo/Redo.
-- Aucun identifiant de profil sauvegardé, nouveau schéma, migration ou nouvelle géométrie socle/paroi/tranchant. Les projets V1 restent V1 ; les projets avec ponts restent V2.
-- Ce sont des réglages indicatifs, **sans certification de solidité ni de sécurité alimentaire**. Les gardes géométriques existantes continuent de s’appliquer.
+- El catálogo inmutable se encuentra en `src/lib/domain/wallProfiles.ts`.
+- `CutterSection.svelte` aplica los dos valores juntos mediante `updateParams`, la conexión existente hacia la sesión. El documento actual sigue siendo el propietario de los parámetros; los almacenes heredados no se convierten en una segunda referencia persistente.
+- La elección activa se deriva de la igualdad exacta entre espesor y ángulo. Fuera del catálogo se muestra **Personalizado**. Presionar el perfil ya activo no crea una modificación.
+- Los valores siguen siendo ajustables. Las etiquetas y los valores de accesibilidad muestran las magnitudes físicas actuales, sin redondear los decimales de proyectos antiguos.
+- Tamaño, alturas, agarre, identidad, fuente, boceto y puentes no se sustituyen al elegir perfil. Cada elección equivale a un único paso de Deshacer/Rehacer.
+- No se guarda identificador de perfil, nuevo esquema, migración ni geometría independiente de base/pared/filo. Los proyectos V1 siguen siendo V1 y los que contienen puentes siguen siendo V2.
+- Son ajustes indicativos, **sin certificación de resistencia ni de seguridad alimentaria**. Siguen aplicándose los controles geométricos existentes.
 
-## TDD et contrôles automatiques
+## TDD y pruebas automáticas
 
-Les tests des profils ont été exécutés en échec avant l’implémentation, puis au vert. Une régression dédiée reproduit l’arrondi trompeur d’une valeur personnalisée (`0.85 mm`), avant sa correction. Le runner Chromium a également reproduit la fragmentation du mot `Standard` ; la correction CSS est limitée aux libellés des nouveaux boutons. Après correction, chaque nom tient sur une ligne dans les états capturés.
+Primero se ejecutaron las pruebas de perfiles en rojo antes de implementar, y luego en verde. Una regresión específica reprodujo el redondeo engañoso de un valor personalizado (`0.85 mm`) antes de corregirlo. Chromium también reprodujo la fragmentación de la palabra `Standard`; el arreglo CSS se limitó a las etiquetas de los botones nuevos. Después, cada nombre cabía en una línea en las capturas registradas.
 
-Les tests UI/session couvrent application atomique, absence d’application au montage, état dérivé, personnalisation, absence du groupe en mode Stamp, notice, fidélité des valeurs et round-trip V1/V2. Les tests App utilisent réellement session, historique, recette et sérialisation STL ; seul le viewer GPU est simulé et le stockage y est en mémoire. **Ce stockage simulé n’est pas présenté comme une preuve IndexedDB** : la persistance est vérifiée séparément dans Chromium.
+Las pruebas de interfaz y sesión cubrieron la aplicación atómica de parámetros, ausencia de aplicación al montar, estado derivado, personalización, ausencia del grupo en modo Sello, aviso, fidelidad de valores y persistencia V1/V2. Las pruebas de App utilizaron sesión, historial, receta y serialización STL reales; solo se simuló el visor GPU y se usó almacenamiento en memoria. **Ese almacenamiento simulado no se presentó como prueba de IndexedDB:** la persistencia se comprobó por separado en Chromium.
 
-Après le dernier changement applicatif :
+Después del último cambio funcional:
 
-| Contrôle | Résultat |
+| Comprobación | Resultado |
 |---|---|
-| Profils et voisins : paramètres, App, historique, export, recettes, codec, session, ponts | 191 tests réussis, 11 fichiers |
-| `pnpm check` | 0 erreur, 0 avertissement |
-| Suite complète | 1 096 tests réussis, 79 fichiers |
-| Smoke export | 3 tests réussis |
-| `pnpm build` | Réussi |
-| Budget JS entrée | 175 103 octets / 204 800 autorisés (200 KiB) |
-| Plus gros autre chunk, `three-vendor` | 561 528 octets / 614 400 autorisés (600 KiB) |
-| Inventaire du budget | 35 fichiers JS, aucune violation |
-| `pnpm audit --audit-level=moderate` | Aucune vulnérabilité connue signalée |
+| Perfiles y módulos asociados: parámetros, App, historial, exportación, recetas, códec, sesión y puentes | 191 pruebas correctas en 11 archivos |
+| `pnpm check` | 0 errores, 0 advertencias |
+| Suite completa | 1.096 pruebas correctas, 79 archivos |
+| Pruebas de exportación | 3 correctas |
+| `pnpm build` | Correcto |
+| Presupuesto de entrada JS | 175.103 bytes / 204.800 permitidos (200 KiB) |
+| Fragmento restante más grande, `three-vendor` | 561.528 bytes / 614.400 permitidos (600 KiB) |
+| Inventario de presupuestos | 35 archivos JS, ninguna infracción |
+| `pnpm audit --audit-level=moderate` | Ninguna vulnerabilidad conocida notificada |
 
-Les budgets portent sur les fichiers JS UTF-8 finaux non compressés, après la transformation preload de Vite. Ils ne prouvent pas une baisse du transfert total.
+Los presupuestos corresponden a los archivos JS finales UTF-8 sin comprimir, después de la transformación `preload` de Vite. No prueban una reducción del tráfico total transferido.
 
-### Commandes réellement exécutées
+### Comandos realmente ejecutados
 
-À la racine Git, avec le TMP isolé du dépôt et un parallélisme limité :
+En la raíz de Git, con directorio temporal aislado y paralelismo limitado:
 
 ```sh
 REPO_TMP=$(python3 /workspace/.hermes-tools/workspace-tmp.py --repo "$PWD" --purpose commands --path-only) || exit 1
@@ -62,68 +64,68 @@ pnpm audit --audit-level=moderate
 git diff --check
 ```
 
-Smoke et benchmark ont été ajustés pour respecter `TMPDIR` avec `tmpdir()` ; leurs artefacts restent dans le TMP isolé, pas dans un chemin `/tmp` codé en dur. Aucun changement de dépendances applicatives.
+Las pruebas de exportación y rendimiento se modificaron para respetar `TMPDIR` con `tmpdir()`; sus artefactos permanecían en el directorio aislado y no en una ruta `/tmp` fija. No se cambiaron dependencias funcionales.
 
-## Parcours Chromium réel
+## Recorrido real en Chromium
 
-Le runner sert deux builds statiques en localhost : baseline archivée depuis `origin/main` vérifié puis reconstruite dans le TMP, et `dist` contenant le travail local. Il compare en HTTP les **54 fichiers HTML/assets de chacun** à leurs octets locaux. Les captures ne sont donc pas attribuées au seul SHA de base : le rapport enregistre aussi branche, statut Git et empreintes de toutes les sources `src/` avant/après, strictement identiques pendant la recette.
+El ejecutor sirvió dos compilaciones estáticas en localhost: una base archivada desde `origin/main` verificado y recompilada en el directorio temporal; otra de `dist` con los cambios locales. Se compararon por HTTP los **54 archivos HTML/recursos de cada compilación** con sus bytes locales. Las capturas no se atribuyeron únicamente al SHA base: el informe registró rama, estado de Git y huellas de todas las fuentes `src/` antes y después, idénticas durante la prueba.
 
-Parcours effectivement exercés :
+Recorridos realizados:
 
-1. Un V1 créé/exporté par la baseline est ouvert dans la nouvelle version sans édition : JSON et STL strictement inchangés.
-2. **Fin → Standard → Robuste**, sur V1 puis sur V2 avec un pont créé dans l’éditeur réel : valeurs exportées exactes, source/sketch/ponts préservés et trois STL distincts.
-3. Undo/Redo : JSON restauré exactement, une étape par sélection.
-4. Personnalisation au clavier : épaisseur 1,4 mm et hauteur ajustée ; statut Personnalisé.
-5. Sauvegarde IndexedDB, rechargement complet, réouverture et nouveaux exports : JSON et STL strictement identiques aux versions enregistrées, en V1 et V2.
-6. V2 mobile : sélection tactile de Standard, sauvegarde/rechargement/réouverture, pont inchangé et JSON/STL identiques.
-7. Activation clavier d’un profil avec focus visible (outline 3 px), thèmes clair/sombre, desktop 1365×900 et mobile 375×812 ; document sans débordement horizontal. Cibles des boutons mesurées à 97×61 px sur le parcours mobile.
-8. Mesure des sommets des STL binaires : dimensions conformes au badge de l’aperçu, dans sa précision d’affichage de 0,1 mm ; hauteur et position Z vérifiées. Ce contrôle ne remplace pas une métrologie physique.
+1. Se abrió en la nueva versión un V1 creado/exportado con la base, sin editarlo: JSON y STL quedaron idénticos byte a byte.
+2. **Fino → Estándar → Robusto**, en V1 y luego en V2 con un puente creado en el editor real: valores exportados exactos, fuente/boceto/puentes preservados y tres STL diferentes.
+3. Deshacer/Rehacer: JSON restaurado exactamente, con un paso por elección.
+4. Personalización mediante teclado: espesor de 1,4 mm y altura ajustada; estado Personalizado.
+5. Guardado IndexedDB, recarga completa, reapertura y nuevas exportaciones: JSON y STL estrictamente idénticos a lo guardado, tanto en V1 como V2.
+6. V2 móvil: selección táctil de Estándar, guardado/recarga/reapertura, puente intacto y JSON/STL idénticos.
+7. Activación de perfiles mediante teclado con foco visible (borde de 3 px), temas claro/oscuro, escritorio de 1.365 × 900 y móvil de 375 × 812; sin desplazamiento horizontal del documento. Botones medidos en 97 × 61 px en el recorrido móvil.
+8. Medición de vértices STL binarios: dimensiones acordes con la insignia de la vista previa dentro de su precisión de 0,1 mm; altura y posición Z comprobadas. No sustituye mediciones físicas.
 
-Aucune erreur console ni requête échouée dans le rapport final. Sources inchangées pendant la recette. Les serveurs des parcours ont été arrêtés et leurs ports contrôlés fermés.
+No hubo errores de consola ni solicitudes fallidas en el informe final. Fuentes invariables durante el recorrido. Se detuvieron los servidores y se comprobó que los puertos estuvieran cerrados.
 
-## Preuves et essais intermédiaires
+## Evidencias e intentos intermedios
 
-Les preuves brutes restent hors dépôt sous `/workspace/reports` :
+Las evidencias originales se guardaron fuera del repositorio en `/workspace/reports`:
 
-- Gates finales : `wall-profiles-{targeted,check,tests,smoke,build}-post-ui.log`.
-- Budgets finaux : `wall-profiles-budgets-post-ui.json`.
-- Audit final : `wall-profiles-audit-post-ui.log`.
-- Parcours complet : `wall-profiles-browser-1791725360750/report.json`, JSON, STL et captures associés ; runner `wall-profiles-smoke.mjs`.
-- Libellés après correction : `wall-profiles-labels-1791725349336/report.json` ; runner `wall-profiles-labels.mjs`.
-- Comparatif visible final : `wall-profiles-framing-1791726291148/report.json`, avant contrôle de paroi et après Robuste sélectionné, desktop/mobile ; runner `wall-profiles-framing.mjs`. Ce rapport vérifie la position dans le viewport et l’absence d’occultation aux bords supérieur/inférieur avec `elementFromPoint`, ainsi que les empreintes de build et l’absence de mutation.
+- Comprobaciones finales: `wall-profiles-{targeted,check,tests,smoke,build}-post-ui.log`.
+- Presupuestos: `wall-profiles-budgets-post-ui.json`.
+- Auditoría: `wall-profiles-audit-post-ui.log`.
+- Recorrido completo: `wall-profiles-browser-1791725360750/report.json`, JSON, STL y capturas asociadas; ejecutor `wall-profiles-smoke.mjs`.
+- Etiquetas corregidas: `wall-profiles-labels-1791725349336/report.json`; ejecutor `wall-profiles-labels.mjs`.
+- Comparación visual final: `wall-profiles-framing-1791726291148/report.json`, antes del control de pared y después de seleccionar Robusto, escritorio/móvil; ejecutor `wall-profiles-framing.mjs`. Comprobó encuadre en el viewport y ausencia de ocultamiento en bordes superior/inferior mediante `elementFromPoint`, huellas de compilación y ausencia de cambios.
 
-Les premiers cadrages du panneau entier ou alignés en début de panneau étaient partiellement coupés/recouverts par la barre Undo/Redo. Même lorsqu’un premier rapport de cadrage indiquait PASS sur ses seules dimensions, l’inspection visuelle montrait cette occultation : ces images ne sont **pas** retenues comme comparatif final. Le cadrage centré a été revérifié et inspecté ; aucun CSS applicatif n’a été modifié pour fabriquer la preuve.
+Los primeros encuadres del panel completo o alineados con su comienzo estaban parcialmente cortados o tapados por la barra Deshacer/Rehacer. Aunque un informe preliminar indicara PASS para las dimensiones que medía, la inspección visual mostró el problema: esas imágenes **no se aceptaron como comparación final**. Se verificó e inspeccionó de nuevo el encuadre centrado, sin modificar CSS funcional para fabricar la evidencia.
 
-La chaîne de revalidation post-correction a dépassé la limite de l’appel terminal (420 s). Ce statut d’outil n’est pas une réussite de commande. Les journaux ont ensuite été relus individuellement, les processus inventoriés, et le runner navigateur a terminé avec son rapport PASS et ses ports fermés. Aucun résultat n’a été déduit du timeout seul.
+La cadena de revalidación posterior a la corrección excedió el límite de la herramienta de terminal (420 s). Ese estado de herramienta no se consideró éxito del comando. Se revisaron individualmente los registros, se inventariaron los procesos y el ejecutor de navegador terminó con informe PASS y puertos cerrados. No se infirió ningún resultado del tiempo agotado por sí solo.
 
-Deux premiers essais du test App ont échoué (délai, puis comparaison d’identité mémoire). Le délai du test a été borné à 30 s ; l’orchestrateur valide/clone légitimement le document, donc le contrat testé est l’égalité complète du contenu, pas la même instance mémoire. Les succès ci-dessus sont ceux des exécutions finales après ces corrections.
+Dos primeras ejecuciones de pruebas de App fallaron (tiempo de espera y luego comparación de identidad en memoria). El tiempo máximo del test se fijó en 30 s; el orquestador valida y clona legítimamente el documento, por lo que se verifica la igualdad completa del contenido y no la misma instancia en memoria. Los éxitos citados corresponden a ejecuciones finales posteriores a ambos arreglos.
 
-## Contrôle du diff final
+## Revisión de diferencias final
 
-Dernier fetch de qualification, avant commit : `HEAD == origin/main`, base inchangée ; ancienne branche du lot 5 inchangée, index Git vide et aucune PR ouverte. Revue locale contre cette base, y compris les nouveaux fichiers : conformité au périmètre et qualité examinées, aucun constat bloquant retenu. Les **217 empreintes des fichiers `src/`** sont identiques à celles du rapport navigateur final ; les dernières modifications sont documentaires uniquement. Les 35 budgets JS ont été recalculés depuis `dist`, les liens documentaires locaux vérifiés et le whitespace contrôlé aussi dans les fichiers non suivis. Le mode strict TypeScript est confirmé après résolution de l’héritage `@tsconfig/svelte`, pas par lecture du JSON brut.
+Último `fetch` de calificación antes del commit: `HEAD == origin/main`, base invariable, rama anterior del lote 5 intacta, índice Git vacío y ninguna PR abierta. Revisión local frente a esa base, incluidos archivos nuevos: alcance y calidad examinados, sin bloqueos. Las **217 huellas de `src/`** coincidían con el informe final del navegador; los últimos cambios eran exclusivamente documentales. Los presupuestos de los 35 archivos JS se recalcularon desde `dist`, se verificaron vínculos documentales locales y espacios en archivos no seguidos. Se confirmó TypeScript estricto después de resolver la herencia `@tsconfig/svelte`, no leyendo solamente JSON sin procesar.
 
-Contrôle reproductible hors dépôt : `/workspace/reports/wall-profiles-final-review.py` ; sortie finale `/workspace/reports/wall-profiles-final-review.log`. À cette étape de qualification, neuf fichiers modifiés/nouveaux étaient locaux, aucun fichier indexé. Le GO limité au commit local est enregistré dans ce dossier de validation et dans `AGENT_CONTEXT.md` avant indexation.
+Revisión reproducible externa: `/workspace/reports/wall-profiles-final-review.py`; informe `/workspace/reports/wall-profiles-final-review.log`. En esa etapa había nueve archivos nuevos/modificados locales sin indexar. El permiso limitado al commit local quedó registrado en el informe y en `AGENT_CONTEXT.md` antes de agregar al índice.
 
-Précommit du 11 octobre 2026 : `pnpm check` relancé avec 0 erreur/0 avertissement ; `pnpm exec vitest run src/lib/components/parameters/__tests__/WallProfiles.test.ts src/__tests__/App.wall-profiles.test.ts --pool=threads --maxWorkers=1 --fileParallelism=false` : **13/13 tests réussis**, 2 fichiers. Même TMP isolé ; logs `wall-profiles-precommit-{check,tests}.log`. La suite complète et le navigateur n’ont pas été relancés à cette étape : leurs preuves restent liées aux mêmes 217 empreintes applicatives, vérifiées avant commit.
+Antes de confirmar, el 11/10/2026, se repitieron `pnpm check` (0 errores/0 advertencias) y `pnpm exec vitest run src/lib/components/parameters/__tests__/WallProfiles.test.ts src/__tests__/App.wall-profiles.test.ts --pool=threads --maxWorkers=1 --fileParallelism=false`: **13/13 pruebas correctas** en 2 archivos. Mismo directorio temporal aislado; registros `wall-profiles-precommit-{check,tests}.log`. No se repitieron la suite completa ni Chromium en ese paso: las pruebas anteriores seguían asociadas con las mismas 217 huellas funcionales, comprobadas antes del commit.
 
-## Correctif des fichiers temporaires après publication de la PR #70
+## Corrección de archivos temporales después de publicar la PR #70
 
-Le commit initial `1d3d351019ba00940d743ab4c45dc25b62572b62` a passé Quality et le job d’analyse CodeQL, mais le verdict externe CodeQL a signalé quatre alertes high « Insecure temporary file » dans smoke/benchmark. Le succès du job ne constitue pas une approbation sécurité.
+El commit inicial `1d3d351019ba00940d743ab4c45dc25b62572b62` superó Quality y el trabajo de análisis CodeQL, pero el veredicto externo CodeQL señaló cuatro alertas altas «Insecure temporary file» en pruebas de exportación/rendimiento. Que el trabajo de análisis terminara bien no implicaba aprobación de seguridad.
 
-Rza a autorisé le 11 octobre 2026 la correction, les tests, le commit et le push sur la même PR brouillon, sans passage ready, fusion ni déploiement.
+El 11/10/2026 Rza autorizó corregir, probar, confirmar y publicar en la misma PR borrador, sin pasarla a lista para revisión, fusionar ni desplegar.
 
-- Chacun des deux tests alloue désormais un répertoire unique via `mkdtempSync` sous `tmpdir()`, avec permissions privées `0700` sous Linux. `TMPDIR` reste respecté.
-- Le smoke ne supprime ni ne réutilise de chemin partagé prévisible. Les fichiers finaux restent à noms stables **dans** le répertoire privé, sans accès d’un autre utilisateur au parent.
-- Les artefacts restent disponibles après le test ; les chemins sont imprimés par `process.stdout.write`. Une tentative avec `console.info` n’affichait pas les chemins dans l’environnement de tests ; la sortie stdout effective a été vérifiée après correction.
-- Le README demande d’utiliser le chemin exact annoncé, sans rechercher par glob un artefact potentiellement obsolète. Benchmark : `report.json` sous son répertoire privé.
-- Deux régressions exécutées avant correction échouaient sur les chemins partagés, puis passent avec contrôles des permissions. Deux exécutions indépendantes vérifiées : répertoires distincts, artefacts précédents conservés, rapports JSON lisibles et archives 3MF intègres (`unzip -t` sur chaque archive).
+- Cada una de las dos pruebas pasó a crear un directorio único con `mkdtempSync` bajo `tmpdir()`, con permisos privados `0700` en Linux. Se sigue respetando `TMPDIR`.
+- La prueba de exportación no elimina ni reutiliza rutas compartidas predecibles. Los artefactos finales mantienen nombres estables **dentro** del directorio privado, inaccesible a otros usuarios a través de su carpeta padre.
+- Los artefactos se conservan tras las pruebas y las rutas se imprimen con `process.stdout.write`. Un intento con `console.info` no mostraba las rutas en ese entorno; se comprobó la salida real después de corregirlo.
+- El README indica utilizar la ruta exacta comunicada, sin buscar mediante patrones globales artefactos potencialmente antiguos. El benchmark crea `report.json` en su carpeta privada.
+- Dos regresiones ejecutadas antes de corregir fallaban con las rutas compartidas; después aprobaron junto con controles de permisos. Se verificaron dos ejecuciones independientes: directorios distintos, artefactos previos conservados, informes JSON legibles y archivos 3MF íntegros (`unzip -t` en ambos).
 
-Qualification locale finale : **1 098 tests / 79 fichiers**, `pnpm check` 0/0, smoke **4/4**, benchmark **2/2**, audit sans vulnérabilité connue et build réussis. Les deux nouvelles régressions expliquent la différence avec les 1 096 tests de la qualification initiale. Suite finale relancée après la modification de stdout. Budgets finals inchangés : 35 JS, entrée 175 103 octets, autre maximum 561 528 octets, seuils 200/600 KiB respectés.
+Calificación local final: **1.098 pruebas en 79 archivos**, `pnpm check` 0/0, exportación **4/4**, rendimiento **2/2**, auditoría sin vulnerabilidades conocidas y compilación correcta. Las dos nuevas regresiones explican la diferencia con las 1.096 pruebas iniciales. La suite final se volvió a ejecutar tras modificar la salida estándar. Presupuestos finales sin cambios: 35 archivos JS, entrada 175.103 bytes y máximo restante 561.528 bytes, dentro de 200/600 KiB.
 
-Commandes supplémentaires réellement exécutées, avec le même TMP isolé :
+Comandos adicionales realmente ejecutados, con el mismo directorio aislado:
 
 ```sh
-pnpm exec vitest run src/lib/utils/__tests__/exportArtifacts.smoke.test.ts src/lib/utils/__tests__/pipeline.benchmark.test.ts -t 'uses a private unique temporary directory' --pool=threads --maxWorkers=1 --fileParallelism=false # RED avant correction
+pnpm exec vitest run src/lib/utils/__tests__/exportArtifacts.smoke.test.ts src/lib/utils/__tests__/pipeline.benchmark.test.ts -t 'uses a private unique temporary directory' --pool=threads --maxWorkers=1 --fileParallelism=false # RED antes de corregir
 pnpm test:smoke --pool=threads --fileParallelism=false
 pnpm benchmark --pool=threads --fileParallelism=false
 pnpm check
@@ -132,17 +134,17 @@ pnpm build
 pnpm audit --audit-level=moderate
 ```
 
-Preuves hors dépôt : `/workspace/reports/wall-profiles-temp-security-red.log`, `*-smoke-final.log`, `*-benchmark-final.log`, `*-check-final.log`, `*-full-final.log`, `*-build.log` et `*-audit.log`. Les quatre premiers sites annotés restent couverts sans désactivation ni dismissal CodeQL ; la conclusion distante doit être relue sur le SHA correctif poussé.
+Evidencias fuera del repositorio: `/workspace/reports/wall-profiles-temp-security-red.log`, `*-smoke-final.log`, `*-benchmark-final.log`, `*-check-final.log`, `*-full-final.log`, `*-build.log` y `*-audit.log`. Los cuatro puntos inicialmente señalados quedaron cubiertos sin desactivar ni descartar CodeQL; el veredicto remoto debe comprobarse nuevamente sobre el SHA correctivo publicado.
 
-Aucun code applicatif modifié : seuls smoke/benchmark diffèrent sous `src/` de l’implémentation qualifiée. Le navigateur n’a pas été relancé pour ce correctif d’outillage ; ne pas présenter la recette historique comme une nouvelle exécution. Les répertoires d’artefacts sont volontairement retenus et peuvent être nettoyés séparément après inspection/accord ; pas de nettoyage global automatique.
+No se modificó código funcional; únicamente las pruebas de exportación/rendimiento difirieron de la implementación calificada bajo `src/`. No se repitió el recorrido de navegador para este arreglo de herramientas; no debe presentarse la validación histórica como una ejecución nueva. Los directorios de artefactos se conservaron deliberadamente y pueden limpiarse por separado tras inspección y autorización, nunca mediante una limpieza global automática.
 
-## Limites et prochaine décision
+## Limitaciones y próxima decisión histórica
 
-- Chromium uniquement, toucher émulé : pas d’essai sur téléphone physique, Safari, Firefox ou lecteur d’écran.
-- Pas de slicer, imprimante, mesure de rigidité, essai de matériau ou qualification alimentaire.
-- Les nouveaux parcours profils/V2 portent sur un pont simple. Les chaînes et états intermédiaires restent couverts par les tests historiques relancés, pas par un nouveau parcours navigateur profils-chaîne.
-- Les profils ne garantissent pas qu’un SVG arbitraire génère un modèle valide ; un refus des gardes existantes reste possible.
-- Aucun test de performance sur très gros SVG ni test de zoom/texte à 200 % dans ce lot.
-- PR #70 publiée en brouillon après accord ; correction de l’outillage, commit et push autorisés. CI initiale détaillée ci-dessus ; aucune fusion ni déploiement autorisés ou exécutés. La version publiée n’a pas changé.
+- Solo Chromium con tacto emulado: no se probó teléfono físico, Safari, Firefox ni lector de pantalla.
+- Sin laminador, impresora, medición de rigidez, pruebas de materiales o calificación alimentaria.
+- Los recorridos nuevos de perfiles/V2 cubrieron un puente sencillo. Las cadenas de puentes y estados intermedios se cubrieron con pruebas históricas repetidas, no con un recorrido nuevo en navegador para cadenas.
+- Los perfiles no garantizan que un SVG cualquiera produzca un modelo válido; los controles geométricos existentes pueden rechazarlo.
+- Sin pruebas de rendimiento sobre SVG enormes ni pruebas de zoom/texto al 200 % en ese lote.
+- PR #70 publicada como borrador tras autorización; corrección de herramientas, commit y push permitidos. CI inicial detallada anteriormente; **no se autorizaron ni ejecutaron fusión o despliegue**. No cambió la versión publicada.
 
-Avant toute publication : accord explicite de Rza et nouvelle vérification du snapshot à publier. Socle/paroi/tranchant indépendants et multi-cutter restent hors périmètre.
+Antes de cualquier publicación del proyecto original se exigía permiso explícito de Rza y nueva validación de la versión exacta. Base, pared y filo independientes y múltiples cortantes quedaban fuera de alcance.
