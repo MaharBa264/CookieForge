@@ -1,58 +1,62 @@
-# Gemini API - Technical Documentation
+# API de Gemini — Documentación técnica
 
-This document provides technical details about the Gemini API integration in Cookie Cutter Designer.
+> Documento técnico histórico, actualizado originalmente el **16/11/2025**. Las versiones, precios, cuotas y recomendaciones de API deben contrastarse con la documentación actual antes de un despliegue.
 
-## Architecture Overview
+Este documento describe los detalles técnicos de la integración de Gemini en Cookie Cutter Designer.
 
+## Arquitectura general
+
+```text
+Navegador del usuario (cliente)
+    ↓
+geminiAPI.ts (adaptador de API)
+    ↓
+API de Google Gemini (REST)
+    ↓
+Respuesta (JSON/imagen)
 ```
-User Browser (Client)
-    ↓
-geminiAPI.ts (API Wrapper)
-    ↓
-Google Gemini API (REST)
-    ↓
-Response (JSON/Image)
-```
 
-## API Models Used
+## Modelos de API utilizados
 
-### 1. Text Generation: `gemini-2.5-flash`
+### 1. Generación de texto: `gemini-2.5-flash`
 - **Endpoint:** `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`
-- **Use Cases:**
-  - Design improvement suggestions
-  - SVG analysis
-  - Design variations
-- **Features:**
-  - System instructions
-  - Structured JSON output
-  - Response schemas
+- **Usos:**
+  - Sugerencias para mejorar el diseño.
+  - Análisis de SVG.
+  - Variaciones de diseño.
+- **Capacidades:**
+  - Instrucciones de sistema.
+  - Respuestas estructuradas en JSON.
+  - Esquemas de respuesta.
 
-### 2. Image Generation: `gemini-2.5-flash-image`
+### 2. Generación de imágenes: `gemini-2.5-flash-image`
 - **Endpoint:** `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent`
-- **Use Cases:**
-  - Text-to-image generation
-  - Cookie cutter silhouette creation
-- **Output:** Base64-encoded image (PNG/JPEG)
+- **Usos:**
+  - Generación de imágenes desde texto.
+  - Creación de siluetas para cortantes.
+- **Salida:** imagen PNG/JPEG codificada en Base64.
 
-## Implementation Details
+## Detalles de implementación
 
-### System Instructions (Best Practice)
+### Instrucciones de sistema (buena práctica)
 
-All API calls use `systemInstruction` to define the AI's role and behavior:
+Las llamadas a la API usan `systemInstruction` para definir el rol y el comportamiento de la IA:
 
 ```typescript
 const systemInstruction = `You are an expert 3D printing engineer with 10+ years of experience.
 You provide practical, actionable advice focusing on structural integrity, printability, and user experience.`;
 ```
 
-**Benefits:**
-- Consistent behavior across requests
-- Better quality responses
-- Clear role definition
+La instrucción en el código se mantiene literalmente para preservar el ejemplo técnico original.
 
-### Structured Output (JSON Mode)
+**Ventajas:**
+- Comportamiento uniforme entre solicitudes.
+- Respuestas de mejor calidad.
+- Definición clara del rol.
 
-Functions use `responseMimeType` and `responseSchema` for guaranteed JSON responses:
+### Respuestas estructuradas (modo JSON)
+
+Las funciones usan `responseMimeType` y `responseSchema` para solicitar respuestas JSON con estructura definida:
 
 ```typescript
 responseMimeType: 'application/json',
@@ -75,25 +79,23 @@ responseSchema: {
 }
 ```
 
-**Benefits:**
-- Parsable responses (no manual regex parsing)
-- Type-safe output
-- Fallback handling if parsing fails
+**Ventajas:**
+- Respuestas interpretables sin expresiones regulares manuales.
+- Salidas con tipos definidos.
+- Tratamiento alternativo cuando falla el análisis.
 
-### Temperature Settings
+### Ajustes de temperatura
 
-Different tasks use different temperatures:
+| Tarea | Temperatura | Motivo |
+|---|---:|---|
+| Análisis SVG | 0,2 | Respuesta precisa y más determinista |
+| Sugerencias | 0,7 | Equilibrio entre creatividad y exactitud |
+| Variaciones | 0,95 | Máxima creatividad |
+| Generación de imágenes | 0,4 | Siluetas creativas pero consistentes |
 
-| Task | Temperature | Reasoning |
-|------|-------------|-----------|
-| SVG Analysis | 0.2 | Precise, deterministic output |
-| Suggestions | 0.7 | Balanced creativity and accuracy |
-| Variations | 0.95 | Maximum creativity |
-| Image Generation | 0.4 | Consistent but creative silhouettes |
+### Indicaciones de razonamiento paso a paso
 
-### Chain-of-Thought Prompting
-
-Complex tasks use step-by-step reasoning:
+Para tareas complejas, el original utilizaba indicaciones estructuradas por pasos:
 
 ```typescript
 **Step 1: Assess Current Parameters**
@@ -108,41 +110,43 @@ Check for:
 **Step 3: Generate Recommendations**
 ```
 
-**Benefits:**
-- Better reasoning quality
-- More accurate suggestions
-- Transparent thought process
+**Ventajas documentadas:**
+- Mejor calidad de razonamiento.
+- Sugerencias más precisas.
+- Proceso de evaluación más transparente.
 
-## Security Considerations
+El ejemplo anterior es una plantilla histórica de prompt, no una exposición del razonamiento interno de un modelo.
 
-### ⚠️ CRITICAL: API Key Exposure
+## Consideraciones de seguridad
 
-**Current Implementation:**
-- API key stored in `localStorage` (client-side)
-- All API calls made directly from browser
-- Key exposed in network traffic
+### ⚠️ CRÍTICO: exposición de claves API
 
-**Risk Level:** 🔴 **HIGH** for production applications
+**Implementación original:**
+- La clave se guarda en `localStorage` (cliente).
+- Todas las llamadas se realizan directamente desde el navegador.
+- La clave puede verse en las solicitudes de red del propio cliente.
 
-**Why This is a Problem:**
-1. Anyone can inspect browser DevTools and extract the key
-2. Key visible in network requests (even with HTTPS)
-3. Rate limits apply to the key (abuse possible)
-4. No server-side validation
+**Nivel de riesgo:** 🔴 **ALTO** para aplicaciones de producción.
 
-### ✅ Recommended Production Architecture
+**Problemas:**
+1. Quien tenga acceso al navegador o a scripts del mismo origen puede inspeccionar y extraer la clave.
+2. La clave aparece en las solicitudes que construye el cliente, incluso si HTTPS protege el transporte.
+3. Los límites de solicitudes se aplican a esa clave y pueden agotarse por abuso.
+4. No hay validación del lado del servidor.
 
-For production deployment, implement a backend proxy:
+### ✅ Arquitectura recomendada para producción
 
-```
-User Browser
+Implementar un proxy en el backend:
+
+```text
+Navegador del usuario
     ↓
-Your Backend API (Node.js/Express/Cloud Function)
-    ↓ (API key stored server-side)
-Google Gemini API
+API del backend (Node.js/Express/Cloud Function)
+    ↓ (clave API almacenada en el servidor)
+API de Google Gemini
 ```
 
-**Example Backend (Node.js/Express):**
+**Ejemplo de backend (Node.js/Express):**
 
 ```javascript
 // server.js
@@ -152,10 +156,10 @@ const app = express();
 app.post('/api/gemini', async (req, res) => {
   const { prompt, config } = req.body;
 
-  // API key stored in environment variable (secure)
+  // Clave API en una variable de entorno del servidor
   const apiKey = process.env.GEMINI_API_KEY;
 
-  // Make request to Gemini API
+  // Solicitud a la API Gemini
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
     {
@@ -175,13 +179,13 @@ app.post('/api/gemini', async (req, res) => {
 app.listen(3000);
 ```
 
-**Frontend Update:**
+**Cambio en el frontend:**
 
 ```typescript
-// Instead of calling Gemini directly:
+// En lugar de llamar directamente a Gemini:
 // const response = await fetch(`${GEMINI_API_ENDPOINT}?key=${apiKey}`, ...)
 
-// Call your backend:
+// Llamar al backend propio:
 const response = await fetch('/api/gemini', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
@@ -189,19 +193,22 @@ const response = await fetch('/api/gemini', {
 });
 ```
 
-### Alternative: Serverless Functions
+> Estos fragmentos son ilustrativos. Un proxy de producción también necesita autenticación o control de abuso, validación de entradas, límites de uso y tratamiento de errores.
 
-**Vercel/Netlify Functions:**
+### Alternativa: funciones sin servidor permanente
+
+**Funciones de Vercel/Netlify:**
 
 ```typescript
 // api/gemini.ts
 export default async function handler(req, res) {
   const apiKey = process.env.GEMINI_API_KEY;
-  // ... proxy request
+  // ... solicitud a través del proxy
 }
 ```
 
-**Deploy:**
+**Despliegue:**
+
 ```bash
 # Vercel
 vercel --prod
@@ -210,36 +217,36 @@ vercel --prod
 netlify deploy --prod
 ```
 
-### Current Use Case Justification
+### Justificación histórica de la implementación del lado del cliente
 
-**Why we use client-side for now:**
-1. ✅ **Educational/Demo purposes** - easier to understand the flow
-2. ✅ **User-provided keys** - users bring their own free API keys
-3. ✅ **No cost to developers** - no backend infrastructure needed
-4. ✅ **Transparent operation** - users see exactly what's happening
+**Motivos documentados:**
+1. ✅ **Educación y demostración:** facilita comprender el flujo.
+2. ✅ **Claves aportadas por usuarios:** cada persona utiliza su propia clave API.
+3. ✅ **Sin costo de infraestructura para desarrolladores:** no exige backend.
+4. ✅ **Funcionamiento transparente:** permite ver qué solicitudes se hacen.
 
-**This is acceptable for:**
-- Personal projects
-- Learning/experimentation
-- Demos and prototypes
-- When users understand they're sharing their own API key
+**Uso contemplado:**
+- Proyectos personales.
+- Aprendizaje y experimentación.
+- Demostraciones y prototipos.
+- Situaciones donde los usuarios comprenden los riesgos de proporcionar una clave.
 
-**NOT acceptable for:**
-- Production SaaS applications
-- Public-facing services
-- Apps with your own API key
-- Commercial products
+**No recomendado para:**
+- Aplicaciones SaaS de producción.
+- Servicios públicos.
+- Aplicaciones que utilizan una clave propia del desarrollador.
+- Productos comerciales.
 
-## Rate Limits
+## Límites de frecuencia
 
-Gemini 2.5 Flash Free Tier:
-- **15 requests per minute**
-- **1,500 requests per day**
-- **1 million requests per month**
+El documento original indicaba para el nivel gratuito de Gemini 2.5 Flash:
+- **15 solicitudes por minuto.**
+- **1.500 solicitudes por día.**
+- **1 millón de solicitudes por mes.**
 
-**Handling Rate Limits:**
+Son **cifras históricas** y deben verificarse con Google.
 
-The current implementation throws an error if rate limited. For production, implement exponential backoff:
+**Cómo tratar límites:** la implementación original lanzaba un error al alcanzar la cuota. Para producción se proponía un reintento con espera exponencial:
 
 ```typescript
 async function callGeminiWithRetry(prompt, config, retries = 3) {
@@ -248,7 +255,7 @@ async function callGeminiWithRetry(prompt, config, retries = 3) {
       return await callGemini(prompt, config);
     } catch (error) {
       if (error.message.includes('429') && i < retries - 1) {
-        // Wait exponentially: 1s, 2s, 4s
+        // Esperas exponenciales: 1 s, 2 s, 4 s
         await new Promise(r => setTimeout(r, 1000 * Math.pow(2, i)));
         continue;
       }
@@ -258,9 +265,9 @@ async function callGeminiWithRetry(prompt, config, retries = 3) {
 }
 ```
 
-## Error Handling
+## Gestión de errores
 
-All functions implement try-catch with informative error messages:
+Las funciones utilizaban `try/catch` con mensajes informativos:
 
 ```typescript
 try {
@@ -268,33 +275,33 @@ try {
   const data = JSON.parse(response.text);
   return data.suggestions.map(/* ... */);
 } catch (e) {
-  // Fallback to regex parsing if JSON fails
-  // This should rarely happen with structured output
+  // Analizar el formato heredado si falla JSON.
+  // Con la respuesta estructurada debería ocurrir raramente.
   console.warn('Structured output parsing failed, using fallback');
   return parseLegacyFormat(response.text);
 }
 ```
 
-## Testing
+## Pruebas
 
-### Manual Testing
+### Pruebas manuales
 
 ```bash
-# Start dev server
+# Iniciar el servidor de desarrollo
 pnpm run dev
 
-# 1. Configure API key in UI
-# 2. Try each AI feature:
-#    - Generate: "Christmas tree"
-#    - Suggestions: Upload a design
-#    - Analyze: Check console for analysis
-#    - Variations: "star cookie cutter"
+# 1. Configurar la clave API en la interfaz.
+# 2. Probar todas las funciones:
+#    - Generación: "Christmas tree"
+#    - Sugerencias: cargar un diseño
+#    - Análisis: revisar la consola
+#    - Variaciones: "star cookie cutter"
 ```
 
-### API Testing (Direct)
+### Prueba directa de API
 
 ```bash
-# Test with curl
+# Probar con curl: sustituir YOUR_KEY por una clave de prueba
 curl -X POST \
   "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=YOUR_KEY" \
   -H "Content-Type: application/json" \
@@ -303,11 +310,11 @@ curl -X POST \
   }'
 ```
 
-## Performance Optimization
+## Optimización del rendimiento
 
-### 1. Response Caching
+### 1. Caché de respuestas
 
-Currently not implemented. For production, cache common requests:
+El original no la tenía implementada. Para producción, proponía guardar solicitudes comunes:
 
 ```typescript
 const cache = new Map();
@@ -324,9 +331,9 @@ async function callGeminiCached(prompt, config) {
 }
 ```
 
-### 2. Request Debouncing
+### 2. Agrupación temporal de solicitudes (*debounce*)
 
-For real-time features, debounce requests:
+Para funciones en tiempo real se propuso limitar las llamadas:
 
 ```typescript
 let debounceTimer;
@@ -339,23 +346,23 @@ function debouncedGenerateSuggestions(params) {
 }
 ```
 
-## Monitoring and Logging
+## Supervisión y registros
 
-### Console Logging
+### Mensajes de consola
 
-All functions log to console for debugging:
+Las funciones originales emitían registros para depurar:
 
 ```typescript
 console.log('SVG Optimization Analysis:', data);
 console.error('Image generation error:', err);
 ```
 
-### Production Monitoring
+### Supervisión en producción
 
-For production, implement proper logging:
+Para producción se proponía un registro adecuado:
 
 ```typescript
-// Using a service like Sentry, LogRocket, etc.
+// Con servicios como Sentry, LogRocket, etc.
 try {
   const result = await callGemini(prompt, config);
   analytics.track('gemini_request_success', {
@@ -369,11 +376,11 @@ try {
 }
 ```
 
-## Future Improvements
+## Mejoras futuras propuestas
 
-### 1. Streaming Responses
+### 1. Respuestas en streaming
 
-Gemini supports streaming for real-time output:
+Gemini admite respuestas en flujo para presentar resultados progresivamente:
 
 ```typescript
 async function* streamGemini(prompt, config) {
@@ -391,9 +398,9 @@ async function* streamGemini(prompt, config) {
 }
 ```
 
-### 2. Multi-turn Conversations
+### 2. Conversaciones con varios turnos
 
-Implement chat history for iterative refinement:
+Mantener historial para refinar iterativamente:
 
 ```typescript
 const history = [];
@@ -411,9 +418,9 @@ async function chatWithGemini(userMessage) {
 }
 ```
 
-### 3. Image Understanding
+### 3. Comprensión de imágenes
 
-Add image input analysis (Gemini 2.5 Pro Vision):
+Analizar imágenes de entrada (mencionado como Gemini 2.5 Pro Vision):
 
 ```typescript
 async function analyzeUploadedImage(imageBlob) {
@@ -430,24 +437,24 @@ async function analyzeUploadedImage(imageBlob) {
 }
 ```
 
-## References
+## Referencias
 
-- [Gemini API Documentation](https://ai.google.dev/gemini-api/docs)
-- [Prompting Strategies](https://ai.google.dev/gemini-api/docs/prompting-strategies)
-- [Structured Output Guide](https://ai.google.dev/gemini-api/docs/json-mode)
-- [Safety Settings](https://ai.google.dev/gemini-api/docs/safety-settings)
-- [Rate Limits](https://ai.google.dev/gemini-api/docs/quota)
+- [Documentación de Gemini API](https://ai.google.dev/gemini-api/docs).
+- [Estrategias de creación de prompts](https://ai.google.dev/gemini-api/docs/prompting-strategies).
+- [Guía de salida estructurada](https://ai.google.dev/gemini-api/docs/json-mode).
+- [Ajustes de seguridad](https://ai.google.dev/gemini-api/docs/safety-settings).
+- [Límites de frecuencia](https://ai.google.dev/gemini-api/docs/quota).
 
-## Support
+## Ayuda
 
-For issues with the Gemini API integration:
-1. Check browser console for detailed error messages
-2. Verify API key is valid at [Google AI Studio](https://aistudio.google.com/app/apikey)
-3. Check rate limits in AI Studio dashboard
-4. Open an issue on GitHub with error details
+Para problemas de integración:
+1. Revisar los errores detallados de la consola del navegador.
+2. Comprobar la clave en [Google AI Studio](https://aistudio.google.com/app/apikey).
+3. Revisar el consumo y las cuotas en el panel de AI Studio.
+4. Abrir una incidencia en GitHub con el detalle del error.
 
 ---
 
-**Last Updated:** 2025-11-16
-**API Version:** v1beta
-**Models:** gemini-2.5-flash, gemini-2.5-flash-image
+**Última actualización original:** 16/11/2025.  
+**Versión de API:** v1beta.  
+**Modelos:** `gemini-2.5-flash`, `gemini-2.5-flash-image`.
