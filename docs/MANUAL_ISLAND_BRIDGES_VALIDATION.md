@@ -1,42 +1,44 @@
-# Lot 5 — ponts manuels entre îlots : validation locale
+# Lote 5 — Puentes manuales entre islas: validación local
 
-Date : 11 octobre 2026. Branche `feature/manual-island-bridges`, issue de `origin/main` au commit `ee647698f4b94e75ba5993460e0f39527cc70f2e`. Commit et push de la branche autorisés par Rza ; aucune PR, fusion ou déploiement autorisé.
+Fecha: 11 de octubre de 2026. Rama original `feature/manual-island-bridges`, creada desde `origin/main` en el commit `ee647698f4b94e75ba5993460e0f39527cc70f2e`. Rza autorizó el commit y la publicación de la rama; no autorizó solicitudes de incorporación, fusiones ni despliegues.
 
-## Contrat et chemin de données
+## Contrato y flujo de datos
 
-- Les projets historiques restent des documents **V1** tant qu'aucun pont n'est ajouté ; leur lecture, leur sauvegarde et leur génération suivent le chemin V1. Le premier ajout de pont promeut explicitement, par copie, vers **V2**. La version de l'enveloppe `.ccd.json` correspond à celle du document. Le parseur strict refuse les versions futures et les ponts mal formés.
-- Un pont possède deux extrémités en coordonnées SVG, une largeur physique en millimètres et un identifiant stable. Les bornes du contrat sont 32 ponts, 0,8–10 mm et des coordonnées finies dans ±1 000 000. Chaque extrémité doit rejoindre un contour distinct ; croisements et segments superposés sont rejetés, mais deux ponts en chaîne peuvent partager une extrémité.
-- L'édition passe par le document canonique et l'historique de session : ajout, déplacement souris/clavier/tactile, suppression, suppression globale et Undo/Redo. Un commit asynchrone revalide snapshot, époque et composant monté avant de publier ; une validation refusée ne modifie ni document ni historique.
-- La géométrie des ponts est unie aux empreintes de paroi, avec conservation des trous et loft des parois, y compris poignée et dépouille. Une connexion **complète** doit générer une seule coque fermée et imprimable. Si plusieurs îlots exigent plusieurs ponts, chaque pont individuellement valide peut être conservé comme état **intermédiaire V2** ; l'export STL reste désactivé jusqu'à la connexion finale. Le modèle sans pont conserve son chemin historique. Le JSON de projet reste exportable pendant l'état intermédiaire.
-- Une modification ultérieure du dessin peut invalider des ponts sauvegardés. L'export est alors bloqué ; « Supprimer tous les ponts » permet de récupérer en une action annulable même quand les suppressions individuelles ne passent pas la prévalidation.
+- Los proyectos históricos siguen siendo documentos **V1** mientras no se agregue ningún puente; su lectura, guardado y generación utilizan la ruta V1. El primer puente promueve explícitamente, mediante copia, a **V2**. La versión del envoltorio `.ccd.json` coincide con la del documento. El analizador estricto rechaza versiones futuras y puentes malformados.
+- Cada puente tiene dos extremos en coordenadas SVG, un ancho físico en milímetros y un identificador estable. Límites del contrato: 32 puentes, 0,8–10 mm y coordenadas finitas entre ±1.000.000. Cada extremo debe conectarse a un contorno diferente; se rechazan cruces y segmentos superpuestos, aunque dos puentes encadenados pueden compartir un extremo.
+- La edición utiliza el documento canónico y el historial de sesión: agregar, mover mediante mouse/teclado/tacto, eliminar, eliminar todos y Deshacer/Rehacer. Una confirmación asíncrona vuelve a validar instantánea, época y componente montado antes de publicar; una validación rechazada no modifica el documento ni el historial.
+- La geometría de los puentes se une a las huellas de pared, conservando huecos y la extrusión progresiva de paredes, incluso con agarre y ángulo de salida. Una conexión **completa** debe generar una única envolvente cerrada e imprimible. Cuando varias islas necesitan varios puentes, cada puente individualmente válido puede guardarse como estado **intermedio V2**; la exportación STL queda deshabilitada hasta conectar la última isla. El JSON del proyecto sigue siendo exportable en ese estado.
+- Un cambio posterior en el dibujo puede invalidar puentes guardados. Se bloquea entonces la exportación; «Eliminar todos los puentes» permite recuperarse con una única acción reversible incluso si las eliminaciones individuales no superan la validación previa.
 
-## Vérifications automatisées
+## Verificaciones automáticas
 
-Avec `TMPDIR` isolé par `/workspace/.hermes-tools/workspace-tmp.py --repo "$PWD" --purpose commands --path-only`, `GOMAXPROCS=2` et `UV_THREADPOOL_SIZE=2` :
+Con `TMPDIR` aislado mediante `/workspace/.hermes-tools/workspace-tmp.py --repo "$PWD" --purpose commands --path-only`, `GOMAXPROCS=2` y `UV_THREADPOOL_SIZE=2`:
 
-| Commande | Résultat |
-| --- | --- |
-| `pnpm check` | 0 erreur, 0 avertissement |
-| `pnpm test:run --pool=threads --maxWorkers=1 --fileParallelism=false` | 1 083 tests réussis, 77 fichiers |
-| `pnpm test:smoke --pool=threads --fileParallelism=false` | 3 tests réussis |
-| `pnpm build` | réussi |
+| Comando | Resultado |
+|---|---|
+| `pnpm check` | 0 errores, 0 advertencias |
+| `pnpm test:run --pool=threads --maxWorkers=1 --fileParallelism=false` | 1.083 pruebas aprobadas, 77 archivos |
+| `pnpm test:smoke --pool=threads --fileParallelism=false` | 3 pruebas aprobadas |
+| `pnpm build` | correcto |
 | `pnpm audit` | `No known vulnerabilities found` |
-| `git diff --check` | réussi |
+| `git diff --check` | correcto |
 
-Les tests couvrent migration non mutante, codec V1/V2, persistance/récupération, publication asynchrone, historique, ponts isolés et en chaîne, segments superposés, trou central effectivement ouvert au rayon Three.js, variantes de poignée/dépouille et compatibilité du chemin sans pont. Le test du premier pont d'une chaîne à trois contours a d'abord échoué avant le correctif ; un test de chevauchement colinéaire et celui du trou central avaient également échoué avant leurs corrections. Les validations finales correspondantes sont vertes. Journaux locaux : `/workspace/reports/manual-island-bridges-final-{check,tests,smoke,build,audit}.log`.
+Las pruebas abarcan migración sin mutaciones, códec V1/V2, persistencia/recuperación, publicación asíncrona, historial, puentes aislados y encadenados, segmentos superpuestos, hueco central realmente abierto al trazar un rayo Three.js, variantes de agarre/ángulo de salida y compatibilidad de la ruta sin puentes. La prueba del primer puente en una cadena de tres contornos falló inicialmente antes de corregirse; también fallaron antes de sus correcciones las pruebas de solapamiento colineal y hueco central. Las verificaciones finales correspondientes aprobaron. Registros locales: `/workspace/reports/manual-island-bridges-final-{check,tests,smoke,build,audit}.log`.
 
-## Navigateur réel (build de production, Chromium local)
+## Navegador real (compilación de producción, Chromium local)
 
-Script de recette hors dépôt : `/workspace/reports/manual-island-bridges-smoke.mjs`. Rapport du dernier parcours : `/workspace/reports/manual-island-bridges-1791718707624/report.json` ; captures avant, desktop et mobile dans le même répertoire. Ce n'est pas un mock du générateur : le parcours charge de vrais SVG, déclenche génération et téléchargement STL, puis recharge des projets IndexedDB.
+Script de prueba fuera del repositorio: `/workspace/reports/manual-island-bridges-smoke.mjs`. Informe del último recorrido: `/workspace/reports/manual-island-bridges-1791718707624/report.json`; capturas previas, de escritorio y móvil en la misma carpeta. No se simuló el generador: el recorrido carga SVG reales, genera y descarga STL, y después recarga proyectos IndexedDB.
 
-- Un pont : ajout, déplacement clavier/souris/tactile, suppression et Undo/Redo ; export JSON V1 de départ puis V2 après ajout, sauvegarde, rechargement et STL **strictement identique** avant/après : 6 284 octets, 124 triangles, SHA-256 `35a7017f7752b3754956b71c5b4a0b600215a5aa91cbaa7bfa9e4c50bb0ceb3e`.
-- Trois contours : premier pont sauvegardé puis rouvert comme projet V2 incomplet, bouton STL désactivé ; second pont posé depuis l'extrémité existante, Undo/Redo, STL exporté (10 084 octets, 200 triangles), projet JSON à deux ponts vérifié ; suppression globale suivie d'Undo. Aucun événement console erroné ni requête échouée dans le rapport.
-- Vue mobile émulée à 375 px : document à 375 px, sans débordement horizontal ; déplacement tactile et Undo exercés. Serveur de preview arrêté et port fermé après la recette.
+- Un puente: agregar, mover con teclado/mouse/tacto, eliminar y Deshacer/Rehacer; exportación JSON V1 inicial y V2 después de agregar; guardado, recarga y STL **estrictamente idéntico** antes y después: 6.284 bytes, 124 triángulos, SHA-256 `35a7017f7752b3754956b71c5b4a0b600215a5aa91cbaa7bfa9e4c50bb0ceb3e`.
+- Tres contornos: primer puente guardado y reabierto como proyecto V2 incompleto, botón STL deshabilitado; segundo puente conectado desde el extremo existente, Deshacer/Rehacer, STL exportado (10.084 bytes, 200 triángulos), JSON con dos puentes verificado; eliminación global seguida de Deshacer. Sin errores de consola ni solicitudes fallidas en el informe.
+- Vista móvil emulada a 375 px: documento de 375 px, sin desbordamiento horizontal; movimiento táctil y Deshacer probados. Servidor de vista previa detenido y puerto cerrado después.
 
-Non-régression navigateur V1 : `/workspace/reports/raster-circle-loft-1791719156523/report.json`. Le cercle raster conserve son JSON canonique, la source, et le STL de 178 884 octets / 3 576 triangles **identique après rechargement** (SHA-256 `272704f5baea3144ea793aec695e41eb049ba7ef6d6ff07477b28f804d4b1381`). Le script rapporte `pass`, `sourceUnchanged` et `portClosed`.
+Prueba de no regresión V1 en navegador: `/workspace/reports/raster-circle-loft-1791719156523/report.json`. El círculo raster conserva su JSON canónico, fuente y STL de 178.884 bytes / 3.576 triángulos **idéntico después de recargar** (SHA-256 `272704f5baea3144ea793aec695e41eb049ba7ef6d6ff07477b28f804d4b1381`). El script informa `pass`, `sourceUnchanged` y `portClosed`.
 
-Budgets JavaScript mesurés sur les fichiers réels de `dist/assets` : entrée `index-ygi8OyIm.js` **173 489 octets** < 200 KiB ; plus grand autre chunk `three-vendor-BVsn0h3b.js` **561 528 octets** < 600 KiB ; 35 fichiers JS, aucune violation. Ces tailles doivent être relevées de nouveau après toute modification du build.
+Presupuestos JavaScript medidos en archivos reales de `dist/assets`: entrada `index-ygi8OyIm.js` de **173.489 bytes**, menor que 200 KiB; fragmento restante mayor `three-vendor-BVsn0h3b.js` de **561.528 bytes**, menor que 600 KiB; 35 archivos JS sin infracciones. Estos tamaños deben volver a medirse después de cualquier cambio de compilación.
 
-## Limites
+## Límites
 
-Aucun essai sur téléphone physique, autre moteur de navigateur, slicer ou imprimante 3D ; les contrôles de coque n'attestent pas tous les SVG possibles ni la résistance mécanique réelle d'un pont de 0,8 mm. Le navigateur est un Chromium local à localhost, le toucher est émulé. L'historique Undo/Redo reste en mémoire de l'onglet, pas dans le JSON. Le script Playwright et ses artefacts sont hors dépôt : les tests Vitest suivis par Git constituent la régression automatique partageable. Les workflows Quality/CodeQL ne se déclenchent pas sur un simple push de cette branche ; aucune PR, fusion ou déploiement du lot n'a été exécuté.
+No hubo pruebas en teléfono físico, otro motor de navegador, laminador ni impresora 3D; las verificaciones de envolvente no certifican todos los SVG posibles ni la resistencia mecánica real de un puente de 0,8 mm. El navegador fue Chromium local en localhost y el tacto se emuló. El historial Deshacer/Rehacer permanece en memoria de la pestaña, no en el JSON. El script Playwright y sus artefactos están fuera del repositorio: las pruebas Vitest versionadas en Git son la regresión automática compartible. Los flujos Quality/CodeQL no se activan por un simple push de esta rama; no se ejecutó ninguna solicitud de incorporación, fusión ni despliegue de este lote.
+
+> **Nota CookieForge:** estos resultados son históricos del proyecto original y no se volvieron a ejecutar al traducir el informe.
