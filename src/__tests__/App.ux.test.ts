@@ -40,18 +40,18 @@ describe('App UX states', () => {
   it('opens Bibliothèque de formes directly and exposes its active navigation state', async () => {
     renderApp();
 
-    const navigationButton = document.querySelector<HTMLButtonElement>('button[title="Bibliothèque de formes"]');
+    const navigationButton = document.querySelector<HTMLButtonElement>('button[title="Biblioteca de formas"]');
     navigationButton?.click();
 
     await vi.waitFor(() => {
-      expect(document.getElementById('shape-library-title')?.textContent).toBe('Bibliothèque de formes');
+      expect(document.getElementById('shape-library-title')?.textContent).toBe('Biblioteca de formas');
     });
 
     expect(navigationButton?.getAttribute('aria-current')).toBe('page');
     expect(document.querySelector('button[aria-label^="Utiliser la forme "]')).not.toBeNull();
 
     const seasonalFilter = Array.from(document.querySelectorAll<HTMLButtonElement>('.category-filter'))
-      .find((button) => button.textContent?.trim() === 'Saisons');
+      .find((button) => button.textContent?.trim() === 'Temporadas');
     seasonalFilter?.click();
     await vi.waitFor(() => {
       expect(seasonalFilter?.getAttribute('aria-pressed')).toBe('true');
