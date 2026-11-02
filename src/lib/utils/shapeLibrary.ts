@@ -1,5 +1,5 @@
 /**
- * Predefined shapes library for quick cookie cutter design
+ * Biblioteca de figuras predefinidas para diseñar cortantes rápidamente
  */
 
 export interface ShapeDefinition {
@@ -11,10 +11,10 @@ export interface ShapeDefinition {
 }
 
 export const SHAPE_LIBRARY: ShapeDefinition[] = [
-  // Basic shapes
+  // Formas básicas
   {
     id: 'circle',
-    name: 'Circle',
+    name: 'Círculo',
     category: 'basic',
     icon: '⚪',
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -23,7 +23,7 @@ export const SHAPE_LIBRARY: ShapeDefinition[] = [
   },
   {
     id: 'square',
-    name: 'Square',
+    name: 'Cuadrado',
     category: 'basic',
     icon: '⬛',
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -32,7 +32,7 @@ export const SHAPE_LIBRARY: ShapeDefinition[] = [
   },
   {
     id: 'heart',
-    name: 'Heart',
+    name: 'Corazón',
     category: 'basic',
     icon: '❤️',
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -41,7 +41,7 @@ export const SHAPE_LIBRARY: ShapeDefinition[] = [
   },
   {
     id: 'star',
-    name: 'Star',
+    name: 'Estrella',
     category: 'basic',
     icon: '⭐',
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -50,7 +50,7 @@ export const SHAPE_LIBRARY: ShapeDefinition[] = [
   },
   {
     id: 'flower',
-    name: 'Flower',
+    name: 'Flor',
     category: 'basic',
     icon: '🌸',
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -62,10 +62,10 @@ export const SHAPE_LIBRARY: ShapeDefinition[] = [
     </svg>`
   },
 
-  // Seasonal
+  // Temporada
   {
     id: 'snowflake',
-    name: 'Snowflake',
+    name: 'Copo de nieve',
     category: 'seasonal',
     icon: '❄️',
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -78,7 +78,7 @@ export const SHAPE_LIBRARY: ShapeDefinition[] = [
   },
   {
     id: 'tree',
-    name: 'Christmas Tree',
+    name: 'Árbol de Navidad',
     category: 'seasonal',
     icon: '🎄',
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -88,7 +88,7 @@ export const SHAPE_LIBRARY: ShapeDefinition[] = [
   },
   {
     id: 'pumpkin',
-    name: 'Pumpkin',
+    name: 'Calabaza',
     category: 'seasonal',
     icon: '🎃',
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -99,7 +99,7 @@ export const SHAPE_LIBRARY: ShapeDefinition[] = [
   },
   {
     id: 'egg',
-    name: 'Easter Egg',
+    name: 'Huevo de Pascua',
     category: 'seasonal',
     icon: '🥚',
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -107,10 +107,10 @@ export const SHAPE_LIBRARY: ShapeDefinition[] = [
     </svg>`
   },
 
-  // Animals
+  // Animales
   {
     id: 'cat',
-    name: 'Cat',
+    name: 'Gato',
     category: 'animals',
     icon: '🐱',
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -121,7 +121,7 @@ export const SHAPE_LIBRARY: ShapeDefinition[] = [
   },
   {
     id: 'dog',
-    name: 'Dog',
+    name: 'Perro',
     category: 'animals',
     icon: '🐶',
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -132,7 +132,7 @@ export const SHAPE_LIBRARY: ShapeDefinition[] = [
   },
   {
     id: 'butterfly',
-    name: 'Butterfly',
+    name: 'Mariposa',
     category: 'animals',
     icon: '🦋',
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -145,7 +145,7 @@ export const SHAPE_LIBRARY: ShapeDefinition[] = [
   },
   {
     id: 'fish',
-    name: 'Fish',
+    name: 'Pez',
     category: 'animals',
     icon: '🐠',
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -155,10 +155,10 @@ export const SHAPE_LIBRARY: ShapeDefinition[] = [
     </svg>`
   },
 
-  // Letters (just a few examples)
+  // Letras (algunos ejemplos)
   {
     id: 'letter-a',
-    name: 'Letter A',
+    name: 'Letra A',
     category: 'letters',
     icon: 'A',
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -167,7 +167,7 @@ export const SHAPE_LIBRARY: ShapeDefinition[] = [
   },
   {
     id: 'letter-b',
-    name: 'Letter B',
+    name: 'Letra B',
     category: 'letters',
     icon: 'B',
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -175,10 +175,10 @@ export const SHAPE_LIBRARY: ShapeDefinition[] = [
     </svg>`
   },
 
-  // Numbers
+  // Números
   {
     id: 'number-0',
-    name: 'Number 0',
+    name: 'Número 0',
     category: 'numbers',
     icon: '0',
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -187,7 +187,7 @@ export const SHAPE_LIBRARY: ShapeDefinition[] = [
   },
   {
     id: 'number-1',
-    name: 'Number 1',
+    name: 'Número 1',
     category: 'numbers',
     icon: '1',
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -197,21 +197,21 @@ export const SHAPE_LIBRARY: ShapeDefinition[] = [
 ];
 
 /**
- * Get shapes by category
+ * Obtener figuras por categoría
  */
 export function getShapesByCategory(category: ShapeDefinition['category']): ShapeDefinition[] {
   return SHAPE_LIBRARY.filter(shape => shape.category === category);
 }
 
 /**
- * Get all categories
+ * Obtener todas las categorías
  */
 export function getAllCategories(): ShapeDefinition['category'][] {
   return ['basic', 'seasonal', 'animals', 'letters', 'numbers'];
 }
 
 /**
- * Get shape by ID
+ * Obtener una figura por identificador
  */
 export function getShapeById(id: string): ShapeDefinition | undefined {
   return SHAPE_LIBRARY.find(shape => shape.id === id);
