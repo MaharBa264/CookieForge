@@ -1,55 +1,58 @@
-# Validation — brouillons de récupération locaux (REA lot 1b)
+# Validación — Borradores de recuperación local (REA, lote 1b)
 
-## Livraison et périmètre
+## Entrega y alcance
 
-Date : 2026-10-10. Dépôt razorglyon/cookie-cutter-designer, clone /workspace/cookie-cutter-designer. Branche feature/local-project-recovery, **PR #59 brouillon**, base fix/dependency-audit / #58. Programme REA et Continue1558447158800420917 autorisent commits/push/PR ; **aucun merge ou déploiement sans GO merge**.
+Fecha: 10/10/2026. Repositorio original `razorglyon/cookie-cutter-designer`, copia local `/workspace/cookie-cutter-designer`. Rama `feature/local-project-recovery`, **PR #59 en borrador**, base `fix/dependency-audit` / #58. El programa REA y Continue1558447158800420917 autorizaban commits, publicaciones y solicitudes de incorporación; **no autorizaban fusionar ni desplegar sin un permiso específico**.
 
-- Fondations : `fc757b1140a20feda926ee348e6173b3493808d0`, add isolated local recovery drafts.
-- App/UI : `c3d9fbacb4f30fe22da947011112538fa01d8d26`, connect recovery drafts to the app workflow.
-- Le checkpoint documentaire suivant ne change aucun octet de source, tests, manifeste, lockfile ou configuration.
-- Base produit #57 et correctif sécurité #58 restent séparés, ouverts, non fusionnés ; aucune fermeture des PR Dependabot.
+- Fundamentos: `fc757b1140a20feda926ee348e6173b3493808d0`, incorporación de borradores aislados de recuperación local.
+- Aplicación/interfaz: `c3d9fbacb4f30fe22da947011112538fa01d8d26`, conexión de borradores de recuperación al flujo de la aplicación.
+- El siguiente punto de control documental no modificó código fuente, pruebas, manifiesto, archivo de bloqueo ni configuración.
+- La base de producto #57 y la corrección de seguridad #58 permanecían separadas, abiertas y sin fusionar; no se cerraron solicitudes de Dependabot.
 
-## Contrat livré
+## Contrato implementado
 
-Base IndexedDB distincte cookie-cutter-designer-recovery, version1, store drafts ; enveloppe format/version/draftIdUUID/savedAt/documentV1 stricte, détachée, gelée et revalidée à lecture/écriture. Pas de modification du schéma des projets nommés.
+Base IndexedDB independiente `cookie-cutter-designer-recovery`, versión 1, almacén `drafts`; estructura estricta con formato, versión, UUID `draftId`, `savedAt` y `documentV1`, separada, congelada y revalidada al leer y escribir. No se modifica el esquema de proyectos con nombre.
 
-Un UUID neuf par instance/époque, même projet dans plusieurs onglets = brouillons indépendants. Debounce750ms, queue sérialisée, confirmation seulement après completion transactionnelle. Les snapshots de l'ancien projet gardent leur emplacement et ne remplacent pas le statut du nouveau.
+Un UUID nuevo por instancia/época; un mismo proyecto abierto en varias pestañas genera borradores independientes. Espera de 750 ms antes de guardar, cola serializada y confirmación únicamente después de completar la transacción. Las instantáneas del proyecto anterior conservan su ubicación y no reemplazan el estado del nuevo.
 
-Reprise explicite via workflow.startNew et garde save/discard/cancel : capture avant première attente, version affichée vérifiée, éditions/imports/changements de session/unmount invalidant une reprise tardive. Pas d'autorécupération, pas de suppression du brouillon source. Suppression confirmée via comparaison atomique dans une transaction ; conflit visible et refresh si un autre onglet actualise la version.
+Reanudación explícita mediante `workflow.startNew` y comprobación de guardar/descartar/cancelar: captura antes de la primera espera, verificación de la versión mostrada, e invalidación de reanudaciones tardías si hubo ediciones, importaciones, cambios de sesión o desmontaje. No hay recuperación automática ni eliminación del borrador de origen. Eliminación confirmada mediante comparación atómica en una transacción; conflicto visible y actualización si otra pestaña cambia la versión.
 
-Brouillons **conservés après Save project**, supprimables explicitement. Erreurs/retry et statut autosave distincts de Saved locally ; export .ccd.json utilisable comme backup. Flush pagehide/visibilityhidden best effort, drainage au démontage normal.
+Los borradores **se conservan después de Guardar proyecto** y pueden eliminarse expresamente. Los errores, reintentos y el estado de guardado automático son distintos de «Guardado localmente»; la exportación `.ccd.json` permite obtener una copia de seguridad. Vaciado de escrituras en `pagehide` o `visibilityhidden` como mejor esfuerzo; drenaje al desmontar normalmente.
 
-## Provenance des contrôles
+## Procedencia de las comprobaciones
 
-- TDD fondations : RED réel puis52 ciblés verts ; rejeu parent global882/57 et check0/0 avant commit.
-- Conformité core deleg_908eab2c PASS ; qualité deleg_10d31ca1 APPROVED. Digest4 trié UTF-8+NUL+octets+NUL : `2fc266d643616285fed2513f3e46f445ec07d5dbe2a0352d120adf16b604b2ec`, identique aux octets committés.
-- TDD intégration : RED proposition initiale, puis73 ciblés verts incluant App.local-projects et App.export-validity, sans modification des tests voisins.
-- **Global parent : 915 tests / 59 fichiers**, check0 erreur/0 warning, smoke exports3, build réussi, pnpm audit au seuil moderate0 avis connus. TMP isolé, threadsVitest1 et validations sérialisées. Warning chunkThree.js>600kB préexistant.
-- Conformité UI deleg_cfc14922 PASS ; qualité deleg_8fddb9ad APPROVED. Digest4 : `7cb502cea7a816d2b4831244319a8ac20fdb28005df83eba3df8177648f7c1f6`, vérifié et identique au commitc3d9fba. Revues lecture seule, pas des replays runtime supplémentaires.
+- Desarrollo guiado por pruebas de los fundamentos: resultado rojo real, seguido de 52 pruebas específicas aprobadas; ejecución global principal de 882 pruebas en 57 archivos y comprobación de tipos 0/0 antes del commit.
+- Conformidad del núcleo `deleg_908eab2c`: PASS; calidad `deleg_10d31ca1`: APPROVED. Digest4 de rutas ordenadas, UTF-8 + NUL + bytes + NUL: `2fc266d643616285fed2513f3e46f445ec07d5dbe2a0352d120adf16b604b2ec`, idéntico a los bytes publicados.
+- Desarrollo guiado por pruebas de integración: propuesta inicial roja, luego 73 pruebas específicas aprobadas, incluidas `App.local-projects` y `App.export-validity`, sin modificar pruebas vecinas.
+- **Ejecución global principal: 915 pruebas / 59 archivos**; comprobación 0 errores / 0 advertencias, 3 pruebas de exportación, compilación correcta y `pnpm audit` con umbral moderado sin avisos conocidos. Directorio temporal aislado, Vitest con un proceso y validaciones secuenciales. Advertencia previa de fragmento Three.js mayor a 600 kB.
+- Conformidad de interfaz `deleg_cfc14922`: PASS; calidad `deleg_8fddb9ad`: APPROVED. Digest4: `7cb502cea7a816d2b4831244319a8ac20fdb28005df83eba3df8177648f7c1f6`, comprobado e idéntico al commit `c3d9fba`. Revisiones de solo lectura, no ejecuciones adicionales.
 
-## Chromium réel — observation ponctuelle hors dépôt
+## Chromium real — observación puntual externa al repositorio
 
-Script : /workspace/reports/local-project-recovery-browser.mjs. Rapport : commands/native-recovery-1791636402629/report.json sous TMP du dépôt. Serveur Vite127.0.0.1:4325, contexte navigateur neuf, données de recette jetables ; viewport1365x900 puis375x812. Capture de l'application réelle, pas montage alternatif de composants ni donnée native simulée. Seule la panne quota est injectée intentionnellement dans put du store recovery ; le reste passe par les vraies UI et transactions IndexedDB.
+Script: `/workspace/reports/local-project-recovery-browser.mjs`. Informe: `commands/native-recovery-1791636402629/report.json` bajo el directorio temporal del repositorio. Servidor Vite `127.0.0.1:4325`, contexto de navegador nuevo y datos de prueba descartables; resolución 1365 × 900 y luego 375 × 812. Se probó la aplicación real, sin montaje alternativo de componentes ni datos nativos simulados. Solo se inyectó deliberadamente una falla de cuota en `put` del almacén de recuperación; lo demás utilizó la interfaz y transacciones IndexedDB reales.
 
-**11 étapes réussies :**
-1. Création/sauvegarde nommée puis édition : brouillon confirmé égal au JSON exporté, bibliothèque inchangée.
-2. Reload propose le brouillon sans ouvrir automatiquement un document.
-3. Reprise explicite exacte avec génération, dirty, brouillon source et projet enregistré préservés.
-4. Deux onglets éditent le même ID projet avec UUID de brouillons différents ; ancien brouillon conservé.
-5. Reprise pendant dirty : Cancel natif conserve document et brouillon.
-6. Autre onglet actualise pendant confirmation delete : transaction comparative refuse le snapshot obsolète.
-7. Delete Cancel conserve ; confirmé supprime uniquement le brouillon choisi et rend le focus.
-8. Quota recovery-only injecté : erreur visible, backupJSON disponible, bibliothèque intacte.
-9. Après restauration de put natif, retry confirme le dernier snapshot accepté.
-10. Save project explicite modifie le projet nommé sans purger le brouillon.
-11. Desktop puis largeur375 : captures inspectées, aucun overflow horizontal global.
+**11 etapas aprobadas:**
 
-Errors/consoleErrors/failedRequests vides. HEADfc757b1 et digest11 des sources/tests/manifeste/lock/config `fcf331130e40dc2e33148ae48621eb942395dbf8a8362eb8e3f279eb10b3a2d6` identiques avant/après. Les mêmes octets ont été comparés aux blobs du commitc3d9fba avant publication. Le SHA de collecte n'est donc pas présenté comme le SHA committé à ce moment ; l'égalité des contenus est démontrée séparément.
+1. Crear/guardar un proyecto con nombre y luego editarlo: borrador confirmado igual al JSON exportado; biblioteca sin cambios.
+2. Recargar: se ofrece el borrador sin abrir automáticamente ningún documento.
+3. Reanudar explícitamente la versión exacta con generación, estado modificado, borrador de origen y proyecto guardado preservados.
+4. Dos pestañas editan el mismo ID de proyecto con UUID de borradores distintos; se conserva el borrador anterior.
+5. Reanudación con cambios sin guardar: Cancelar nativo conserva documento y borrador.
+6. Otra pestaña actualiza durante la confirmación de eliminación: la transacción comparativa rechaza la instantánea desactualizada.
+7. Cancelar eliminación conserva; confirmar elimina solo el borrador elegido y devuelve el foco.
+8. Falla de cuota inyectada solo en recuperación: error visible, copia JSON disponible y biblioteca intacta.
+9. Tras restaurar el `put` nativo, reintentar confirma la última instantánea aceptada.
+10. Guardar proyecto explícitamente modifica el proyecto con nombre sin purgar el borrador.
+11. Escritorio y ancho de 375 px: capturas revisadas, sin desbordamiento horizontal global.
 
-## Limites et suite
+Listas de errores, errores de consola y solicitudes fallidas vacías. HEAD `fc757b1` y digest11 de fuentes/pruebas/manifiesto/bloqueo/configuración `fcf331130e40dc2e33148ae48621eb942395dbf8a8362eb8e3f279eb10b3a2d6` idénticos antes y después. Los mismos bytes se compararon con los blobs del commit `c3d9fba` antes de publicarlo. Por eso el SHA de recolección no se presenta como el SHA publicado en aquel momento: la igualdad de contenidos se demostró por separado.
 
-Le browser harness/rapport/captures restent hors dépôt et non intégrés à la CI. Les captures montrent des portions visibles/scrollées du panneau, pas tous les contrôles simultanément. Pas de certification lecteur d'écran, responsive global, application déployée ou impression physique. Le chrono exact750ms n'est pas mesuré par les tests App/UI (couvert au niveau core), et unmount pendant le prompt de reprise n'est pas un cas App explicite : les tests distinguent lecture retardée et prompt delete.
+## Límites y próximos pasos
 
-Aucune garantie du dernier geste avant crash/fermeture forcée ou transaction terminée. Aucun undo/raster original après reload ajouté au formatV1. Pas de purge automatique, claim collaboratif ou LWW multi-onglets.
+El ejecutor del navegador, el informe y las capturas permanecen fuera del repositorio y no forman parte de la integración continua. Las capturas muestran partes visibles o desplazadas del panel, no todos los controles simultáneamente. No certifican lectores de pantalla, adaptación global a móviles, aplicación desplegada ni impresión física. Los 750 ms exactos no se midieron en las pruebas de aplicación/interfaz (se cubrieron en el núcleo); desmontar durante la pregunta de reanudación no es un caso explícito de la aplicación: las pruebas distinguen lectura retrasada y confirmación de eliminación.
 
-La CI finale doit être lue sur le head exact de #59, dispatch Quality seulement car base non-main ; les résultats locaux ne la rendent pas implicitement verte. Aucun Deploy lancé. Après autorisation de fusion seulement, rollback via PR de revert ; ne pas supprimer les bases utilisateur. Prochain lot fonctionnel : import fluide, lot2, branche/PR distincte.
+No se garantiza conservar el último gesto antes de un cierre forzado, fallo o transacción sin terminar. No se incorporaron deshacer ni raster original después de recargar el formato V1. No hay purga automática, coordinación colaborativa ni resolución «última escritura gana» entre pestañas.
+
+La integración continua final debe comprobarse sobre el commit exacto de #59; solo se preveía disparar Quality porque la base no era `main`. Los resultados locales no implican que la integración remota haya aprobado. No se ejecutó Deploy. Solo después de autorizar una fusión se permite revertir mediante solicitud de incorporación; no eliminar las bases de datos del usuario. Siguiente lote funcional original: importación fluida, lote 2, rama y solicitud separadas.
+
+> **Nota CookieForge:** se trata de evidencias y autorizaciones históricas del proyecto original, no de pruebas repetidas en nuestra rama.
