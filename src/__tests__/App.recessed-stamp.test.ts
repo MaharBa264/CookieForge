@@ -58,10 +58,10 @@ it.each(['circle', 'heart'] as const)('%s selects a session-owned mode with one 
   const original = fixture(shape === 'heart' ? 3 : 2, shape), records = new Map<string, DesignDocument>();
   let session = setup(original, records); await ready(session); const raised = bytes(), originalJson = encodeProject(session.getDocument());
   await click('Réglages'); const length = historyStore.getLength(), epoch = session.sessionEpoch;
-  await click('Creux');
+  await click('Hueco');
   expect(session.getDocument()).toMatchObject({ schemaVersion: 4, imprintMode: 'recessed', id: original.id, source: original.source, sketch: original.sketch });
   expect(historyStore.getLength()).toBe(length + 1); expect(session.sessionEpoch).toBe(epoch);
-  expect(button('Creux').getAttribute('aria-pressed')).toBe('true');
+  expect(button('Hueco').getAttribute('aria-pressed')).toBe('true');
   expect(document.querySelector<HTMLInputElement>('#stampDepth')!.max).toBe('3');
   await ready(session); const recessed = bytes(), recessedJson = encodeProject(session.getDocument());
   expect(recessed).not.toEqual(raised);
@@ -81,19 +81,19 @@ it.each(['circle', 'heart'] as const)('%s selects a session-owned mode with one 
   session = setup(null, records); await click('Projets locaux'); await vi.waitFor(() => expect(document.querySelector('[aria-label="Ouvrir Tampon local"]')).not.toBeNull());
   await click('Ouvrir Tampon local'); await ready(session);
   expect(encodeProject(session.getDocument())).toBe(savedJson); expect(bytes()).toEqual(savedBytes);
-  await click('Réglages'); expect(button('Creux').getAttribute('aria-pressed')).toBe('true');
+  await click('Réglages'); expect(button('Hueco').getAttribute('aria-pressed')).toBe('true');
   const action = await exportPanel(); expect(action.disabled).toBe(false); action.click();
   expect(boundary.stl).toHaveBeenCalledTimes(1); expect(boundary.stl.mock.calls[0][0]).toBe(get(model)!.mesh);
 }, 40000);
 it('refuses deep raised settings without loss and offers an explicit reduction action', async () => {
   const session = setup(fixture(5)); await ready(session); await click('Réglages');
   const before = session.getDocument(), length = historyStore.getLength();
-  await click('Creux'); expect(session.getDocument()).toBe(before); expect(historyStore.getLength()).toBe(length);
-  expect(button('Relief').getAttribute('aria-pressed')).toBe('true');
+  await click('Hueco'); expect(session.getDocument()).toBe(before); expect(historyStore.getLength()).toBe(length);
+  expect(button('Relieve').getAttribute('aria-pressed')).toBe('true');
   expect(document.querySelector('#stampImprint-error')?.textContent).toContain('3 mm');
-  expect(button('Creux').getAttribute('aria-describedby')).toContain('stampImprint-error');
+  expect(button('Hueco').getAttribute('aria-describedby')).toContain('stampImprint-error');
   await click('Réduire la profondeur à 3 mm'); expect(session.getDocument()?.parameters.stampDepth).toBe(3);
-  expect(session.getDocument()?.schemaVersion).toBe(1); await click('Creux'); await ready(session);
+  expect(session.getDocument()?.schemaVersion).toBe(1); await click('Hueco'); await ready(session);
   expect(session.getDocument()).toMatchObject({ schemaVersion: 4, imprintMode: 'recessed' });
 }, 20000);
 it('blocks a retained raised mesh synchronously even if generation is cancelled back to ready', async () => {
