@@ -1,222 +1,73 @@
-# Contributing to Cookie Cutter Designer
+# Cómo colaborar con CookieForge
 
-Thank you for your interest in contributing to Cookie Cutter Designer! This document provides guidelines and instructions for contributing to the project.
+¡Gracias por querer contribuir! CookieForge es un proyecto de código abierto orientado a diseñar cortantes y sellos para galletas imprimibles en 3D.
 
-## 🌟 How Can I Contribute?
+## Idioma del proyecto
 
-### Reporting Bugs
+**El español es el idioma principal** de la interfaz, documentación, tutoriales, mensajes y ejemplos. Consultá [las convenciones de idioma](docs/CONVENCIONES_ES.md). Conservá los nombres de APIs, dependencias, archivos y formatos cuando traducirlos pueda romper compatibilidad.
 
-Before creating bug reports, please check existing issues to avoid duplicates. When creating a bug report, include:
+## Informar errores y proponer mejoras
 
-- **Clear title and description**
-- **Steps to reproduce** the behavior
-- **Expected behavior** vs actual behavior
-- **Screenshots** if applicable
-- **Browser/OS information**
-- **Console errors** if any
+Antes de abrir una incidencia, comprobá si ya existe otra similar. Incluí una descripción clara, pasos para reproducir el problema, resultado esperado y resultado observado. Adjuntá capturas, archivos de ejemplo y datos del navegador o sistema operativo cuando sean útiles. No publiques credenciales ni información privada.
 
-### Suggesting Enhancements
+Las propuestas de nuevas funciones también se registran mediante [incidencias](https://github.com/MaharBa264/CookieForge/issues). Explicá qué problema resuelven y, si podés, acompañalas con un ejemplo.
 
-Enhancement suggestions are tracked as GitHub issues. When creating an enhancement suggestion:
+## Preparar el entorno
 
-- **Use a clear and descriptive title**
-- **Provide a detailed description** of the suggested enhancement
-- **Explain why this enhancement would be useful**
-- **Include mockups or examples** if applicable
-
-### Pull Requests
-
-1. **Fork the repository** and create your branch from `main`
-2. **Install dependencies**: `pnpm install --frozen-lockfile`
-3. **Make your changes** following the code style guidelines below
-4. **Test your changes**: `pnpm run dev` and verify everything works
-5. **Run dependency and type checks**: `pnpm audit --audit-level=moderate` then `pnpm run check`
-6. **Commit your changes** with clear, descriptive commit messages
-7. **Push to your fork** and submit a pull request
-
-## 📝 Code Style Guidelines
-
-### TypeScript
-
-- Use **TypeScript strict mode** - no `any` types unless absolutely necessary
-- Add **JSDoc comments** to all exported functions
-- Prefer **async/await** over promises
-- Extract **magic numbers** to constants or parameters
-
-### Svelte
-
-- Use **Svelte 5 runes** syntax (`$state()`, `$derived()`, `$effect()`)
-- Keep components **focused and small**
-- Separate **UI logic from business logic**
-- Put business logic in `src/lib/utils/`
-
-### File Organization
-
-```
-src/lib/
-├── components/
-│   ├── ui/              # UI components
-│   └── viewer/          # 3D viewer components
-├── stores/              # Svelte stores for state management
-├── types/               # TypeScript type definitions
-└── utils/               # Business logic and utilities
-```
-
-### Naming Conventions
-
-- **Components**: PascalCase (e.g., `FileUpload.svelte`)
-- **Utilities**: camelCase (e.g., `pathOperations.ts`)
-- **Types**: PascalCase (e.g., `CookieCutterParams`)
-- **Constants**: UPPER_SNAKE_CASE (e.g., `DEFAULT_PARAMS`)
-
-## 🏗️ Development Setup
-
-### Prerequisites
-
-- **Node.js 22.12+** (see `.nvmrc`)
-- **pnpm 10.33.4** (declared in `package.json`)
-
-### Installation
+Se requieren **Node.js 22.12 o posterior** y **pnpm 10.33.4**.
 
 ```bash
-# Clone your fork
-git clone https://github.com/YOUR-USERNAME/cookie-cutter-designer.git
-cd cookie-cutter-designer
-
-# Install dependencies
+git clone https://github.com/MaharBa264/CookieForge.git
+cd CookieForge
 pnpm install --frozen-lockfile
-
-# Start development server
 pnpm run dev
 ```
 
-The app will be available at `http://localhost:5173/cookie-cutter-designer/` by default.
+El servidor local suele estar disponible en `http://localhost:5173/`.
 
-### Development Commands
+## Proponer cambios
+
+1. Creá una rama a partir de la versión que corresponda y evitá modificar directamente `main`.
+2. Realizá cambios pequeños y enfocados.
+3. Conservá la compatibilidad de los documentos existentes y evitá alterar el motor geométrico sin pruebas.
+4. Escribí o actualizá las pruebas pertinentes.
+5. Ejecutá las verificaciones antes de enviar una solicitud de incorporación (*pull request*).
+6. Explicá el cambio, sus límites y cómo lo probaste.
 
 ```bash
-# Start dev server
-pnpm run dev
-
-# Type checking
 pnpm run check
-
-# Dependency security audit
-pnpm audit --audit-level=moderate
-
-# Build for production
+pnpm run test:run -- --maxWorkers=1
 pnpm run build
-
-# Preview production build
-pnpm run preview
+pnpm run test:smoke
 ```
 
-## 🎯 Areas for Contribution
+Para revisar las dependencias, también podés ejecutar `pnpm audit --audit-level=moderate`.
 
-### High Priority
+## Convenciones de código
 
-- **Performance optimizations** for large SVG files
-- **Additional export formats** (3MF, OBJ)
-- **Better mobile support** and responsive design
-- **Internationalization** (i18n) support
-- **Unit tests** for utilities and components
+- Utilizá TypeScript con tipado estricto.
+- Preferí funciones y componentes pequeños, con responsabilidades claras.
+- Mantené separadas la lógica de interfaz y la lógica geométrica.
+- Conservá los nombres existentes de componentes, tipos y funciones cuando renombrarlos implique cambios innecesarios.
+- Agregá comentarios explicativos en español, especialmente para restricciones geométricas y decisiones de compatibilidad.
+- Respetá las convenciones de Svelte 5 ya utilizadas en el proyecto.
 
-### Feature Enhancements
+## Pruebas recomendadas
 
-- **Advanced path editing** tools
-- **Texture mapping** for embossing
-- **Print cost estimation** calculator
-- **Cloud storage** integration
-- **Community gallery** of designs
-- **AR preview** for mobile devices
+Además de las pruebas automáticas, comprobá los casos que correspondan al cambio: SVG con varios trazados, imágenes rasterizadas, contornos con huecos, límites de parámetros, funcionamiento táctil, guardado y recuperación de proyectos, y apertura de los archivos exportados en un laminador.
 
-### Documentation
+**No basta con que la vista 3D se vea bien:** las geometrías exportadas deben superar las validaciones existentes.
 
-- **Video tutorials** for using the app
-- **3D printing guides** for different materials
-- **API documentation** for utilities
-- **Translation** of docs to other languages
+## Seguridad y compatibilidad
 
-## 🧪 Testing Guidelines
+- No introduzcas llamadas a servicios externos en funciones previstas para trabajar sin conexión.
+- No incorpores claves ni tokens al repositorio.
+- No alteres los formatos V1–V4 sin un plan de migración y pruebas de compatibilidad.
+- No declares que una pieza es apta para contacto alimentario sin evidencia específica.
+- Conservá la licencia y los avisos de atribución del proyecto original.
 
-Before submitting a PR, please test:
+## Convivencia y licencia
 
-1. **Simple shapes** (test-star.svg in public/)
-2. **Complex SVGs** with many paths and curves
-3. **Large raster images** (>5MB)
-4. **Parameter edge cases** (min/max values)
-5. **Different browsers** (Chrome, Firefox, Safari)
-6. **STL export** in a slicer (PrusaSlicer, Cura, etc.)
+Se espera una colaboración respetuosa, constructiva e inclusiva. No se admiten acoso, discriminación ni divulgación de datos privados. Las contribuciones se distribuyen bajo la licencia MIT del repositorio.
 
-## 🔧 Technical Notes
-
-### Important Constraints
-
-- **Path Operations**: Always use Clipper.js (`pathOperations.ts`) for offsetting or boolean operations - native JavaScript operations lack precision
-- **Web Workers**: Use for CPU-intensive operations (>100ms) to keep UI responsive
-- **Memory Management**: Dispose Three.js meshes when replacing to prevent memory leaks
-- **3D Printing**: Respect physical constraints (wall thickness, angles, etc.)
-
-### Key Architecture Patterns
-
-- **State Management**: Centralized in `cookieCutterStore.ts`
-- **Reactive Updates**: Svelte 5 runes for component state, stores for global state
-- **Pipeline**: Upload → Process → Generate → Render → Export
-- **Path Precision**: Use Clipper.js for all geometric operations
-
-See `CLAUDE.md` for detailed architectural documentation.
-
-## 📄 Commit Message Guidelines
-
-Use clear, descriptive commit messages:
-
-```
-Add text embossing feature with font selection
-
-- Implement TextEmbosser component
-- Add 9 font options
-- Support for mirroring text for stamps
-- Add depth control (0.5-5mm)
-```
-
-**Format**:
-- First line: Brief summary (50 chars or less)
-- Blank line
-- Detailed description with bullet points
-- Reference issues if applicable (#123)
-
-## 🤝 Code of Conduct
-
-### Our Pledge
-
-We are committed to providing a welcoming and inspiring community for all. Please be respectful and constructive in all interactions.
-
-### Expected Behavior
-
-- Be **respectful** and **inclusive**
-- Provide **constructive feedback**
-- Focus on **what is best for the community**
-- Show **empathy** towards other community members
-
-### Unacceptable Behavior
-
-- Harassment, discrimination, or trolling
-- Personal or political attacks
-- Publishing others' private information
-- Any conduct inappropriate in a professional setting
-
-## 📞 Questions?
-
-- **Issues**: For bugs and feature requests
-- **Discussions**: For questions and general discussion
-- **Email**: For private inquiries (check README for contact)
-
-## 📜 License
-
-By contributing, you agree that your contributions will be licensed under the MIT License.
-
----
-
-**Thank you for contributing to Cookie Cutter Designer!** 🍪✨
-
-Your contributions help make 3D-printable cookie cutter design accessible to everyone.
+¡Gracias por ayudar a construir CookieForge! 🍪
