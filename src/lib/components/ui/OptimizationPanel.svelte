@@ -43,7 +43,7 @@
 
 <div class="optimization-panel">
   <div class="panel-header">
-    <h3>🔧 Optimisation de l’impression</h3>
+    <h3>🔧 Optimización de impresión</h3>
     <button class="toggle-btn" on:click={() => showDetails = !showDetails}>
       {showDetails ? '▼' : '▶'}
     </button>
@@ -59,7 +59,7 @@
 
     <div class="status-info">
       <div class="status-badge" class:ready={report.canPrint} class:issues={!report.canPrint}>
-        {report.canPrint ? '✓ Prêt à imprimer' : '✗ Problèmes détectés'}
+        {report.canPrint ? '✓ Listo para imprimir' : '✗ Problemas detectados'}
       </div>
       <div class="print-stats">
         <div class="stat">
@@ -95,7 +95,7 @@
       </div>
 
       <button class="auto-fix-btn" on:click={applyAutoFix}>
-        🔧 Tout corriger automatiquement
+        🔧 Corregir todo automáticamente
       </button>
     </div>
 
@@ -115,7 +115,7 @@
     {/if}
   {:else}
     <div class="no-issues">
-      ✨ Parfait ! Aucun problème d’optimisation détecté.
+      ✨ ¡Perfecto! No se detectaron problemas de optimización.
     </div>
   {/if}
 </div>
