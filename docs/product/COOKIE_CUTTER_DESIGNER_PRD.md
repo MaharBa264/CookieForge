@@ -1,107 +1,109 @@
-# PRD — Cookie Cutter Designer nouvelle génération
+# Documento de requisitos del producto (PRD) — Cookie Cutter Designer de nueva generación
 
-**Statut :** prêt pour découpage technique
-**Audience :** Codex, développeur, reviewer produit
-**Produit :** application personnelle et locale de conception d’outils alimentaires imprimables en 3D
-**Stack contrainte :** Svelte 5, TypeScript strict, Three.js, Web Workers, pnpm
+**Estado histórico:** listo para dividir en tareas técnicas.  
+**Destinatarios:** Codex, desarrolladores y revisores de producto.  
+**Producto:** aplicación personal y local para diseñar herramientas alimentarias imprimibles en 3D.  
+**Tecnologías obligatorias del proyecto original:** Svelte 5, TypeScript estricto, Three.js, Web Workers y pnpm.
 
-**Contrainte de périmètre :** aucun compte, abonnement, paiement, paywall, backend métier ou bibliothèque cloud. Les fonctionnalités marquées Premium chez Cookiecad sont étudiées uniquement comme capacités fonctionnelles à proposer localement.
+**Restricción de alcance:** sin cuentas, suscripciones, pagos, muros de pago, backend funcional ni biblioteca en nube. Las funciones Premium de Cookiecad se consideran únicamente capacidades que podrían ofrecerse localmente.
 
-## 1. Résumé exécutif
+> Documento histórico de requisitos: las funciones aquí descritas son **objetivos**, no una afirmación de que todas estén implementadas en CookieForge.
 
-Cookie Cutter Designer transforme une image, un dessin ou une forme en un ou plusieurs outils imprimables : cutter, tampon, pochoir et variantes spécialisées.
+## 1. Resumen ejecutivo
 
-La refactorisation doit faire évoluer l’application d’un modèle monolithique `cutter | stamp` vers un système extensible de **documents**, **recettes métier** et **artefacts validés**, sans perdre les garanties print-ready existantes.
+Cookie Cutter Designer convierte una imagen, un dibujo o una forma en una o más herramientas imprimibles: cortante, sello, plantilla y variantes especializadas.
 
-La proposition de valeur différenciante est :
+La refactorización debe evolucionar desde un modelo monolítico `cutter | stamp` hasta un sistema extensible de **documentos**, **recetas de generación** y **artefactos validados**, sin perder las comprobaciones de imprimibilidad existentes.
 
-> Concevoir rapidement un outil personnalisé, comprendre ses dimensions et risques, puis exporter un fichier réellement validé pour la fabrication — sans compte obligatoire.
+La propuesta diferencial es:
 
-## 2. Problème
+> Diseñar rápidamente una herramienta personalizada, conocer sus dimensiones y riesgos, y exportar un archivo realmente validado para fabricar, sin necesidad de crear una cuenta.
 
-Les utilisateurs non experts en CAO veulent passer d’un visuel à un objet imprimable sans :
+## 2. Problema
 
-- redessiner manuellement la géométrie ;
-- comprendre les opérations booléennes ;
-- gérer les axes et unités ;
-- découvrir après impression que le modèle est ouvert ou déconnecté ;
-- multiplier les logiciels pour des variantes fréquentes.
+Quienes no dominan CAD quieren convertir imágenes en piezas imprimibles sin:
 
-Le dépôt actuel possède une géométrie robuste, mais :
+- redibujar toda la geometría;
+- comprender operaciones booleanas;
+- administrar ejes y unidades;
+- descubrir después de imprimir que la malla está abierta o desconectada;
+- utilizar varios programas para variantes frecuentes.
 
-- le modèle de paramètres ne représente que Cutter et Stamp ;
-- `App.svelte` orchestre trop de responsabilités ;
-- de nombreux composants avancés ne forment pas des parcours cohérents ;
-- il n’existe pas de format de projet portable et versionné ;
-- les modes spécialisés ne peuvent pas être ajoutés proprement.
+El repositorio analizado tenía geometría robusta, pero:
 
-## 3. Objectifs
+- su modelo de parámetros representaba solo Cortante y Sello;
+- `App.svelte` coordinaba demasiadas responsabilidades;
+- varios componentes avanzados no formaban flujos coherentes;
+- no existía un archivo de proyecto portátil y versionado;
+- no podían agregarse limpiamente modos especializados.
 
-### 3.1 Objectifs produit
+## 3. Objetivos
 
-- Réduire le temps entre import et premier aperçu exploitable à moins de 30 secondes sur un visuel simple.
-- Permettre de créer Cutter, Stamp, Imprint Cutter, Cutter + Stamp, Multi Cutter et Stencil dans le socle P1.
-- Afficher dimensions finales, validité et avertissements avant export.
-- Conserver un fonctionnement local-first sans inscription.
-- Permettre de sauvegarder et reprendre un projet.
-- Rendre chaque fonction annoncée réellement exécutable et testée.
+### 3.1 Objetivos de producto
 
-### 3.2 Objectifs techniques
+- Reducir a menos de 30 segundos el tiempo desde importar una imagen sencilla hasta obtener una primera vista previa útil.
+- Crear Cortante, Sello, Cortante con impresión interior, Cortante + Sello, Múltiples cortantes y Plantilla en la base P1.
+- Mostrar dimensiones finales, validez y advertencias antes de exportar.
+- Conservar una aplicación prioritariamente local, sin registro obligatorio.
+- Permitir guardar y continuar proyectos.
+- Lograr que toda función anunciada sea realmente ejecutable y esté probada.
 
-- Remplacer le `mode` binaire par un registry de recettes extensible.
-- Extraire l’orchestration de génération hors de `App.svelte`.
-- Conserver TypeScript strict et les validations actuelles.
-- Préserver les budgets de bundle.
-- Garantir l’annulation, le rejet des résultats obsolètes et la libération mémoire.
-- Versionner les documents et migrations.
+### 3.2 Objetivos técnicos
 
-## 4. Non-objectifs
+- Reemplazar el modo binario por un registro extensible de recetas.
+- Extraer de `App.svelte` la coordinación de generación.
+- Mantener TypeScript estricto y validaciones actuales.
+- Respetar los límites de tamaño JavaScript.
+- Garantizar cancelación, rechazo de respuestas obsoletas y liberación de memoria.
+- Versionar documentos y migraciones.
 
-- Génération de G-code.
-- Estimation fiable du temps d’impression.
-- Slicer intégré.
-- Compte utilisateur, authentification ou gestion de session.
-- Abonnement, paiement, essai commercial, paywall ou gestion de droits.
-- Backend métier, hébergement de projets ou bibliothèque cloud.
-- Marketplace de modèles.
-- Copie de l’interface, du contenu ou du code de Cookiecad.
-- Réparation silencieuse de géométries ambiguës.
-- Promesse d’une détection exhaustive des auto-intersections avant implémentation dédiée.
+## 4. Fuera de alcance
 
-## 5. Personas
+- Generar G-code.
+- Estimar de manera confiable el tiempo de impresión.
+- Integrar un laminador.
+- Cuentas, autenticación o sesiones de usuario.
+- Suscripciones, pagos, pruebas comerciales, muros de pago o gestión de licencias.
+- Backend de negocio, alojamiento de proyectos o biblioteca en nube.
+- Mercado de modelos.
+- Copiar la interfaz, el contenido o el código de Cookiecad.
+- Reparar silenciosamente geometrías ambiguas.
+- Prometer detección exhaustiva de autointersecciones sin implementar el algoritmo correspondiente.
 
-### 5.1 Créateur occasionnel
+## 5. Personas usuarias
 
-- possède une imprimante ou utilise un service d’impression ;
-- part d’une image ;
-- veut un STL rapidement ;
-- a besoin de valeurs recommandées et d’erreurs compréhensibles.
+### 5.1 Creador ocasional
 
-### 5.2 Pâtissier ou artisan
+- Tiene impresora 3D o utiliza un servicio de impresión.
+- Parte de una imagen.
+- Quiere obtener un STL rápidamente.
+- Necesita valores recomendados y errores comprensibles.
 
-- crée régulièrement des séries ;
-- utilise dimensions et tolérances précises ;
-- veut Cutter + Stamp, Multi Cutter, texte et presets ;
-- doit retrouver ses projets.
+### 5.2 Pastelero o artesano
 
-### 5.3 Maker avancé
+- Prepara series regularmente.
+- Necesita medidas y tolerancias precisas.
+- Quiere Cortante + Sello, Múltiples cortantes, texto y perfiles predefinidos.
+- Debe poder recuperar sus proyectos.
 
-- comprend les paramètres géométriques ;
-- veut inspecter épaisseur, couches et topologie ;
-- exporte STL, OBJ et 3MF ;
-- préfère un format de projet portable.
+### 5.3 Usuario avanzado de fabricación
 
-## 6. Principes UX
+- Comprende parámetros geométricos.
+- Quiere inspeccionar espesores, capas y topología.
+- Exporta STL, OBJ y 3MF.
+- Prefiere un formato portátil de proyectos.
 
-1. **Progressive disclosure** : les contrôles essentiels sont visibles ; les options avancées sont repliées.
-2. **Résultat mesuré** : afficher les dimensions du solide final, pas seulement les paramètres demandés.
-3. **Erreurs actionnables** : chaque rejet indique le problème, sa localisation si possible et une correction.
-4. **Pas de faux succès** : aucun export si la validation obligatoire échoue.
-5. **Local-first** : le navigateur reste utilisable sans compte ni backend.
-6. **Annulable** : les opérations longues peuvent être remplacées ou annulées.
-7. **Mobile consultable** : édition complexe prioritairement desktop, mais réglages, aperçu et export utilisables sur mobile.
+## 6. Principios de experiencia de usuario
 
-## 7. Modèle de domaine cible
+1. **Divulgación progresiva:** controles esenciales visibles y opciones avanzadas plegadas.
+2. **Resultados medidos:** mostrar dimensiones del sólido final, no solamente valores solicitados.
+3. **Errores accionables:** indicar problema, ubicación cuando sea posible y forma de corregirlo.
+4. **Sin éxitos ficticios:** impedir exportaciones que no superen la validación obligatoria.
+5. **Primero local:** el navegador funciona sin cuenta ni backend.
+6. **Operaciones cancelables:** permitir reemplazar o cancelar tareas largas.
+7. **Consulta móvil:** priorizar escritorio para edición compleja, pero permitir ajustes, visualización y exportación en móvil.
+
+## 7. Modelo de dominio previsto
 
 ```ts
 export type DesignKind =
@@ -139,7 +141,7 @@ export interface GeneratedArtifact {
 }
 ```
 
-Chaque recette doit fournir :
+Cada receta proporciona:
 
 ```ts
 export interface GenerationRecipe<K extends DesignKind> {
@@ -150,293 +152,289 @@ export interface GenerationRecipe<K extends DesignKind> {
 }
 ```
 
-## 8. Parcours principal
-
-1. L’utilisateur démarre un projet vide ou un exemple.
-2. Il importe une source ou choisit une forme.
-3. L’application nettoie/vectorise et présente les contours détectés.
-4. L’utilisateur corrige éventuellement le dessin dans l’éditeur 2D.
-5. Il choisit une recette métier.
-6. Les paramètres par défaut génèrent un premier résultat.
-7. Les modifications relancent une génération debounced et annulable.
-8. L’application mesure et valide chaque artefact.
-9. L’utilisateur inspecte l’aperçu, la heatmap ou les couches.
-10. Il sauvegarde le projet ou exporte un ou plusieurs fichiers.
-
-## 9. Exigences fonctionnelles
-
-### FR-001 — Création de projet
-
-- Créer un projet vide, depuis un exemple ou depuis un fichier.
-- Demander confirmation avant de remplacer un projet modifié.
-- Affecter un identifiant local et un nom éditable.
-
-**Acceptation**
-
-- Étant donné un projet modifié, quand l’utilisateur demande un nouveau projet, alors l’ancien reste intact jusqu’à confirmation.
-
-### FR-002 — Import
-
-Formats P0/P1 : SVG, PNG, JPG/JPEG, WebP.
-
-- sélection, drag & drop et collage ;
-- limites explicites de taille, dimensions et pixels ;
-- validation MIME et extension ;
-- SVG nettoyé sans scripts, événements ni ressources distantes ;
-- raster vectorisé dans un Worker ;
-- progression, annulation et erreurs structurées.
-
-**Acceptation**
-
-- Un fichier dépassant une limite est refusé avant vectorisation.
-- Deux imports rapides ne peuvent pas publier le résultat du premier après le second.
-- Un SVG contenant un script ne l’exécute jamais.
-
-### FR-003 — Document de dessin 2D
-
-- contours fermés, trous et îlots ;
-- outil plume pour segments droits et courbes de Bézier ;
-- primitives rectangle, cercle/ellipse, polygone régulier et étoile ;
-- sélection, déplacement, duplication et suppression ;
-- édition de points, conversion angle/courbe et poignées de Bézier ;
-- transformations : translation, rotation, échelle, miroir et conservation optionnelle des proportions ;
-- grille configurable ;
-- aimantation activable à la grille, aux points, aux axes et aux centres ;
-- calques avec renommage, visibilité, verrouillage et ordre ;
-- undo/redo ;
-- snapshot original restaurable ;
-- opérations booléennes explicites ;
-- détection des chemins ouverts et auto-intersections 2D.
-
-**Acceptation**
-
-- Désactiver l’aimantation restitue les coordonnées libres sans modifier les points existants.
-- Une transformation numérique et son annulation restaurent exactement les coordonnées précédentes.
-- Un calque verrouillé ne peut pas être modifié par un geste ou un raccourci.
-- Les primitives sont convertibles en chemins éditables sans changement visuel perceptible.
-
-### FR-004 — Catalogue de recettes
-
-- afficher les recettes disponibles avec description et niveau de maturité ;
-- filtrer les réglages selon la recette ;
-- empêcher les combinaisons incompatibles ;
-- permettre une migration explicite lors du changement de recette.
-
-Aucune recette ne doit apparaître comme stable si elle ne possède pas tests et export vérifié.
-
-### FR-005 — Cutter
-
-Paramètres requis :
-
-- taille cible et dimension pilote ;
-- épaisseur de paroi ;
-- hauteur de coupe et hauteur totale ;
-- taper ;
-- poignée activée, style et hauteur ;
-- plateau cible.
-
-P1/P2 : seconde lame, pointe biseautée, profil Fondant, symétrie, barres centrales.
-
-Le résultat doit être un solide fermé et connecté, sauf ensemble explicitement multi-pièces.
-
-### FR-006 — Stamp
-
-- relief ;
-- base commune obligatoire ;
-- poignée optionnelle ;
-- trous conservés ;
-- îlots connectés par la base ;
-- emboss/deboss ;
-- hauteur du dos et du relief.
-
-### FR-007 — Imprint Cutter
-
-- cutter extérieur ;
-- reliefs intérieurs ;
-- profondeur depuis la pointe de lame ;
-- profondeur zéro autorisée pour convertir un détail en découpe ;
-- courbe plate, chanfreinée ou arrondie ;
-- base des reliefs configurable.
-
-### FR-008 — Cutter + Stamp
-
-- produire au minimum deux artefacts : cutter et tampon ;
-- dimensions coordonnées ;
-- tolérance positive configurable ;
-- miroir correct du tampon ;
-- validation indépendante de chaque pièce ;
-- export séparé et export groupé 3MF.
-
-### FR-009 — Multi Cutter
-
-- lignes, colonnes, espacement X/Y ;
-- connexion structurelle configurable ;
-- disposition mesurée sur plateau ;
-- limites de nombre d’instances et triangles ;
-- génération atomique.
-
-### FR-010 — Cutter Set
-
-- liste de tailles ;
-- proportions conservées ;
-- noms et ordre déterministes ;
-- export groupé ;
-- refus si une taille devient non imprimable.
-
-### FR-011 — Stencil
-
-- répétition rectangulaire ou diagonale ;
-- taille du motif, grille ou dimensions extérieures ;
-- marge et épaisseur ;
-- conservation optionnelle des détails ;
-- ponts de connexion des îlots ;
-- résultat monocoque sauf option documentée.
-
-### FR-012 — Sandwich Cutter
-
-- cutter extérieur ;
-- bande de scellement ;
-- dents de forme, taille, espacement et profondeur réglables ;
-- tampon complémentaire optionnel ;
-- aucun angle ou détail inférieur aux seuils imprimables configurés.
-
-### FR-013 — Cake Topper
-
-- image, texte ou combinaison ;
-- backing connectant les détails ;
-- base et relief ;
-- un ou plusieurs pics ;
-- texte multi-ligne ;
-- validation de la jonction backing/pics.
-
-### FR-014 — Cake Pop Mold
-
-P3 uniquement :
-
-- moule, poussoir et plateau éventuel ;
-- clearance par pièce ;
-- poussoir monobloc ou multi-pièces ;
-- packing sans collision ;
-- tests physiques requis avant statut stable.
-
-### FR-015 — Texte
-
-- texte de paroi, relief et plaque nominative ;
-- polices embarquées ou importées légalement ;
-- prévisualisation ;
-- source textuelle conservée tant que la conversion n’est pas finalisée ;
-- conversion déterministe en chemins pour la génération et l’export ;
-- backing rectangulaire ou offset ;
-- position et extrusion ;
-- détection des glyphes non supportés.
-
-### FR-016 — Presets
-
-- presets système immuables ;
-- presets utilisateur locaux ;
-- création, duplication, renommage, suppression ;
-- presets versionnés par recette ;
-- migration ou refus explicite si incompatibles.
-
-### FR-017 — Historique
-
-- undo/redo des paramètres et du dessin ;
-- regroupement des mouvements continus ;
-- historique borné ;
-- restauration sans relancer des générations obsolètes.
-
-### FR-018 — Aperçu 3D
-
-- orbite, pan, zoom et fit ;
-- grille et axes optionnels ;
-- dimensions ;
-- sélection des artefacts ;
-- matériaux ;
-- heatmap ;
-- aperçu de couches clairement étiqueté « inspection, pas slicing » ;
-- libération de toutes les ressources remplacées.
-
-### FR-019 — Validation
-
-Contrôles obligatoires existants à préserver :
-
-- coordonnées finies ;
-- triangles non dégénérés ;
-- arêtes ouvertes et non-manifold ;
-- composants connectés ;
-- orientation des faces adjacentes ;
-- volume signé ;
-- dimensions et pose fabrication.
-
-Chaque rapport contient code, sévérité, message utilisateur et détails techniques.
-
-### FR-020 — Export
-
-- STL binaire ;
-- OBJ ;
-- 3MF réel ;
-- P2 : PDF/SVG du contour ;
-- noms de fichiers déterministes ;
-- Z-up et `Z = 0` ;
-- millimètres ;
-- export bloqué sur erreur ;
-- multi-pièces séparées ou groupées sans fusion accidentelle ;
-- STL individuel par rôle (`cutter`, `stamp`, `handle`, `tray`) ;
-- P2 : capture PNG du viewport sans modifier la scène.
-
-### FR-021 — Projet portable
-
-- sauvegarde JSON versionnée ;
-- import du projet ;
-- inclusion optionnelle de la source ;
-- checksum des ressources ;
-- migration de schéma ;
-- aucun objet Three.js sérialisé.
-
-### FR-022 — Bibliothèque locale
-
-- projets récents ;
-- recherche et tags ;
-- duplication ;
-- export/suppression ;
-- IndexedDB avec quotas et erreurs visibles ;
-- aucune synchronisation cloud ;
-- aucun compte requis ;
-- export JSON disponible pour sauvegarder ou déplacer manuellement les projets.
-
-### FR-023 — Transmission locale d’un projet
-
-P2 :
-
-- export d’un fichier projet partageable ;
-- import du fichier sur un autre appareil ;
-- option de produire une URL locale sérialisée uniquement si elle reste sous une limite sûre ;
-- aucune source ou donnée envoyée vers un serveur ;
-- aucun lien court ou stockage distant.
-
-### FR-024 — IA optionnelle
-
-- désactivée par défaut ;
-- clé jamais stockée dans le projet ;
-- avertissement avant envoi d’image ;
-- dans cette application personnelle, une éventuelle clé utilisateur reste dans le stockage local du navigateur ;
-- aucun backend n’est ajouté pour l’IA dans le périmètre actuel ;
-- le cœur fonctionne sans IA.
-
-### FR-025 — PWA hors ligne
-
-P2 :
-
-- manifeste installable ;
-- cache uniquement des ressources statiques versionnées ;
-- démarrage et ouverture des projets locaux sans réseau après une première visite réussie ;
-- aucune mise en cache opaque des appels IA ;
-- notification explicite lorsqu’une nouvelle version est prête ;
-- stratégie de mise à jour empêchant le mélange de chunks de versions différentes.
-
-## 10. États et erreurs
-
-États minimaux :
+## 8. Flujo principal
+
+1. La persona inicia un proyecto vacío o un ejemplo.
+2. Importa un archivo o elige una figura.
+3. La aplicación limpia/vectoriza y muestra los contornos detectados.
+4. Si hace falta, corrige el dibujo en el editor 2D.
+5. Selecciona la receta de fabricación.
+6. Los parámetros predeterminados producen un primer resultado.
+7. Los cambios activan una generación agrupada temporalmente y cancelable.
+8. La aplicación mide y valida cada artefacto.
+9. El usuario inspecciona vista previa, mapa térmico o capas.
+10. Guarda el proyecto o exporta uno o varios archivos.
+
+## 9. Requisitos funcionales
+
+### FR-001 — Creación del proyecto
+
+- Crear desde cero, desde un ejemplo o desde un archivo.
+- Pedir confirmación antes de sustituir un proyecto modificado.
+- Asignar identificador local y nombre editable.
+
+**Aceptación:** si hay un proyecto modificado y se solicita otro, el anterior permanece intacto hasta confirmar.
+
+### FR-002 — Importación
+
+Formatos P0/P1: SVG, PNG, JPG/JPEG y WebP.
+
+- selección, arrastrar/soltar y pegar;
+- límites explícitos de tamaño, dimensiones y píxeles;
+- validación de MIME y extensión;
+- saneamiento SVG sin scripts, eventos ni recursos remotos;
+- vectorización raster en Worker;
+- progreso, cancelación y errores estructurados.
+
+**Aceptación:**
+- Un archivo que supera los límites se rechaza antes de vectorizar.
+- Dos importaciones rápidas no pueden publicar el resultado de la primera después de la segunda.
+- Un SVG con scripts nunca los ejecuta.
+
+### FR-003 — Documento de boceto 2D
+
+- Contornos cerrados, huecos e islas.
+- Pluma de segmentos rectos y curvas Bézier.
+- Rectángulo, círculo/elipse, polígono regular y estrella.
+- Seleccionar, mover, duplicar y eliminar.
+- Editar puntos, convertir entre esquinas/curvas y manejar controles Bézier.
+- Trasladar, girar, escalar, reflejar y conservar proporciones opcionalmente.
+- Grilla configurable.
+- Ajuste magnético activable a grilla, puntos, ejes y centros.
+- Capas renombrables, visibles/ocultas, bloqueables y reordenables.
+- Deshacer/Rehacer.
+- Restaurar una copia del original.
+- Operaciones booleanas explícitas.
+- Detectar caminos abiertos y autointersecciones 2D.
+
+**Aceptación:**
+- Desactivar ajuste magnético permite coordenadas libres sin modificar puntos existentes.
+- Una transformación numérica seguida de Deshacer restaura exactamente las coordenadas previas.
+- Una capa bloqueada no admite modificaciones por gestos ni atajos.
+- Convertir primitivas a trazados editables no introduce diferencias visuales perceptibles.
+
+### FR-004 — Catálogo de recetas
+
+- Mostrar recetas disponibles con descripción y nivel de madurez.
+- Filtrar ajustes según receta.
+- Bloquear combinaciones incompatibles.
+- Requerir migración explícita al cambiar de receta.
+
+Una receta sin pruebas y exportaciones verificadas nunca aparece como estable.
+
+### FR-005 — Cortante
+
+Parámetros obligatorios:
+
+- tamaño objetivo y dimensión de referencia;
+- espesor de pared;
+- altura de corte y altura total;
+- ángulo de salida;
+- agarre, estilo y altura;
+- base de impresión de referencia.
+
+P1/P2: segundo filo, punta biselada, perfil para fondant, simetría y barras centrales.
+
+El resultado es un sólido cerrado y conectado, excepto cuando se declara explícitamente un conjunto de varias piezas.
+
+### FR-006 — Sello
+
+- Relieve.
+- Base común obligatoria.
+- Agarre opcional.
+- Conservación de huecos.
+- Islas conectadas mediante la base.
+- Relieve positivo o negativo.
+- Altura del dorso y del relieve.
+
+### FR-007 — Cortante con impresión interior
+
+- Cortante exterior.
+- Relieves interiores.
+- Profundidad desde la punta del filo.
+- Se permite profundidad cero para convertir detalle en corte.
+- Perfil plano, biselado o redondeado.
+- Base de relieves configurable.
+
+### FR-008 — Cortante + sello
+
+- Generar al menos dos artefactos: cortante y sello.
+- Coordinar dimensiones.
+- Holgura positiva configurable.
+- Espejado correcto del sello.
+- Validación independiente de ambas piezas.
+- Exportación separada y 3MF agrupado.
+
+### FR-009 — Múltiples cortantes
+
+- Filas, columnas y distancias X/Y.
+- Conexión estructural configurable.
+- Distribución medida sobre la plataforma.
+- Límites de unidades y triángulos.
+- Generación atómica.
+
+### FR-010 — Conjunto de cortantes
+
+- Lista de tamaños.
+- Proporciones conservadas.
+- Nombres y orden deterministas.
+- Exportación agrupada.
+- Rechazo de tamaños no imprimibles.
+
+### FR-011 — Plantilla (Stencil)
+
+- Repetición rectangular o diagonal.
+- Tamaño del motivo, grilla o medidas exteriores.
+- Márgenes y espesor.
+- Conservación opcional de detalles.
+- Puentes que unen islas.
+- Resultado de una sola envolvente salvo opción documentada.
+
+### FR-012 — Cortante para sándwich
+
+- Cortante exterior.
+- Banda de sellado.
+- Dientes con forma, tamaño, distancia y profundidad regulables.
+- Sello complementario opcional.
+- No admitir ángulos ni detalles menores que los umbrales configurados.
+
+### FR-013 — Adorno para tortas
+
+- Imagen, texto o ambos.
+- Respaldo que une detalles.
+- Base y relieve.
+- Una o varias varillas.
+- Texto en varias líneas.
+- Validación de la unión entre respaldo y varillas.
+
+### FR-014 — Molde para cake pops
+
+Solo P3:
+
+- Molde, empujador y posible bandeja.
+- Holgura por pieza.
+- Empujador de una o varias piezas.
+- Distribución sin colisiones.
+- Pruebas físicas obligatorias antes de declararlo estable.
+
+### FR-015 — Texto
+
+- Texto de pared, relieve y placa identificadora.
+- Tipografías incluidas o importadas legalmente.
+- Vista previa.
+- Conservación del texto editable hasta terminar la conversión.
+- Transformación determinista a trazados para generar y exportar.
+- Respaldo rectangular o desplazado.
+- Posición y extrusión.
+- Detección de caracteres no admitidos.
+
+### FR-016 — Perfiles predefinidos
+
+- Perfiles del sistema inmutables.
+- Perfiles locales del usuario.
+- Crear, duplicar, renombrar y borrar.
+- Versionar por receta.
+- Migrar o rechazar explícitamente incompatibilidades.
+
+### FR-017 — Historial
+
+- Deshacer/Rehacer parámetros y boceto.
+- Agrupar movimientos continuos.
+- Historial acotado.
+- Restaurar sin volver a generar resultados obsoletos.
+
+### FR-018 — Vista previa 3D
+
+- Órbita, desplazamiento, zoom y encuadre.
+- Grilla y ejes opcionales.
+- Dimensiones.
+- Selección de artefactos.
+- Materiales.
+- Mapa térmico.
+- Vista por capas identificada como «inspección, no laminado».
+- Liberación de todos los recursos sustituidos.
+
+### FR-019 — Validación
+
+Comprobaciones obligatorias existentes que deben conservarse:
+
+- Coordenadas finitas.
+- Triángulos no degenerados.
+- Aristas abiertas o no manifold.
+- Componentes conectados.
+- Orientación de caras contiguas.
+- Volumen con signo.
+- Dimensiones y posición de fabricación.
+
+Cada informe incluye código, gravedad, mensaje para usuario y detalles técnicos.
+
+### FR-020 — Exportación
+
+- STL binario.
+- OBJ.
+- 3MF real.
+- P2: PDF/SVG de contorno.
+- Nombres deterministas.
+- Eje Z vertical y `Z = 0`.
+- Milímetros.
+- Bloqueo de exportación ante error.
+- Varias piezas agrupadas o separadas sin fusión accidental.
+- STL individual por función (`cutter`, `stamp`, `handle`, `tray`).
+- P2: captura PNG del visor sin modificar la escena.
+
+### FR-021 — Proyecto portátil
+
+- Guardado JSON versionado.
+- Importación de proyectos.
+- Fuente incluida opcionalmente.
+- Sumas de comprobación de recursos.
+- Migración de esquema.
+- Nunca serializar objetos Three.js.
+
+### FR-022 — Biblioteca local
+
+- Proyectos recientes.
+- Búsqueda y etiquetas.
+- Duplicado.
+- Exportación y eliminación.
+- IndexedDB con cuotas y errores visibles.
+- Sin sincronización en nube.
+- Sin cuenta.
+- Exportación JSON para guardar o transferir manualmente.
+
+### FR-023 — Transferencia local de proyecto
+
+P2:
+
+- Exportar un archivo compartible.
+- Importarlo en otro dispositivo.
+- URL con datos serializados solo si se mantiene bajo un límite seguro.
+- No enviar fuentes ni datos a servidores.
+- Sin acortadores ni almacenamiento remoto.
+
+### FR-024 — IA opcional
+
+- Deshabilitada por defecto.
+- Nunca guardar la clave en el proyecto.
+- Advertir antes de enviar imágenes.
+- En esta aplicación personal, una posible clave del usuario queda en almacenamiento local del navegador.
+- No agregar backend para IA en el alcance original.
+- El funcionamiento básico no depende de IA.
+
+### FR-025 — PWA sin conexión
+
+P2:
+
+- Manifiesto instalable.
+- Caché solo de recursos estáticos versionados.
+- Inicio y acceso a proyectos locales sin red después de una primera visita exitosa.
+- No almacenar opacamente llamadas de IA en caché.
+- Aviso explícito cuando haya actualización.
+- Estrategia que evite mezclar fragmentos de distintas versiones.
+
+## 10. Estados y errores
+
+Estados mínimos:
 
 ```ts
 type PipelineStatus =
@@ -450,125 +448,125 @@ type PipelineStatus =
   | 'error';
 ```
 
-Une erreur ne doit jamais effacer le dernier résultat valide. L’interface montre que les paramètres courants n’ont pas encore produit un résultat exportable.
+Un error nunca debe borrar el último resultado válido. La interfaz informa cuando los parámetros actuales todavía no produjeron un resultado exportable.
 
-## 11. Exigences non fonctionnelles
+## 11. Requisitos no funcionales
 
-### Performance
+### Rendimiento
 
-- premier chunk JavaScript : maximum 200 KiB compressé selon la règle Vite existante ;
-- chunk asynchrone : maximum 600 KiB ;
-- génération simple interactive : cible inférieure à 500 ms sur machine de référence ;
-- opération supérieure à 250 ms : indicateur d’activité ;
-- raster et opérations lourdes : Worker lorsque possible ;
-- aucun rendu continu si la scène est immobile.
-- l’éditeur 2D reste interactif sur une fixture de 10 000 points ; la cible et le protocole de mesure doivent être documentés avant de fixer un seuil FPS bloquant.
+- Fragmento inicial JavaScript: máximo 200 KiB según la regla existente de Vite (en el PRD original se lo describe como comprimido; comprobar el criterio real de medición).
+- Fragmento asíncrono: máximo 600 KiB.
+- Generación simple interactiva: objetivo menor que 500 ms en equipo de referencia.
+- Operaciones mayores que 250 ms: indicador de actividad.
+- Raster y tareas pesadas: Worker si es posible.
+- No renderizar continuamente si la escena está inmóvil.
+- Editor 2D interactivo sobre caso de 10.000 puntos; documentar equipo, protocolo y objetivo antes de exigir un límite de FPS.
 
-### Fiabilité
+### Confiabilidad
 
-- génération déterministe à paramètres identiques ;
-- aucune publication de résultat obsolète ;
-- rollback complet d’un batch ;
-- aucune fuite de géométrie, matériau, texture ou Worker.
+- Generación determinista con parámetros idénticos.
+- Nunca publicar un resultado obsoleto.
+- Reversión completa de lotes.
+- Sin pérdidas de memoria de geometrías, materiales, texturas o Workers.
 
-### Sécurité
+### Seguridad
 
-- nettoyage SVG strict ;
-- aucune utilisation de `{@html}` avec une source non fiable ;
-- limites de ressources avant décodage ;
-- aucune clé ou donnée sensible dans URL, logs ou projet ;
-- CSP compatible avec un déploiement statique ;
-- dépendances auditées.
+- Saneamiento SVG estricto.
+- No usar `{@html}` con fuentes no confiables.
+- Límites de recursos antes de decodificar.
+- Sin claves ni datos sensibles en URL, registros o proyecto.
+- Política CSP adecuada a despliegue estático.
+- Auditoría de dependencias.
 
-### Confidentialité
+### Privacidad
 
-- traitement local obligatoire hors appel IA explicitement déclenché par l’utilisateur ;
-- aucune télémétrie ;
-- aucun compte, identifiant utilisateur ou stockage distant ;
-- suppression locale réelle des projets.
+- Procesamiento local obligatorio excepto solicitudes de IA iniciadas explícitamente.
+- Sin telemetría.
+- Sin cuentas, identificadores de usuario ni almacenamiento remoto.
+- Eliminación local real de proyectos.
 
-### Accessibilité
+### Accesibilidad
 
-- navigation clavier ;
-- focus visible ;
-- labels et unités annoncés ;
-- cibles tactiles d’au moins 44 px ;
-- erreurs avec `role="alert"` ;
-- heatmap accompagnée de valeurs textuelles ;
-- contraste WCAG AA.
+- Navegación mediante teclado.
+- Foco visible.
+- Etiquetas y unidades anunciadas.
+- Objetivos táctiles de al menos 44 px.
+- Errores con `role="alert"`.
+- Mapa térmico acompañado de valores textuales.
+- Contraste WCAG AA.
 
-### Compatibilité
+### Compatibilidad
 
-- dernières versions stables de Chrome, Firefox, Safari et Edge ;
-- desktop complet ;
-- mobile : import, réglages, aperçu et export ;
-- message explicite si WebGL indisponible.
+- Versiones estables recientes de Chrome, Firefox, Safari y Edge.
+- Escritorio completo.
+- Móvil: importar, ajustar, previsualizar y exportar.
+- Mensaje explícito si WebGL no está disponible.
 
-## 12. Mesures de succès
+## 12. Indicadores de éxito
 
-- taux d’import aboutissant à un premier modèle valide ;
-- temps médian import → modèle ;
-- taux d’exports bloqués et catégories d’erreurs ;
-- taux de projets repris avec succès ;
-- mémoire après 20 changements de modèle ;
-- régressions du corpus ;
-- taux de réussite d’import des fichiers de projet anciens.
+- Porcentaje de importaciones que producen un primer modelo válido.
+- Tiempo mediano desde importación hasta modelo.
+- Tasa de exportaciones bloqueadas y categorías de error.
+- Porcentaje de proyectos recuperados correctamente.
+- Memoria después de 20 cambios de modelo.
+- Regresiones del conjunto de pruebas.
+- Éxito al importar archivos de proyecto anteriores.
 
-Aucune télémétrie ne doit être ajoutée sans décision séparée de confidentialité.
+No agregar telemetría sin una decisión de privacidad independiente.
 
-## 13. Priorisation
+## 13. Prioridades
 
-### P0 — Refactorisation
+### P0 — Refactorización
 
-- modèle de document ;
-- registry de recettes ;
-- Cutter/Stamp migrés ;
-- orchestrateur ;
-- validation et exports inchangés ;
-- format de projet ;
-- tests de non-régression.
+- Modelo de documento.
+- Registro de recetas.
+- Migración de Cortante/Sello.
+- Orquestador.
+- Validación y exportación sin cambios.
+- Archivo de proyecto.
+- Pruebas contra regresiones.
 
-### P1 — Produit utilisable avancé
+### P1 — Producto avanzado utilizable
 
-- Imprint Cutter ;
-- Cutter + Stamp ;
-- Multi Cutter ;
-- Stencil ;
-- éditeur 2D ;
-- WebP et collage ;
-- presets ;
-- bibliothèque locale.
+- Cortante con impresión interior.
+- Cortante + Sello.
+- Múltiples cortantes.
+- Plantillas.
+- Editor 2D.
+- WebP y pegado.
+- Perfiles.
+- Biblioteca local.
 
-### P2 — Extension
+### P2 — Ampliaciones
 
-- profils de lame ;
-- center bars ;
-- texte/name plates ;
-- grips ;
-- Sandwich Cutter ;
-- Cake Topper ;
-- PDF/SVG du contour et fichier projet transmissible.
-- PWA hors ligne.
-- Capture PNG du viewport.
+- Perfiles de filo.
+- Barras centrales.
+- Texto y placas de identificación.
+- Agarres.
+- Cortante de sándwich.
+- Adorno para tortas.
+- PDF/SVG de contorno y archivo transferible.
+- PWA sin conexión.
+- Captura PNG del visor.
 
-### P3 — Validation physique nécessaire
+### P3 — Requieren pruebas físicas
 
-- Cake Pop Mold ;
-- Practice Cookie ;
+- Molde de cake pops.
+- Galletita de práctica.
 
-Les comptes, abonnements, paiements, paywalls et services cloud restent hors périmètre, y compris après P3.
+Cuentas, suscripciones, pagos, restricciones comerciales y servicios en nube siguen fuera de alcance incluso después de P3.
 
-## 14. Definition of Done globale
+## 14. Definición global de terminado
 
-Une fonctionnalité est terminée uniquement si :
+Una funcionalidad se considera terminada solo cuando:
 
-- le type et son schéma sont stricts ;
-- les valeurs par défaut sont explicites ;
-- les paramètres invalides sont rejetés ;
-- les tests unitaires et d’intégration couvrent succès, limites et annulation ;
-- le modèle final passe la validation ;
-- les exports sont vérifiés ;
-- les ressources sont libérées ;
-- l’interface est accessible et responsive ;
-- la documentation utilisateur est mise à jour ;
-- aucun secret ni service distant implicite n’est introduit.
+- tiene tipos y esquemas estrictos;
+- define valores predeterminados explícitos;
+- rechaza parámetros inválidos;
+- posee pruebas unitarias y de integración de éxito, límites y cancelación;
+- el modelo final supera la validación;
+- las exportaciones están comprobadas;
+- se liberan los recursos;
+- la interfaz es accesible y adaptable;
+- la documentación de usuario está actualizada;
+- no se introducen secretos ni servicios remotos implícitos.
