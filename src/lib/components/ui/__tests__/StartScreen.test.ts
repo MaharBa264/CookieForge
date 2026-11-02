@@ -4,18 +4,18 @@ import { afterEach, expect, it, vi } from 'vitest';
 import StartScreen from '../StartScreen.svelte';
 let app: ReturnType<typeof mount> | undefined;
 afterEach(async () => { if (app) await unmount(app); document.body.innerHTML = ''; });
-it('isolated start screen offers import, Formes and Reprendre un projet, not a new Draw mode', () => {
+it('isolated start screen ofrece importación, Formas and Continuar un proyecto, not a new Draw mode', () => {
   app = mount(StartScreen, { target: document.body });
   expect(document.querySelector('[role="button"][aria-label="Importer une image"]')).not.toBeNull();
   const labels = [...document.querySelectorAll('button')].map(b => b.textContent?.trim());
-  expect(labels).toContain('Formes'); expect(labels).toContain('Reprendre un projet'); expect(labels).not.toContain('Draw');
+  expect(labels).toContain('Formas'); expect(labels).toContain('Continuar un proyecto'); expect(labels).not.toContain('Draw');
   expect(document.body.textContent).toContain('collez');
 });
 it('routes native keyboard-focusable buttons using existing category events', () => {
   const shapes = vi.fn(), projects = vi.fn();
   app = mount(StartScreen, { target: document.body, events: { shapes, projects } });
   const buttons = [...document.querySelectorAll<HTMLButtonElement>('button')];
-  for (const label of ['Formes', 'Reprendre un projet']) {
+  for (const label of ['Formas', 'Continuar un proyecto']) {
     const button = buttons.find(b => b.textContent?.trim() === label)!;
     expect(button).toBeDefined(); expect(button.disabled).toBe(false); button.focus(); expect(document.activeElement).toBe(button); button.click();
   }
