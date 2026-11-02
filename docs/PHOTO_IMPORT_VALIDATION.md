@@ -1,73 +1,75 @@
-# Préparation photo guidée — qualification locale
+# Preparación guiada de fotografías — Validación local
 
-## État
+> **Informe histórico del proyecto original, fechado el 10/10/2026.** Los resultados corresponden a esa versión y no implican que se haya repetido la validación en CookieForge.
 
-2026-10-10, branche `feature/robust-photo-import`, base `8683d16b73e843d5bc04ee149151944788a601fe` (#67). Diff local non commité/non publié. **Validé localement sur le snapshot final** : 1 068/1 068 tests, check0/0, smoke3/3, build/audit/diff verts et recette réelle rejouée après les correctifs. Les essais précédents restent décrits ci-dessous, mais ne remplacent pas ces preuves finales. Aucun commit/push/PR/merge/deploy du chantier. Revue indépendante du correctif cap : aucun bloqueur ; vérification numérique de216 cas/permutations et8 refus rapportée par le relecteur, distincte des tests exécutés par le parent. Aucun sous-agent encore actif au contrôle final.
+## Estado
 
-## Parcours et propriété de l’état
+10/10/2026, rama `feature/robust-photo-import`, base `8683d16b73e843d5bc04ee149151944788a601fe` (#67). Diferencias locales sin confirmar ni publicar. **Validado localmente en la versión final:** 1.068/1.068 pruebas, comprobación 0 errores/0 advertencias, pruebas de exportación 3/3, compilación, auditoría y revisión de diferencias correctas; recorrido real repetido después de las correcciones. Los intentos anteriores se describen más adelante, pero no sustituyen las evidencias finales. No hubo commit, push, PR, fusión ni despliegue de ese trabajo. Revisión independiente de la corrección de tapa: sin bloqueos; un revisor informó la verificación numérica de 216 casos/permutaciones y ocho rechazos, distinta de las pruebas ejecutadas por el proceso principal. Ningún agente auxiliar seguía activo al finalizar.
 
-`Dessin contrasté` conserve le traitement historique. `Photo — préparation guidée` n’est plus un flou2/pathomit16 : aperçu original/contour, recadrage normalisé, seuil luminance automatique ou manuel, polarité sombre/claire. Nettoyage par surface et comblement des trous explicitement choisis, off par défaut ; effets comptés et annoncés. Pas de sélection cachée du plus gros objet. Masques vides/uniformes, contact avec bord, composants multiples, contacts diagonaux ou complexité excessive refusés avant application. Les trous sont conservés, et la vectorisation qui ne peut pas les représenter est refusée.
+## Flujo y propiedad del estado
 
-`PhotoImportReview` possède le brouillon de réglages, le résultat et le signal ; changement de réglage invalide Apply jusqu’au recalcul. App conserve document, epoch et révision de source jusqu’à confirmation. Annulation/navigation/changement de document rejettent les réponses tardives. Un import confirmé crée le projet ; un retrace confirmé ne remplace que le sketch, via l’historique canonique. Source/identité/paramètres restent identiques.
+`Dessin contrasté` («Dibujo contrastado») conserva el tratamiento histórico. `Photo — préparation guidée` («Foto — preparación guiada») ya no consiste en desenfoque 2/`pathomit16`: ofrece comparación original/contorno, recorte normalizado, umbral de luminancia automático o manual y polaridad oscura/clara. La limpieza por superficie y el relleno de huecos se eligen explícitamente, deshabilitados de forma predeterminada; sus efectos se cuentan e informan. No se selecciona ocultamente el objeto más grande. Antes de aplicar se rechazan máscaras vacías o uniformes, contactos con bordes, componentes múltiples, contactos diagonales o complejidad excesiva. Los huecos se conservan y se rechaza una vectorización incapaz de representarlos.
 
-Chaque préparation possède son Worker, terminé sur succès/abort/erreur/timeout. Décodage et traitement par createImageBitmap/OffscreenCanvas. Crop puis travail limité à1024px par côté et1MP ; fichier≤10Mio, raster source≤8192px/côté et16MP. Pas de cloud. La limite source est vérifiée après décodage du bitmap : ce n’est pas une garantie universelle de consommation mémoire pendant le décodage navigateur.
+`PhotoImportReview` posee el borrador de ajustes, el resultado y la señal de cancelación; cambiar un ajuste invalida Aplicar hasta recalcular. La aplicación conserva documento, época y revisión de la fuente hasta confirmar. Cancelación, navegación y cambio de documento descartan respuestas tardías. Confirmar una importación crea el proyecto; confirmar una nueva vectorización reemplaza únicamente el boceto mediante el historial canónico. Se conservan fuente, identidad y parámetros.
 
-V1 inchangé : le raster et les réglages ne sont pas persistés. Réimport requis après reload. Préparation valide le contour, **pas l’imprimabilité** : les gardes de génération/export restent obligatoires.
+Cada preparación utiliza su propio Worker, que se termina tras éxito, cancelación, error o tiempo agotado. Decodificación y procesamiento usan `createImageBitmap`/`OffscreenCanvas`. Después del recorte se limita el trabajo a 1.024 px por lado y 1 MP; archivo de hasta 10 MiB, raster de origen de hasta 8.192 px por lado y 16 MP. Sin nube. El límite del origen se comprueba después de decodificar el bitmap: no garantiza un uso máximo universal de memoria durante la decodificación del navegador.
 
-## Corpus reproductible
+V1 no cambia: ni el raster ni los ajustes se guardan. Se necesita reimportar tras recargar. La preparación valida el contorno, **no la imprimibilidad**; siguen siendo obligatorios los controles de generación y exportación.
 
-Photos réelles `coins`, `coffee`, `chelsea`, attribution et empreintes dans `src/lib/import/__tests__/fixtures/photos/README.md`. Aucun téléchargement pendant les tests. Fixtures PNG décodées en tests Node et segmentation/vectorisation déterministes, sans mutation de l’original ; fond complexe refusé, aucun trou/îlot supprimé implicitement. Coin recadré explicite préparé avec un seul composant. Ces trois photos ne prouvent pas une segmentation universelle ni une reconnaissance d’objet.
+## Conjunto reproducible
 
-## Premières gates (avant le correctif cap)
+Fotografías reales `coins`, `coffee` y `chelsea`; atribuciones y huellas en `src/lib/import/__tests__/fixtures/photos/README.md`. Las pruebas no descargan archivos. Las imágenes PNG se decodifican en pruebas Node y se someten a segmentación/vectorización deterministas sin modificar el original; se rechaza el fondo complejo y no se eliminan huecos/islas implícitamente. Un recorte explícito de la moneda se prepara como componente único. Tres fotografías no demuestran segmentación universal ni reconocimiento de objetos.
 
-Manifest et logs `/workspace/reports/robust-photo-gates-1791670270537866951/manifest.json` ; sources SHA-256 inchangées pendant exécution, chaque code de sortie0 :
+## Primeras comprobaciones (antes de corregir la tapa)
 
-- ciblés :96 tests /5 fichiers ;
-- `pnpm test:run --pool=threads --maxWorkers=1 --fileParallelism=false` :1065/1065 tests /72 fichiers ;
-- `pnpm check` :0 erreur/0 warning ;
-- `pnpm test:smoke --pool=threads --fileParallelism=false` :3/3 ;
-- `pnpm build` :réussi, budgets200KiB entry/600KiB autres chunks non relevés.
+Manifiesto y registros: `/workspace/reports/robust-photo-gates-1791670270537866951/manifest.json`; huellas SHA-256 sin cambios durante la ejecución y todos los códigos de salida en cero:
 
-TMP isolé sous workspace, GOMAXPROCS2/UV_THREADPOOL_SIZE2, gates sérialisées. Les commandes et logs individuels sont enregistrés, pas déduits du seul exit du wrapper.
+- Pruebas específicas: 96 pruebas / 5 archivos.
+- `pnpm test:run --pool=threads --maxWorkers=1 --fileParallelism=false`: 1.065/1.065 pruebas / 72 archivos.
+- `pnpm check`: 0 errores / 0 advertencias.
+- `pnpm test:smoke --pool=threads --fileParallelism=false`: 3/3.
+- `pnpm build`: correcto; no se excedieron los presupuestos de 200 KiB de entrada / 600 KiB de otros fragmentos.
 
-## Recette réelle et défaut détecté
+Directorio temporal aislado dentro del espacio de trabajo, `GOMAXPROCS=2` y `UV_THREADPOOL_SIZE=2`, comprobaciones secuenciales. Se guardaron comandos y registros individuales; no se dedujo su resultado únicamente del código de salida del proceso contenedor.
 
-Runner hors dépôt `/workspace/reports/robust-photo-browser.mjs`, stockage jetable Chromium, build dist. Rapport initial `/workspace/reports/robust-photo-1791669949838/report.json` : pièce photographiée recadrée, Apply distinct, STL valide85584octets/1710triangles ; annulation retrace sans mutation ; IndexedDB/reload JSON et STL exacts ; raster non reconstruit après reload. Coffee plein cadre refuse1941 composants/1837 trous sans publication ; mobile375px sans overflow. Pas d’erreur JS/requête ; serveurs arrêtés/ports fermés.
+## Prueba real y defecto encontrado
 
-Recette étendue `/workspace/reports/robust-photo-1791670700031/report.json` : seuil manuel140 produit un contour différent, puis génération refuse `The wall triangulation produced a degenerate triangle.` Export bloqué, aucun STL invalide produit. Le scénario undo/redo s’est donc arrêté : **ce rapport ne prouve pas son succès**.
+Ejecutor externo al repositorio `/workspace/reports/robust-photo-browser.mjs`, almacenamiento descartable de Chromium y compilación `dist`. Informe inicial `/workspace/reports/robust-photo-1791669949838/report.json`: pieza fotográfica recortada, Aplicar separado, STL válido de 85.584 bytes / 1.710 triángulos; cancelación de nueva vectorización sin cambios; JSON y STL idénticos después de IndexedDB/recarga; raster no reconstruido después de recargar. `coffee` a cuadro completo se rechaza por 1.941 componentes/1.837 huecos sin publicar proyecto; móvil de 375 px sin desbordamiento. Sin errores de JavaScript o solicitudes; servidores detenidos y puertos cerrados.
 
-RED produit : `/workspace/reports/robust-photo-geometry-red-product.log`, photo-auto réussit, photo-threshold140 échoue dans addCap. Instrumentation temporaire retirée, diagnostic hors dépôt `/workspace/reports/robust-photo-geometry-debug.log` : trois sommets alignés, aire double≈1.78e-14. `repairCollinearCapFaces` remplace le couple de faces adjacent en partageant le voisin via le point médian : mêmes sommets/arêtes frontières, aire conservée, aucune suppression de triangle/point/trou. Projection intérieure, voisin unique, nouvelle diagonale non existante et faces non dégénérées exigés ; en cas d’incertitude, garde stricte historique inchangée. Deux photos dérivées conservées comme fixtures.
+Prueba ampliada `/workspace/reports/robust-photo-1791670700031/report.json`: el umbral manual 140 generó otro contorno, pero la generación lo rechazó con `The wall triangulation produced a degenerate triangle.` Se bloqueó exportar y no se produjo un STL inválido. El escenario Deshacer/Rehacer se detuvo: **ese informe no demuestra que haya funcionado**.
 
-Après premier correctif :39/39 tests dans photoGeometry, cutterGeometry et cookieCutterGenerator. Le contrôle renforcé `validatePrintableObject` a ensuite révélé une deuxième erreur : le chemin blanc servant de fond à l’aperçu était interprété comme une frontière de découpe et ajoutait un cadre. RED conservé dans `/workspace/reports/robust-photo-background-red.log` : deux tests refusent un path blanc. Worker corrigé pour n’émettre que les contours noirs ; le fond visuel appartient à la surface CSS, pas au SVG. Aucun filtre global sur les couleurs des SVG utilisateur ou sur le pipeline contrasté.
+Fallo reproducido (RED): `/workspace/reports/robust-photo-geometry-red-product.log`. La foto con umbral automático aprobaba y la del umbral 140 fallaba en `addCap`. Se retiró la instrumentación temporal. Diagnóstico externo: `/workspace/reports/robust-photo-geometry-debug.log`, tres vértices alineados y área doble ≈ 1,78 × 10⁻¹⁴. `repairCollinearCapFaces` reemplaza el par de caras adyacentes compartiendo el vecino mediante el punto intermedio: mismos vértices y aristas de borde, área conservada, sin eliminar triángulos, puntos ni huecos. Se exigen proyección interior, vecino único, diagonal nueva no existente y caras no degeneradas; ante la incertidumbre permanece el control estricto histórico. Dos fotografías derivadas se guardaron como casos de prueba.
 
-Les fixtures actuelles photo-auto/photo-threshold140 proviennent des exports Chromium du résultat corrigé. Test explicite : `validatePrintableObject(..., {requireSingleShell:true})`, fermeture, winding et volume positifs, une seule coque et un seul contour. L’ancien SVG avec cadre est conservé séparément (`coin-photo-pre-fix-frame.svg`) uniquement pour la régression cap ; il n’est jamais présenté comme la bonne sortie utilisateur.
+Tras el primer arreglo, 39/39 pruebas aprobaron en `photoGeometry`, `cutterGeometry` y `cookieCutterGenerator`. Una comprobación más fuerte de `validatePrintableObject` descubrió otro defecto: el trazado blanco usado como fondo de la vista previa se interpretaba como borde de corte y agregaba un marco. Se conservó el fallo RED en `/workspace/reports/robust-photo-background-red.log`: dos pruebas rechazaban un trazado blanco. Se corrigió el Worker para emitir únicamente contornos negros; el fondo visual pertenece al CSS, no al SVG. No se aplicó un filtrado general de colores a SVG de usuarios ni al proceso de dibujo contrastado.
 
-Une attente UI du panneau CollisionDetector échouait à1s lors de son chargement différé (également en ciblé). Le test attend désormais le vrai contrôle jusqu’à10s, comme le reste du parcours asynchrone : toutes les assertions de refus de mutation et d’export sont conservées. Aucun timeout du produit ni contrôle de sécurité changé ; instrumentation temporaire retirée.
+Los casos actuales `photo-auto`/`photo-threshold140` proceden de exportaciones Chromium de la versión corregida. Prueba explícita: `validatePrintableObject(..., {requireSingleShell:true})`, cierre, orientación de caras y volumen positivos, una sola envolvente y un solo contorno. El SVG antiguo con marco se guarda aparte como `coin-photo-pre-fix-frame.svg` únicamente para regresión de la tapa; no se presenta como salida correcta para el usuario.
 
-## Qualification finale après tous les correctifs
+Una espera de interfaz del panel `CollisionDetector` fallaba al segundo durante su carga diferida (también en pruebas específicas). La prueba ahora espera el control real hasta 10 segundos, como el resto del flujo asíncrono; conserva todas las comprobaciones de rechazo de cambios y exportaciones. No se alteró ningún tiempo de espera del producto ni un control de seguridad. Se retiró la instrumentación temporal.
 
-Manifest `/workspace/reports/robust-photo-qualified-gates-1791673153140978086/manifest.json`, hashes source identiques avant/après exécution ; tous les codes de sortie0 :
+## Calificación final tras todas las correcciones
 
-- ciblés photos/import/export/géométrie :151/151 tests dans9 fichiers ;
-- suite entière :**1 068/1 068 tests,73 fichiers** ;
-- `pnpm check` :0 erreur/0 warning ;
-- exports smoke :3/3 ; build réussi,684 modules ;
-- `pnpm audit --audit-level=moderate` :aucune vulnérabilité connue ;
-- `git diff --check` :réussi ; budgets200/600KiB inchangés.
+Manifiesto `/workspace/reports/robust-photo-qualified-gates-1791673153140978086/manifest.json`, huellas del código fuente idénticas antes/después y todos los códigos de salida en cero:
 
-Recette finale sur ce dist : `/workspace/reports/robust-photo-1791673558128/report.json`.
+- Pruebas específicas de fotos/importación/exportación/geometría: **151/151 en 9 archivos**.
+- Suite completa: **1.068/1.068 pruebas en 73 archivos**.
+- `pnpm check`: 0 errores / 0 advertencias.
+- Pruebas de exportación: 3/3; compilación correcta de 684 módulos.
+- `pnpm audit --audit-level=moderate`: ninguna vulnerabilidad conocida.
+- `git diff --check`: correcto; presupuestos 200/600 KiB sin cambios.
 
-- Photo caméra `coins.png`, crop33.3%/33.3%/14.1%/17.8%, polarité claire, nettoyage9px², silhouette extérieure explicitement choisie. Apply distinct du calcul, réglages invalidant le précédent résultat.
-- STL de la seule silhouette :94 584octets /1 890triangles ; SHA-256 `a1fc1850819fea162ee1aea776ea235a0a740161cb13cb85a5b8869205380a32`. Ancienne valeur1 710 incluait le cadre incorrect et **n’est pas** une preuve de fidélité de la photo.
-- Revectorisation réelle avec seuil manuel140 produit un autre sketch ; identité/nom/source/paramètres/viewport/date création restent inchangés. Génération/export réussis ; undo/redo restore les documents exacts, STL original retrouvé après undo.
-- Annulation conserve le document exact ; IndexedDB sauvegarde/recharge JSON et STL strictement identiques. V1 demande bien l’original après reload.
-- Coffee complexe :Apply désactivé, diagnostics explicites, aucun objet choisi/supprimé silencieusement. Mobile375px, document375px ; annulation conserve le projet. Pas d’erreur JS/console/requête.
-- Serveur/navigateur fermés, port fermé. Captures desktop/mobile inspectées ; poignée/cadrage visibles sans chevauchement dans les zones exercées, contrôles restants atteints via défilement.
+Recorrido final sobre esa compilación: `/workspace/reports/robust-photo-1791673558128/report.json`.
 
-Cercle historique sur le même build : `/workspace/reports/raster-circle-loft-1791673641926/report.json`,178 884octets/3 576triangles, JSON et STL exacts après reload ; SHA-256 STL `272704f5baea3144ea793aec695e41eb049ba7ef6d6ff07477b28f804d4b1381` inchangé. Serveur et port fermés, aucune erreur. Les gates et recettes ne sont pas une CI distante.
+- Fotografía `coins.png`, recorte 33,3 % / 33,3 % / 14,1 % / 17,8 %, polaridad clara, limpieza de 9 px² y silueta exterior elegida explícitamente. Aplicar es independiente del cálculo; cambiar ajustes invalida el resultado anterior.
+- STL de la silueta únicamente: **94.584 bytes / 1.890 triángulos**; SHA-256 `a1fc1850819fea162ee1aea776ea235a0a740161cb13cb85a5b8869205380a32`. El valor anterior de 1.710 incluía el marco incorrecto y **no prueba la fidelidad fotográfica**.
+- La nueva vectorización real con umbral manual 140 produce otro boceto sin modificar identidad, nombre, fuente, parámetros, vista ni fecha de creación. Generación y exportación correctas; Deshacer/Rehacer restaura documentos idénticos y Deshacer recupera el STL original.
+- Cancelar conserva exactamente el documento; IndexedDB guarda y recupera JSON/STL idénticos. V1 pide la imagen original tras recargar.
+- Fotografía compleja `coffee`: Aplicar deshabilitado, diagnósticos explícitos y ningún objeto seleccionado/eliminado ocultamente. Móvil y documento de 375 px; cancelar conserva el proyecto. Sin errores de JS, consola ni solicitudes.
+- Navegador y servidor cerrados, puerto liberado. Se inspeccionaron capturas escritorio/móvil: agarre y encuadre visibles sin superposición en las áreas recorridas; controles restantes accesibles desplazándose.
 
-## Limites
+Caso histórico del círculo en la misma compilación: `/workspace/reports/raster-circle-loft-1791673641926/report.json`, 178.884 bytes / 3.576 triángulos, JSON/STL idénticos después de recargar; SHA-256 STL `272704f5baea3144ea793aec695e41eb049ba7ef6d6ff07477b28f804d4b1381` invariable. Servidor y puerto cerrados; ningún error. Las comprobaciones y recorridos fueron locales, **no CI remota**.
 
-Pas d’objet arbitraire extrait automatiquement, pas d’IA sémantique ; recadrage et contraste sont des décisions utilisateur. Les détails impossibles à segmenter ne sont pas inventés. Nettoyage et comblement destructifs restent explicites. Le contour peut rester inadéquat aux dimensions/parois demandées ; l’application bloque l’export plutôt que livrer une forme non valide.
+## Limitaciones
 
-Pas de mesure de performance sur gros fichiers, de Safari/iOS physique, de lecteur d’écran ou d’impression réelle. L’absence d’overflow375px et un viewport tactile Chromium ne certifient pas tout device. Pas de CI distante ni déploiement du chantier.
+No se extraen objetos arbitrarios automáticamente ni hay IA semántica; el usuario decide recorte y contraste. No se inventan detalles imposibles de segmentar. Limpieza y relleno destructivos requieren aprobación explícita. El contorno puede no servir para las dimensiones o paredes pedidas; la aplicación bloquea la exportación en lugar de entregar una figura inválida.
+
+No hubo mediciones de rendimiento en archivos grandes, pruebas con Safari/iOS físico, lector de pantalla ni impresión real. La ausencia de desbordamiento a 375 px y el viewport táctil simulado de Chromium no certifican todos los dispositivos. No hubo CI remota ni despliegue de ese desarrollo.
