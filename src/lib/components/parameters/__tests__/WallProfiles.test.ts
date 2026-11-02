@@ -13,9 +13,9 @@ import type { DesignDocument } from '../../../domain/designDocument';
 const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -10 120 120"><path d="M0 0 L100 0 L100 100 L0 100 Z"/><path d="M35 35 L65 35 L65 65 L35 65 Z"/></svg>';
 const bridge = { id: 'bridge-1', from: { x: 0, y: 50 }, to: { x: 35, y: 50 }, widthMm: 2 };
 const profiles = [
-  { id: 'thin', label: 'Fin', wallThickness: 0.8, taperAngle: 5 },
+  { id: 'thin', label: 'Fino', wallThickness: 0.8, taperAngle: 5 },
   { id: 'standard', label: 'Standard', wallThickness: 1, taperAngle: 7 },
-  { id: 'robust', label: 'Robuste', wallThickness: 1.5, taperAngle: 10 }
+  { id: 'robust', label: 'Robusto', wallThickness: 1.5, taperAngle: 10 }
 ] as const;
 let panel: ReturnType<typeof mount> | undefined;
 let integration: ReturnType<typeof createProjectSessionIntegration> | undefined;
@@ -85,7 +85,7 @@ describe('wall profiles use current document values, not a saved profile name', 
     const { session, schedule, initial } = setup();
     expect(session.getDocument()).toBe(initial);
     expect(schedule).not.toHaveBeenCalled();
-    expect(document.querySelector('[data-wall-profile-status]')?.textContent).toContain('Personnalisé');
+    expect(document.querySelector('[data-wall-profile-status]')?.textContent).toContain('Personalizado');
     expect(profiles.map(p => profileButton(p.id).getAttribute('aria-pressed'))).toEqual(['false', 'false', 'false']);
     session.updateParameters('cutter', { wallThickness: 0.8, taperAngle: 5 });
     await tick();
@@ -94,7 +94,7 @@ describe('wall profiles use current document values, not a saved profile name', 
     await tick();
     expect(session.getDocument()?.parameters.wallThickness).toBe(0.9);
     expect(profileButton('thin').getAttribute('aria-pressed')).toBe('false');
-    expect(document.querySelector('[data-wall-profile-status]')?.textContent).toContain('Personnalisé');
+    expect(document.querySelector('[data-wall-profile-status]')?.textContent).toContain('Personalizado');
     input('wallThickness', 0.8);
     await tick();
     expect(profileButton('thin').getAttribute('aria-pressed')).toBe('true');
@@ -119,7 +119,7 @@ describe('wall profiles use current document values, not a saved profile name', 
 
   it('exposes all values, a named group, and a non-certification notice', () => {
     setup();
-    expect(document.querySelector('fieldset[aria-describedby="wall-profiles-hint"] legend')?.textContent).toContain('Profil de paroi');
+    expect(document.querySelector('fieldset[aria-describedby="wall-profiles-hint"] legend')?.textContent).toContain('Perfil de pared');
     for (const profile of profiles) {
       const button = profileButton(profile.id);
       expect(button.type).toBe('button');
@@ -127,8 +127,8 @@ describe('wall profiles use current document values, not a saved profile name', 
       expect(button.textContent).toContain(`${profile.wallThickness.toFixed(1)} mm`);
       expect(button.textContent).toContain(`${profile.taperAngle}°`);
     }
-    expect(document.getElementById('wall-profiles-hint')?.textContent).toMatch(/hauteurs.*poignée.*ponts/i);
-    expect(document.getElementById('wall-profiles-hint')?.textContent).toMatch(/sans certification.*solidité.*sécurité alimentaire/i);
+    expect(document.getElementById('wall-profiles-hint')?.textContent).toMatch(/alturas.*agarre.*puentes/i);
+    expect(document.getElementById('wall-profiles-hint')?.textContent).toMatch(/sin certificación.*resistencia.*seguridad alimentaria/i);
   });
 
   it('shows exact custom physical values from older projects without rounding their labels or ARIA', async () => {
@@ -136,15 +136,15 @@ describe('wall profiles use current document values, not a saved profile name', 
     session.updateParameters('cutter', { wallThickness: 0.85, cuttingHeight: 12.5, totalHeight: 24.75, taperAngle: 7.25 });
     await tick();
     for (const [field, value, unit, accessibleUnit] of [
-      ['wallThickness', '0.85', 'mm', 'millimètres'],
-      ['cuttingHeight', '12.5', 'mm', 'millimètres'],
-      ['totalHeight', '24.75', 'mm', 'millimètres'],
-      ['taperAngle', '7.25', '°', 'degrés']
+      ['wallThickness', '0.85', 'mm', 'milímetros'],
+      ['cuttingHeight', '12.5', 'mm', 'milímetros'],
+      ['totalHeight', '24.75', 'mm', 'milímetros'],
+      ['taperAngle', '7.25', '°', 'grados']
     ]) {
       expect(document.querySelector(`label[for="${field}"]`)?.textContent).toContain(`${value}${unit === 'mm' ? ' ' : ''}${unit}`);
       expect(document.getElementById(field)?.getAttribute('aria-valuetext')).toBe(`${value} ${accessibleUnit}`);
     }
-    expect(document.querySelector('[data-wall-profile-status]')?.textContent).toContain('Personnalisé');
+    expect(document.querySelector('[data-wall-profile-status]')?.textContent).toContain('Personalizado');
   });
 
   it('does not expose cutter wall profiles in Stamp mode', async () => {
