@@ -10,14 +10,14 @@ CookieForge debe ofrecer documentación e interfaz en español antes de implemen
 - [x] Pruebas de referencia aprobadas (1253 pruebas de la batería principal y 4 pruebas de exportación en la ejecución comunicada).
 - [x] README, guía rápida, contribuciones, mantenimiento, límites de dependencias, seguridad y convenciones en español.
 - [x] Controles principales del editor de dibujo traducidos.
-- [ ] Traducir íntegramente los documentos técnicos y de validación restantes.
-- [ ] Publicar traducción completa del README original, conservando `UPSTREAM_README.md` intacto.
+- [x] Traducir íntegramente los documentos técnicos y de validación restantes.
+- [x] Publicar traducción completa del README original en `UPSTREAM_README_ES.md`, conservando `UPSTREAM_README.md` intacto.
 - [ ] Revisar y traducir todos los textos visibles de los componentes Svelte y mensajes al usuario en TypeScript.
 - [ ] Actualizar pruebas que dependen de cadenas visibles, sin debilitar sus verificaciones.
 - [ ] Ejecutar y aprobar `check`, `test:run`, `build` y `test:smoke`.
 - [ ] Revisar enlaces, nombres de comandos y rutas documentadas.
 
-## Inventario de documentación pendiente
+## Inventario de documentación traducida (referencia histórica)
 
 ### Raíz
 
@@ -27,7 +27,7 @@ CookieForge debe ofrecer documentación e interfaz en español antes de implemen
 - `FEATURES_COMPLETE.md`
 - `GEMINI_API_SETUP.md`
 - `GEMINI_API_TECHNICAL.md`
-- `UPSTREAM_README.md` (conservar original y publicar traducción separada)
+- `UPSTREAM_README_ES.md` (traducción; `UPSTREAM_README.md` se conserva sin modificar)
 
 ### Arquitectura
 
@@ -55,6 +55,10 @@ CookieForge debe ofrecer documentación e interfaz en español antes de implemen
 - `docs/product/COOKIECAD_V6_ANALYSIS.md`
 - `docs/product/COOKIE_CUTTER_DESIGNER_PRD.md`
 - `docs/product/FEATURE_GAP_MATRIX.md`
+
+## Pendientes reales para completar fase 3
+
+La documentación técnica Markdown está traducida. Todavía falta terminar la auditoría de textos de interfaz, mensajes generados desde TypeScript y pruebas que esperan etiquetas antiguas; posteriormente ejecutar `pnpm check`, `pnpm test:run`, `pnpm build` y `pnpm test:smoke`, y revisar enlaces. Las traducciones de componentes son avances publicados, no equivalen por sí solas a la aprobación de la batería de pruebas.
 
 ## Puente mínimo de fase 4 hacia fase 5
 
