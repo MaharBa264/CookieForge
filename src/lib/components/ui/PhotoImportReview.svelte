@@ -100,7 +100,7 @@
   <div class="previews">
     <figure>
       {#if originalUrl}<div class="original-crop"><img src={originalUrl} alt="Original para recortar" /><div class="crop-outline" aria-hidden="true" style:left={`${cropX}%`} style:top={`${cropY}%`} style:width={`${cropWidth}%`} style:height={`${cropHeight}%`}></div></div>{/if}
-      <figcaption>Original : {file.name}</figcaption>
+      <figcaption>Original: {file.name}</figcaption>
     </figure>
     <figure>
       {#if previewUrl}<img src={previewUrl} alt="Contorno preparado" />
@@ -114,9 +114,9 @@
       <label>Izquierda (%)<input aria-label="Recorte de foto: izquierda" type="number" min="0" max="99" step="0.1" bind:value={cropX} /></label>
       <label>Arriba (%)<input aria-label="Recorte de foto: arriba" type="number" min="0" max="99" step="0.1" bind:value={cropY} /></label>
       <label>Ancho (%)<input aria-label="Recorte de foto: ancho" type="number" min="0.1" max="100" step="0.1" bind:value={cropWidth} /></label>
-      <label>Arribaeur (%)<input aria-label="Recorte de foto: arribaeur" type="number" min="0.1" max="100" step="0.1" bind:value={cropHeight} /></label>
+      <label>Alto (%)<input aria-label="Recorte de foto: arribaeur" type="number" min="0.1" max="100" step="0.1" bind:value={cropHeight} /></label>
     </div>
-    <p>Izquierda + largeur et haut + hauteur ne doivent pas dépasser 100 %. Laissez un peu de fond autour de l’objet.</p>
+    <p>Izquierda + ancho y arriba + alto no deben superar el 100 %. Dejá un poco de fondo alrededor de la figura.</p>
   </fieldset>
   <label>Figura que se conserva
     <select aria-label="Figura que se conserva en la foto" value={foreground} on:change={event => foreground = event.currentTarget.value as PhotoSettings['foreground']}>
@@ -134,7 +134,7 @@
   {#if fillHoles}<p>Esta opción elimina todos los huecos interiores. Desmarcala para conservarlos.</p>{/if}
   {#if error}<p role="alert">{error}</p>{/if}
   {#if fresh && result}
-    <p role="status" aria-live="polite">{result.diagnostics.width} × {result.diagnostics.height} px procesados; {result.diagnostics.components} figura(s), {result.diagnostics.holes} hueco(s), {result.diagnostics.removedComponents} regiones eliminadas, {result.diagnostics.filledHoles} hueco(s) comblé(s).</p>
+    <p role="status" aria-live="polite">{result.diagnostics.width} × {result.diagnostics.height} px procesados; {result.diagnostics.components} figura(s), {result.diagnostics.holes} hueco(s), {result.diagnostics.removedComponents} regiones eliminadas, {result.diagnostics.filledHoles} huecos rellenados.</p>
     {#each result.diagnostics.warnings as warning}<p class="warning">{warning}</p>{/each}
     {#if !result.diagnostics.canApply}<p>No se puede aplicar el resultado. Ajustá el recorte, el umbral o el contraste.</p>{/if}
   {:else if pending}<p role="status" aria-live="polite">Procesando localmente…</p>
