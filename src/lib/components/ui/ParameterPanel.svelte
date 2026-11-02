@@ -18,7 +18,7 @@
 </script>
 
 <section class="parameter-panel" aria-labelledby="parameter-panel-title">
-  <h2 id="parameter-panel-title">Paramètres de l’emporte-pièce</h2>
+  <h2 id="parameter-panel-title">Parámetros del cortante</h2>
 
   {#if $parameterError}
     <div
@@ -26,7 +26,7 @@
       class="parameter-error"
       role={$parameterErrorField === null || $parameterErrorField === 'mode' ? 'alert' : undefined}
     >
-      <strong>Échec de la mise à jour des paramètres</strong>
+      <strong>No se pudieron actualizar los parámetros</strong>
       <span>{$parameterError}</span>
     </div>
   {/if}
@@ -35,7 +35,7 @@
     class="design-type"
     class:invalid={$parameterErrorField === 'mode'}
     role="group"
-    aria-label="Type de création"
+    aria-label="Tipo de creación"
     aria-describedby={$parameterErrorField === 'mode'
       ? 'mode-hint parameter-error-summary'
       : 'mode-hint'}
@@ -48,7 +48,7 @@
       on:click={() => updateParam('mode', 'cutter')}
       aria-pressed={$params.mode === 'cutter'}
     >
-      <span aria-hidden="true">✂️</span> Découpe
+      <span aria-hidden="true">✂️</span> Cortante
     </button>
     <button
       type="button"
@@ -58,32 +58,32 @@
       on:click={() => updateParam('mode', 'stamp')}
       aria-pressed={$params.mode === 'stamp'}
     >
-      <span aria-hidden="true">🔖</span> Tampon
+      <span aria-hidden="true">🔖</span> Sello
     </button>
   </div>
   <p id="mode-hint" class="mode-hint">
-    {$params.mode === 'cutter' ? 'Paroi de découpe creuse avec poignée facultative.' : imprintMode === 'recessed' ? 'Empreinte creusée sur la face d’impression de la base.' : 'Relief surélevé relié à une base imprimable.'}
+    {$params.mode === 'cutter' ? 'Pared de corte hueca con agarre opcional.' : imprintMode === 'recessed' ? 'Grabado en la cara de impresión de la base.' : 'Relieve elevado unido a una base imprimible.'}
   </p>
 
-  <ParameterAccordion id="common" title="Dimensions" description="Dimensions finales et limites de l’imprimante">
+  <ParameterAccordion id="common" title="Dimensions" description="Dimensiones finales y límites de la impresora">
     <CommonSizeSection />
   </ParameterAccordion>
 
   {#if $params.mode === 'cutter'}
-    <ParameterAccordion id="cutter" title="Découpe" description="Géométrie de la paroi et de la découpe">
+    <ParameterAccordion id="cutter" title="Cortante" description="Geometría de la pared y del corte">
       <CutterSection />
     </ParameterAccordion>
   {:else}
-    <ParameterAccordion id="stamp" title="Tampon" description="Relief ou creux et épaisseur de la base">
+    <ParameterAccordion id="stamp" title="Sello" description="Relieve o hueco y espesor de la base">
       <StampSection {session} />
     </ParameterAccordion>
   {/if}
 
-  <ParameterAccordion id="handle" title="Poignée" description="Forme et hauteur de la poignée">
+  <ParameterAccordion id="handle" title="Agarre" description="Forma y altura del agarre">
     <HandleSection />
   </ParameterAccordion>
 
-  <ParameterAccordion id="advanced" title="Avancé" description="Fonctions de génération facultatives" open={false}>
+  <ParameterAccordion id="advanced" title="Avanzado" description="Funciones de generación opcionales" open={false}>
     <AdvancedSection />
   </ParameterAccordion>
 </section>
