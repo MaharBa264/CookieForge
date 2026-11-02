@@ -1,61 +1,61 @@
-# Décisions techniques pour les sessions Hermes
+# Decisiones técnicas para las sesiones Hermes
 
-Ce document porte les décisions durables auparavant accumulées dans `AGENT_CONTEXT.md`. Git conserve l'historique des étapes et le contexte court conserve uniquement l'état nécessaire à la reprise.
+Este documento reúne las decisiones duraderas anteriormente registradas en `AGENT_CONTEXT.md`. Git conserva el historial de trabajo y el contexto breve solo el estado necesario para retomarlo.
 
-## Domaine et persistance
+## Dominio y persistencia
 
-- L'unité logique est le millimètre. STL ne stocke pas l'unité ; les coordonnées restent exprimées en mm.
-- La scène Three.js est Y-up. Les exports de fabrication sont Z-up et posés à `Z = 0`.
-- `DesignDocument.kind` est l'unique discriminant métier ; `parameters.mode` reste un champ de compatibilité V1.
-- Un kind futur reste `never` tant que son contrat et son pipeline n'existent pas.
-- Toute évolution incompatible du schéma persistant exige une nouvelle version et une migration explicite.
-- `targetSize` remplace l'ancien facteur abstrait `scale`; la migration historique convertit `scale: 1` en 75 mm.
-- Les données IndexedDB repassent par `parseDesignDocumentV1`; une corruption échoue explicitement.
-- Une ouverture IndexedDB rejetée est retirée du cache afin que l'appel suivant puisse réessayer sans boucle automatique.
-- Le codec projet reste pur : APIs `File`, téléchargement et UI appartiennent aux adaptateurs.
-- La migration legacy utilise une factory UUID injectable afin d'éviter les collisions et rester testable.
-- Le store document valide avant publication, reconstruit des copies défensives et gèle profondément les snapshots persistants.
+- La unidad lógica es el milímetro. STL no guarda unidades; las coordenadas se expresan en mm.
+- La escena Three.js usa Y como eje vertical. Las exportaciones de fabricación usan Z como eje vertical y se apoyan en `Z = 0`.
+- `DesignDocument.kind` es el único discriminante funcional; `parameters.mode` se conserva por compatibilidad con V1.
+- Un tipo futuro permanece como `never` hasta que existan su contrato y su proceso de generación.
+- Cualquier cambio incompatible del esquema persistido requiere una nueva versión y una migración explícita.
+- `targetSize` reemplaza el factor abstracto anterior `scale`; la migración histórica convierte `scale: 1` en 75 mm.
+- Los datos de IndexedDB vuelven a pasar por `parseDesignDocumentV1`; los datos corruptos provocan un error explícito.
+- Si falla la apertura de IndexedDB, se elimina del caché para permitir un nuevo intento en la siguiente llamada, sin reintentos automáticos en bucle.
+- El códec de proyectos sigue siendo puro: las API `File`, las descargas y la interfaz pertenecen a los adaptadores.
+- La migración de datos antiguos utiliza una fábrica UUID inyectable para evitar colisiones y facilitar las pruebas.
+- El almacén del documento valida antes de publicar, construye copias defensivas y congela profundamente las instantáneas persistidas.
 
-## Génération et ownership Three.js
+## Generación y propiedad de recursos Three.js
 
-- Avant un retour réussi, la recette possède son `Object3D`; après retour, le caller le possède.
-- Toute erreur ou annulation après génération impose un disposal unique avant propagation de l'erreur.
-- `GeneratedArtifact` contient des objets runtime et ne doit jamais être sérialisé.
-- Les rôles d'artefact restent corrélés au `DesignKind` au niveau TypeScript.
-- Une promesse de recette rejetée est retirée du cache avec garde d'identité afin de permettre un retry ultérieur sans boucle.
-- Le registry reste local et lazy ; il ne doit importer statiquement ni JSCAD ni les générateurs lourds.
-- L'orchestrateur publie le nouveau snapshot avant le disposal du résultat remplacé ; un échec conserve le dernier résultat valide.
-- Toute mutation engagée porte une révision monotone : une réentrée plus récente gagne.
-- Les callbacks synchrones de barrière ou de disposal peuvent rappeler `clear()` ou `dispose()` sans cycle : l'opération réentrante démarre, mais le callback ne bloque pas son propre drainage.
-- Le batch ne publie rien avant réussite complète et détruit tous les artefacts partiels sur échec ou annulation.
-- Au démontage d'un Batch, vider d'abord le store et les références UI, puis disposer les ressources Three.js possédées.
+- Antes de devolver correctamente el resultado, la receta es propietaria de su `Object3D`; después, la propiedad pasa al código que la llamó.
+- Un error o cancelación posterior a la generación exige liberar los recursos exactamente una vez antes de propagar el error.
+- `GeneratedArtifact` contiene objetos de ejecución y nunca debe serializarse.
+- Los roles de los artefactos se relacionan con `DesignKind` en TypeScript.
+- Una promesa de receta rechazada se retira del caché con una comprobación de identidad para permitir reintentos posteriores sin bucles.
+- El registro es local y de carga diferida; no debe importar estáticamente JSCAD ni generadores pesados.
+- El orquestador publica la nueva instantánea antes de liberar el resultado reemplazado; si falla, conserva el último resultado válido.
+- Toda modificación confirmada lleva una revisión monótona: prevalece la reentrada más reciente.
+- Las funciones síncronas de barrera o liberación pueden llamar nuevamente a `clear()` o `dispose()` sin ciclos: la operación reentrante comienza, pero la función no bloquea su propio vaciado.
+- La generación por lotes no publica nada antes de completarse y destruye todos los artefactos parciales si falla o se cancela.
+- Al desmontar Batch, vaciar primero el almacén y las referencias de la interfaz; luego liberar los recursos Three.js correspondientes.
 
-## Géométrie et exports
+## Geometría y exportaciones
 
-- Toujours valider l'objet source puis sa copie transformée pour la fabrication.
-- Le validateur compte les composants par adjacence de triangles, pas par nombre de meshes.
-- Il ne garantit pas une détection exhaustive des auto-intersections triangle-triangle.
-- Un détail plus petit que les offsets de paroi peut changer la topologie : refuser plutôt que lisser silencieusement.
-- Stamp impose une base commune et une coque finale unique.
-- `repairBooleanCapTriangles` doit rester fail-closed : ne pas élargir ses seuils pour masquer une géométrie invalide.
-- La heatmap est une métadonnée viewer-only ; l'export STL l'ignore.
-- Un 3MF est un package OPC/ZIP, jamais un XML renommé.
-- Préserver exactement `byteOffset` et `byteLength` du `DataView` STL.
-- L'aperçu de couches n'est ni un slicer ni une estimation de temps ; ne produire aucun faux G-code.
+- Validar siempre el objeto original y su copia transformada para fabricación.
+- El validador cuenta componentes por adyacencia de triángulos, no por cantidad de mallas.
+- No garantiza detectar exhaustivamente las autointersecciones entre triángulos.
+- Un detalle menor que los desplazamientos de pared puede cambiar la topología: rechazarlo en vez de suavizarlo silenciosamente.
+- Los sellos requieren una base común y una única envolvente final.
+- `repairBooleanCapTriangles` debe seguir rechazando por defecto los casos inválidos: no ampliar sus umbrales para disimular geometría incorrecta.
+- El mapa de calor es metadato exclusivo del visor; la exportación STL lo ignora.
+- Un 3MF es un paquete OPC/ZIP, nunca un XML renombrado.
+- Preservar exactamente `byteOffset` y `byteLength` del `DataView` STL.
+- La vista previa de capas no es un laminador ni estima tiempos; no generar código G ficticio.
 
-## Sécurité, UI et performances
+## Seguridad, interfaz y rendimiento
 
-- Un SVG importé suit une allowlist géométrique ; ne pas assouplir silencieusement cette frontière.
-- Examiner tout nouvel usage de `{@html}` avec une donnée non fiable.
-- La clé Gemini reste locale au navigateur et ne doit jamais être committée ou réaffichée.
-- Les erreurs de champ utilisent `aria-describedby`, `aria-invalid` et une annonce évitant les doublons.
-- Les sections de paramètres utilisent les éléments natifs `<details>/<summary>`, des cibles d'au moins 44 px et `:focus-visible`.
-- JSCAD, Stamp et les panneaux optionnels restent chargés par `import()` afin de protéger le bundle initial.
-- Le raster est décodé sur Canvas/UI ; ImageTracer s'exécute dans un Worker annulable et borné à 16 MP.
+- Un SVG importado pasa por una lista de elementos geométricos permitidos; no ampliar silenciosamente esa frontera de seguridad.
+- Revisar todo uso nuevo de `{@html}` con datos no confiables.
+- La clave de Gemini permanece local al navegador y nunca debe incorporarse a Git ni mostrarse de nuevo.
+- Los errores de campos utilizan `aria-describedby`, `aria-invalid` y avisos que evitan duplicaciones.
+- Las secciones de parámetros usan los elementos nativos `<details>/<summary>`, objetivos de al menos 44 px y `:focus-visible`.
+- JSCAD, Stamp y los paneles opcionales siguen cargándose mediante `import()` para proteger el tamaño inicial de la aplicación.
+- Las imágenes rasterizadas se decodifican en Canvas/interfaz; ImageTracer se ejecuta en un Worker cancelable limitado a 16 MP.
 
-## Environnement et livraison
+## Entorno y publicación
 
-- Sous `pids.max=256`, `ERR_INSUFFICIENT_RESOURCES` peut provenir de la saturation Chromium plutôt que du code lazy.
-- Tailscale reste hors du repo. Le script de preview doit nettoyer Serve à l'arrêt.
-- L'allowlist Vite reste bornée à l'hôte privé attendu ; ne pas utiliser `allowedHosts: true`.
-- Protection de `main`, vérifiée via l'API GitHub le 2026-08-08 : check strict `validate`, historique linéaire, force-push et suppression interdits.
+- Con `pids.max=256`, `ERR_INSUFFICIENT_RESOURCES` puede deberse a saturación de Chromium y no al código de carga diferida.
+- Tailscale permanece fuera del repositorio. El script de vista previa debe limpiar Serve al detenerse.
+- La lista de hosts permitidos de Vite se limita al host privado previsto; no usar `allowedHosts: true`.
+- Dato histórico del proyecto original: protección de `main` verificada mediante la API de GitHub el 08/08/2026, con comprobación estricta `validate`, historial lineal y prohibición de publicaciones forzadas y eliminación de rama. No acredita la configuración actual de CookieForge.
