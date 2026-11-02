@@ -1,26 +1,28 @@
-# AGENT_CONTEXT — cookie-cutter-designer
+# Contexto del agente — cookie-cutter-designer
 
-## Dépôt et État courant
+> Registro histórico del proyecto original, actualizado el 11 de octubre de 2026. Los permisos, ramas y estados que describe **no constituyen autorizaciones vigentes para CookieForge**.
 
-- Dépôt `razorglyon/cookie-cutter-designer`, clone `/workspace/cookie-cutter-designer`, branche par défaut `main`.
-- **Lot 7a fusionné et déployé, vérifié le 2026-10-11.** PR #71 MERGED ; squash `bafc4246d5c5789a385f844ea5ff3a1d2d7e99dd`, `origin/main` fetché et égal au SHA GitHub.
-- Branche applicative conservée : `feature/reprenable-cutter-series`, HEAD publié `5c74083baec230788468fa70c9bada5c1caecda3`. Son arbre est exactement celui du squash (`3492b6e40b02764c9f83fa021cd95852e7acb4e9`). Cette divergence d’historique ne représente pas du travail applicatif non livré. Main local et anciennes branches non modifiés/rebasés/supprimés.
-- Quality et CodeQL Security Scan réussis sur le HEAD de PR ; verdict externe CodeQL « No new alerts in code changed by this pull request » et GitGuardian réussis. Sur le squash : Quality `38167985591`, CodeQL Security Scan `38167985501` et Pages `38167985508` SUCCESS ; validate, Analyze, build et deploy verts. Les verdicts externes de PR ne sont pas présentés comme réexécutés sur main.
-- Déploiement github-pages `7000582643`, SHA exact et dernier statut success confirmés. Paquet comparé au build qualifié ; **58/58 fichiers publics** relus HTTP 200, tailles/SHA-256 identiques, lazy chunks et Workers inclus. Seul `.nojekyll` vide est propre au build, absent du paquet et qualifié comme métadonnée de packaging.
-- Branche documentaire active : `docs/refresh-product-roadmap`, créée depuis `origin/main` vérifié, sans modifier main ni rebaser la branche livrée. GO courant : commit et push des cinq documents autorisés par Rza ; aucune PR, fusion ni mise en production autorisée.
-- Aucun code local restant, aucune PR ouverte au relevé final. Les cinq documents sont prêts pour le commit/push autorisé ; cette phrase décrit le préflight, pas une preuve de publication distante. Le statut réel se relit dans Git et sur GitHub.
-- Contrôle documentaire du profil : ce contexte respecte la limite ; le contrôle global reste en échec uniquement pour les contextes trop longs de Limace et Sangsue, non modifiés dans cette livraison. Ce contrôle de notes ne remet pas en cause la CI du produit.
+## Repositorio y estado en aquel momento
 
-## Lot livré et validation
+- Repositorio de origen: `razorglyon/cookie-cutter-designer`; clon `/workspace/cookie-cutter-designer`; rama predeterminada `main`.
+- **Lote 7a fusionado y desplegado, verificado el 11/10/2026.** PR #71 fusionada; squash `bafc4246d5c5789a385f844ea5ff3a1d2d7e99dd`. El `origin/main` recuperado coincidía con el SHA de GitHub.
+- Rama funcional conservada: `feature/reprenable-cutter-series`, HEAD publicado `5c74083baec230788468fa70c9bada5c1caecda3`. Su árbol coincidía con el squash (`3492b6e40b02764c9f83fa021cd95852e7acb4e9`); la diferencia de historial no significaba trabajo funcional pendiente. No se alteraron, reorganizaron ni eliminaron `main` local ni otras ramas.
+- Quality y CodeQL Security Scan aprobaron en el HEAD de la PR; CodeQL notificó «No new alerts in code changed by this pull request» y GitGuardian también aprobó. Sobre el squash: Quality `38167985591`, CodeQL `38167985501` y Pages `38167985508` finalizaron en SUCCESS, con validación, análisis, compilación y despliegue correctos. Las evaluaciones externas de la PR no se presentaron como repetidas sobre `main`.
+- Despliegue GitHub Pages `7000582643`: SHA y estado final satisfactorio comprobados. Se comparó el paquete con la compilación calificada: **58/58 archivos públicos** respondieron HTTP 200 con tamaño y SHA-256 idénticos, incluidos fragmentos diferidos y Workers. El único `.nojekyll` vacío era específico de la compilación y se clasificó como metadato de empaquetado.
+- Rama documental entonces activa: `docs/refresh-product-roadmap`, creada desde `origin/main` verificado; sin alterar `main` ni reorganizar la rama entregada. Permiso histórico: confirmar y publicar cinco documentos autorizados por Rza, **sin** autorización de PR, fusión o puesta en producción.
+- Sin código local pendiente ni PR abierta en el último relevamiento. Los cinco documentos estaban listos para confirmar/publicar: era una comprobación previa, no prueba de publicación remota; el estado real debía verificarse en Git y GitHub.
+- El contexto respetaba la extensión permitida. El control global de notas fallaba solo por los contextos demasiado largos de Limace y Sangsue, no modificados en esa entrega. Ese problema documental no invalidaba la CI del producto.
 
-- Séries homogènes de Cutters séparés depuis Batch : copies, colonnes, espacement ; source/profils/ponts/poignée communs éditables. Document/enveloppe V3 stricts, IndexedDB/JSON/reprise et Undo/Redo canoniques. Retour au Cutter unique sans perte. V1/V2 conservés ; V3 nécessite la nouvelle application. Batch libre historique non enregistrable.
-- Bornes : 1–24 copies, 1–copies colonnes, 0,5–40 mm d’espace, 500 000 triangles. Disposition trop grande sauvegardable, géométrie bloquée ; Batch reste accessible sans mesh pour réparer après reload.
-- Qualification du HEAD exact : audit sans vulnérabilité connue, check 0 erreur/0 avertissement, **1 128/1 128 tests (84 fichiers)**, smoke 4/4, benchmark 2/2, build/budgets verts (entrée 178 253, autre max 561 528 octets). Fichiers suivis conformes aux blobs Git et empreintes inchangées avant/après. Première tentative de suite interrompue à 210 s, enfants arrêtés ; relance réussie à 278,92 s sans changement de code.
-- Recette Chromium locale précédente toujours rattachée : 225 empreintes src identiques au commit publié. Desktop/mobile, V1 comparé au vrai main, V2/ponts/profils, JSON/STL exacts après reload, historique et réparation du plateau. Pas de nouveau parcours navigateur sur production ; preuve HTTP de version servie seulement. Pas de Safari/Firefox/device/lecteur d’écran/slicer/impression ni qualification des séries maximales.
+## Lote entregado y pruebas
 
-## Stack, commandes et ressources
+- Series homogéneas de cortantes separados desde Lotes: copias, columnas y espaciado; fuente, perfiles, puentes y agarre comunes editables. Documento/envoltorio V3 estrictos, IndexedDB, JSON, recuperación y Deshacer/Rehacer canónicos. Vuelta al cortante único sin pérdida. V1/V2 conservados; V3 requería la aplicación nueva. El modo Lotes libres histórico no admitía guardado.
+- Límites: 1–24 copias, columnas entre 1 y el número de copias, espaciado de 0,5–40 mm y 500.000 triángulos. Una distribución demasiado grande podía guardarse pero su geometría se bloqueaba; Lotes seguía accesible sin malla para corregirla después de recargar.
+- Validación del HEAD exacto: auditoría sin vulnerabilidades conocidas, comprobación 0 errores/0 advertencias, **1.128/1.128 pruebas (84 archivos)**, pruebas de exportación 4/4, rendimiento 2/2 y compilación/presupuestos correctos (entrada 178.253 bytes; máximo restante 561.528 bytes). Archivos versionados coincidentes con los blobs Git y huellas idénticas antes/después. El primer intento de pruebas se interrumpió a los 210 s, se detuvieron los procesos hijos y una nueva ejecución aprobó en 278,92 s sin modificar el código.
+- Recorrido Chromium local previo todavía vinculado: 225 huellas de `src` idénticas al commit publicado. Escritorio/móvil, V1 comparado con el `main` real, V2/puentes/perfiles, JSON y STL exactos después de recargar, historial y reparación de la plataforma. No se repitió un recorrido en producción; solo hubo comprobación HTTP de los archivos servidos. No se hicieron pruebas con Safari, Firefox, dispositivos reales, lectores de pantalla, laminadores o impresoras; tampoco se certificaron series máximas.
 
-Svelte 5, TypeScript strict, Vite 7, Three.js, Clipper/JSCAD, ImageTracer en Worker. pnpm 10.33.4 ; Node >=22.12.
+## Tecnología, comandos y recursos
+
+Svelte 5, TypeScript estricto, Vite 7, Three.js, Clipper/JSCAD e ImageTracer en Worker. pnpm 10.33.4 y Node.js 22.12 o posterior.
 
 ```sh
 REPO_TMP=$(python3 /workspace/.hermes-tools/workspace-tmp.py --repo "$PWD" --purpose commands --path-only) || exit 1
@@ -32,15 +34,17 @@ pnpm test:run --pool=threads --maxWorkers=1 --fileParallelism=false
 pnpm test:smoke --pool=threads --fileParallelism=false
 pnpm benchmark --pool=threads --fileParallelism=false
 pnpm build
-# Dev : pnpm dev ; preview privé : ./scripts/start-private-preview.sh
+# Desarrollo: pnpm dev; vista previa privada: ./scripts/start-private-preview.sh
 ```
 
-TMP isolé obligatoire pour install/tests/build ; sérialiser les gates. Ne pas dupliquer maxWorkers dans smoke/benchmark. Budgeter les attentes selon la durée mesurée et garder propriété/arrêt des processus.
+En aquel entorno se exigía aislar el directorio temporal al instalar, probar y compilar; ejecutar las comprobaciones secuencialmente y no duplicar `maxWorkers` en las pruebas de exportación/rendimiento. Había que dimensionar las esperas según la duración medida y controlar la creación y detención de procesos.
 
-## Carte, décisions et reprise
+## Mapa, decisiones y continuación histórica
 
-- `src/lib/domain/`, `stores/designSessionStore.ts` : document/session canoniques ; `projects/` : codec/IndexedDB/recovery ; `App.svelte` : intégration.
-- `import/`, `workers/` : import ; `sketch/` : édition ; `generation/`, `utils/` : recettes/géométrie/exports.
-- Invariants durables conservés dans **`docs/PROJECT_INVARIANTS.md`** ; ancienne note intégrale préservée dans Git au HEAD publié. Preuves spécialisées : `docs/CUTTER_SERIES_VALIDATION.md`, `WALL_PROFILES_VALIDATION.md`, `MANUAL_ISLAND_BRIDGES_VALIDATION.md`, `PHOTO_IMPORT_VALIDATION.md` et `SKETCH_WORKSPACE_VALIDATION.md`.
-- Preuves de livraison : `/workspace/reports/cutter-series-release-a0f7i03a/qualification.json`, `pages-verified.json` ; CI : `/workspace/reports/cutter-series-ci-pr-crj3f8yn/final.json` et `/workspace/reports/cutter-series-ci-main-x4dzinj3/final.json`.
-- Suite : préserver les notes locales, fetch et repartir d’une nouvelle branche depuis `origin/main` vérifié. Feuille de route : `.hermes/plans/2026-10-09_214154-rea-product-improvements.md` ; ses anciens statuts ne remplacent pas ce contexte. Pas d’extension au monobloc/multi-dessins/Stamp ni de publication documentaire sans nouveau GO.
+- `src/lib/domain/` y `stores/designSessionStore.ts`: documento/sesión canónicos; `projects/`: códec, IndexedDB y recuperación; `App.svelte`: integración.
+- `import/` y `workers/`: importación; `sketch/`: edición; `generation/` y `utils/`: recetas, geometría y exportación.
+- Invariantes duraderos en **`docs/PROJECT_INVARIANTS.md`**; nota previa íntegra conservada en el historial Git del HEAD publicado. Informes: `docs/CUTTER_SERIES_VALIDATION.md`, `WALL_PROFILES_VALIDATION.md`, `MANUAL_ISLAND_BRIDGES_VALIDATION.md`, `PHOTO_IMPORT_VALIDATION.md` y `SKETCH_WORKSPACE_VALIDATION.md`.
+- Evidencia de entrega: `/workspace/reports/cutter-series-release-a0f7i03a/qualification.json` y `pages-verified.json`; CI: `/workspace/reports/cutter-series-ci-pr-crj3f8yn/final.json` y `/workspace/reports/cutter-series-ci-main-x4dzinj3/final.json`.
+- Paso siguiente que establecía el original: preservar notas locales, actualizar referencias y crear una rama desde `origin/main` verificado. Hoja de ruta: `.hermes/plans/2026-10-09_214154-rea-product-improvements.md`. Sus estados antiguos no reemplazaban ese contexto. No había autorización para ampliar al diseño monobloque/múltiple o a sellos, ni para publicar documentación sin nuevo permiso.
+
+**Para CookieForge:** consultar la hoja de ruta, las decisiones y el estado actual de nuestro propio repositorio antes de aplicar cualquier instrucción operativa.
