@@ -1,60 +1,62 @@
-# Cutter series — lot 7a, validation locale
+# Serie de cortadores — Lote 7a, validación local
 
-## Périmètre et état
+## Alcance y estado
 
-Le 2026-10-11, Rza a autorisé l’implémentation locale du lot 7a : copies homogènes **séparées et reprenables** du Cutter courant. Branche `feature/reprenable-cutter-series`, créée depuis `origin/main` vérifié à `1c9e54a2507eceac7bcb788ffc5ad90d4c38cc9e` (lot 6 intégré). Cette qualification précède la publication. GO explicite supplémentaire de Rza le 2026-10-11 : commit, push, PR, fusion uniquement après contrôles Quality et sécurité verts du SHA exact, puis vérification du déploiement Pages. Au moment de cette rédaction précommit, la production reste au lot 6 ; le résultat distant sera enregistré dans la note de reprise.
+El 11/10/2026, Rza autorizó la implementación local del lote 7a: copias homogéneas **separadas y recuperables** del cortador actual. Rama `feature/reprenable-cutter-series`, creada desde `origin/main` verificado en `1c9e54a2507eceac7bcb788ffc5ad90d4c38cc9e` (lote 6 integrado). Esta calificación precedió a la publicación. Autorización adicional explícita de Rza el 11/10/2026: commit, publicación, solicitud de incorporación y fusión solo después de que Quality y seguridad aprobaran el SHA exacto, seguidas de la verificación del despliegue Pages. Al redactar este documento antes del commit, producción seguía en el lote 6; el resultado remoto debía registrarse en la nota de reanudación.
 
-- Entrée Batch existante : ouvrir/saisir ne change pas le document ; Créer/Appliquer publie une modification atomique, enregistrée dans l’historique canonique.
-- Un dessin et un jeu de paramètres, poignées et ponts communs. Profils Fin / Standard / Robuste et valeurs personnalisées continuent d’éditer la source de la série.
-- Copies 1–24, colonnes 1–copies, espacement positif 0,5–40 mm ; lignes dérivées. Arrangement sur le plateau carré existant, mesuré depuis la géométrie complète, poignée comprise.
-- Document/enveloppe V3 stricts (`kind: multi-cutter`, `layout`, ponts), sans meshes sérialisés. V1/V2 inchangés tant que la fonction n’est pas utilisée. Identité, source originale, sketch, paramètres et viewport conservés. Retour au Cutter unique : V2 si des ponts existent, sinon V1, sans réinitialisation des paramètres.
-- Pas de migration automatique ni de nouvel identifiant de profil ; l’ancienne version de production refuse les fichiers V3 comme version future. Le format V3 nécessite la nouvelle application.
-- Réutilisation de CutterRecipe et du moteur Batch ; le Cutter doit être complet/connecté. Chaque copie possède ses géométries et matériaux ; le prototype est libéré. Annulation et échec de placement ne publient aucune série partielle. Limite totale 500 000 triangles vérifiée avant duplication.
-- Disposition physiquement impossible : document sauvegardable et JSON exportable, mais géométrie bloquée. Batch reste accessible sans mesh après réouverture pour réduire la disposition ; message sur le plateau, sans réparation automatique.
-- Batch libre historique conservé sous un choix explicitement non enregistrable. Hors lot : connexions entre copies, monobloc, plusieurs dessins/tailles, Stamp, placement libre ou optimiseur avancé, socle/paroi/tranchant indépendants.
+- Entrada Batch existente: abrir o escribir no cambia el documento; Crear/Aplicar publica un cambio atómico registrado en el historial canónico.
+- Un dibujo y un conjunto compartido de parámetros, agarres y puentes. Los perfiles Fino / Estándar / Robusto y los valores personalizados siguen editando la fuente de la serie.
+- De 1 a 24 copias, columnas entre 1 y la cantidad de copias, separación positiva de 0,5 a 40 mm; filas calculadas. Distribución sobre la plataforma cuadrada existente, medida desde toda la geometría, incluido el agarre.
+- Documento y envoltorio V3 estrictos (`kind: multi-cutter`, `layout`, puentes), sin mallas serializadas. V1/V2 permanecen iguales hasta utilizar la función. Se conservan identidad, fuente original, boceto, parámetros y visor. Regresar al cortador único produce V2 si existen puentes, o V1 si no, sin restablecer parámetros.
+- Sin migración automática ni identificador nuevo de perfil; la versión anterior de producción rechaza archivos V3 como versión futura. El formato V3 requiere la nueva aplicación.
+- Se reutilizan `CutterRecipe` y el motor Batch; el cortador debe estar completo y conectado. Cada copia tiene geometrías y materiales propios; se libera el prototipo. Cancelar o fallar la distribución no publica series parciales. El límite total de 500.000 triángulos se comprueba antes de duplicar.
+- Distribución físicamente imposible: el documento puede guardarse y exportarse como JSON, pero se bloquea la geometría. Batch sigue accesible sin malla después de reabrir para reducir la distribución; se muestra un mensaje de plataforma sin reparación automática.
+- El Batch libre histórico se conserva como opción expresamente no guardable. Fuera de alcance: conexiones entre copias, pieza monobloque, dibujos o tamaños múltiples, sellos, ubicación libre u optimizador avanzado, y base/pared/filo independientes.
 
-## TDD et régressions
+## Desarrollo guiado por pruebas y regresiones
 
-Cycles RED/GREEN observés pour le contrat V3, la promotion/session, la recette absente et les contrôles de série absents. Compléments RED/GREEN : gardes Cutter-only empêchant l’édition des ponts V3 ; erreur de paramètres restant affichée après correction via le port UI ; impasse de réparation d’une V3 trop grande après réouverture et message de plateau masqué par une erreur générique. Les assertions d’export exigent un vrai bouton, pas `every()` sur une liste potentiellement vide.
+Se observaron ciclos ROJO/VERDE para el contrato V3, la promoción de sesión, la receta ausente y los controles de serie ausentes. Otros ciclos ROJO/VERDE: restricciones solo para cortadores que impiden editar puentes V3; error de parámetros que seguía visible después de corregir mediante el puerto de interfaz; imposibilidad de reparar una V3 demasiado grande después de reabrir y mensaje de plataforma oculto por un error genérico. Las aserciones de exportación exigen un botón real, no `every()` sobre una lista posiblemente vacía.
 
-Couverture complémentaire (pas présentée comme RED avant implémentation) : ownership des clones, annulation entre copies et libération des ressources ; préflight de budget de triangles avec compteur injecté à la frontière du validateur. Ce dernier prouve le garde, **pas** la performance d’une géométrie réelle de 500 000 triangles.
+Cobertura adicional (no presentada como pruebas rojas previas a implementar): propiedad de recursos de clones, cancelación entre copias y liberación; verificación anticipada del presupuesto de triángulos con contador inyectado en el límite del validador. Esta última demuestra la protección, **no** el rendimiento de una geometría real con 500.000 triángulos.
 
-Les anciennes fixtures « version future 3 » passent à 4, en gardant le rejet strict et la priorité du diagnostic de version. Les changements de typage de fixtures reflètent la nouvelle union sans `any`. Un premier runner App a cherché Undo dans Batch plutôt que Parameters ; une attente trop courte d’import dynamique a aussi échoué. Ces tentatives ne sont pas des validations réussies ; la recette finale suit les contrôles réels avec une attente bornée.
+Las imágenes de prueba antiguas que indicaban «versión futura 3» pasan a 4, manteniendo el rechazo estricto y la prioridad del diagnóstico de versión. Los cambios de tipado reflejan la nueva unión sin `any`. Un primer ejecutor de aplicación buscó Deshacer en Batch en vez de Parámetros; también falló una espera demasiado corta de importación dinámica. Estos intentos no se contabilizan como validaciones aprobadas; la prueba final sigue los controles reales con espera limitada.
 
-## Qualification finale après le dernier patch applicatif
+## Calificación final después de la última corrección
 
-Depuis la racine Git, TMP isolé par `/workspace/.hermes-tools/workspace-tmp.py`, `GOMAXPROCS=2`, `UV_THREADPOOL_SIZE=2`, gates sérialisées :
+Desde la raíz Git, directorio temporal aislado mediante `/workspace/.hermes-tools/workspace-tmp.py`, `GOMAXPROCS=2`, `UV_THREADPOOL_SIZE=2`, comprobaciones secuenciales:
 
-| Contrôle | Résultat |
+| Comprobación | Resultado |
 |---|---|
-| Tests concernés et voisins | 511/511, 29 fichiers |
-| Suite complète | 1 128/1 128, 84 fichiers |
-| `pnpm check` | exit 0, Svelte 0 erreur / 0 avertissement, tsc réussi |
+| Pruebas relacionadas y vecinas | 511/511, 29 archivos |
+| Batería completa | 1.128/1.128, 84 archivos |
+| `pnpm check` | salida 0, Svelte 0 errores / 0 advertencias, tsc correcto |
 | `pnpm test:smoke --pool=threads --fileParallelism=false` | 4/4 |
 | `pnpm benchmark --pool=threads --fileParallelism=false` | 2/2 |
-| `pnpm build` | réussi |
-| Budgets finaux JS | 37 fichiers, entrée 178 253 octets < 200 KiB ; autre chunk max 561 528 octets < 600 KiB ; aucune violation |
-| `git diff --check` | réussi |
+| `pnpm build` | correcto |
+| Presupuestos JS finales | 37 archivos; entrada 178.253 bytes, menor que 200 KiB; fragmento restante máximo 561.528 bytes, menor que 600 KiB; ninguna infracción |
+| `git diff --check` | correcto |
 
-Tests : `pnpm test:run --pool=threads --maxWorkers=1 --fileParallelism=false`. Ne pas redonner maxWorkers aux scripts smoke/benchmark qui le fixent déjà. Artefacts smoke/benchmark dans leurs répertoires privés uniques sous le TMP du dépôt, comportement sécurisé du lot 6 conservé.
+Pruebas: `pnpm test:run --pool=threads --maxWorkers=1 --fileParallelism=false`. No repetir `maxWorkers` en scripts de prueba funcional/benchmark que ya lo establecen. Artefactos en directorios temporales privados y únicos bajo el temporal del repositorio; se mantiene el comportamiento seguro del lote 6.
 
-Logs : `/workspace/reports/multi-cutter-{targeted,full,check,smoke,benchmark,build}-qualified.log`. Le premier appel groupé a dépassé 420 s : ses journaux ont montré des tests terminés et un tsc encore actif. Le check a ensuite été confirmé par un vrai exit 0 ; les gates finales ci-dessus ont été relancées après les correctifs navigateur. Ne pas qualifier le timeout initial de succès.
+Registros: `/workspace/reports/multi-cutter-{targeted,full,check,smoke,benchmark,build}-qualified.log`. La primera ejecución agrupada superó 420 s: sus registros mostraron pruebas terminadas mientras tsc seguía activo. Después se confirmó `check` con salida real 0; las comprobaciones finales indicadas se repitieron tras corregir los problemas de navegador. No considerar exitoso el tiempo de espera agotado inicialmente.
 
-## Recette navigateur réelle
+## Prueba funcional real en navegador
 
-Chromium existant, serveur de build localhost possédé par le runner, nouveaux contextes de stockage. Aucun store, réponse réseau ou donnée persistée injectés. Runner hors dépôt : `/workspace/reports/cutter-series-smoke.mjs`. Rapport final **PASS** : `/workspace/reports/cutter-series-browser-PjTE35/report.json`.
+Chromium existente, servidor de compilación localhost controlado por el ejecutor y contextos de almacenamiento nuevos. Sin inyección de almacenes, respuestas de red ni datos persistidos. Ejecutor fuera del repositorio: `/workspace/reports/cutter-series-smoke.mjs`. Informe final **PASS**: `/workspace/reports/cutter-series-browser-PjTE35/report.json`.
 
-- Baseline réelle archivée depuis le SHA main vérifié et reconstruite dans le TMP, puis comparée au nouveau dist. HTML et tous les assets de ces deux builds relus en HTTP et comparés à leurs SHA-256 : 54 ressources baseline, 56 ressources nouveau build. Ce décompte local n’est pas une nouvelle vérification du déploiement Pages historique.
-- V1 à paroi personnalisée 1,4 mm : JSON et STL inchangés sans édition entre main et la nouvelle application. Une copie 576 triangles ; trois copies 1 728, deux copies 1 152. Dimensions STL cohérentes avec le badge aperçu arrondi à 0,1 mm, Z-up et coordonnées finies.
-- Ouvrir Batch ne modifie pas le JSON. Copies 25 refusées, document intact ; création 3 copies / 2 colonnes / 5 mm. Undo/Redo exacts, STL identique après Redo.
-- Mobile 375×812 : application tactile d’une série de deux copies ; sauvegarde IndexedDB, reload/réouverture, JSON et STL strictement identiques ; profil Personnalisé toujours affiché.
-- Disposition 4×1 rangée trop large : export bloqué, JSON sauvegardé et rouvert exact. Sans mesh après reload, export géométrique absent et Batch accessible ; réparation 2 copies / 2 colonnes, STL exact puis retour au Cutter unique au STL original.
-- V2 construit par l’éditeur de ponts natif, puis V3 : source/ponts conservés, triangles doublés ; profil Fin réellement appliqué à la source de série ; extrémité du pont déplacée au clavier, disposition conservée ; save/reload et JSON/STL exacts.
-- Desktop 1365×900 clair/sombre, mobile sombre ; champs/actions ≥44 px, focus clavier 3 px, pas d’overflow horizontal. Captures des champs et action centrés avec sondes DOM de visibilité/non-occultation, puis inspection visuelle. Le titre ou la fin du texte peut être hors champ après défilement normal du panneau mobile ; les contrôles ciblés sont visibles, sans revendiquer une capture intégrale du panneau.
-- Zéro erreur page/console et zéro requête échouée. Les 225 empreintes sous `src/`, HEAD, branche et statut sont identiques avant/après recette ; les empreintes sont encore identiques après la suite finale. Navigateur et serveurs arrêtés ; ports 4354/4355 vérifiés fermés par le runner.
+- Base real archivada desde el SHA de main verificado y recompilada en directorio temporal, luego comparada con la nueva distribución. Se leyeron por HTTP el HTML y todos los recursos de ambas compilaciones y se compararon con sus SHA-256: 54 recursos en la base y 56 en la nueva. Este recuento local no es una nueva verificación del despliegue histórico de Pages.
+- V1 con pared personalizada de 1,4 mm: JSON y STL sin cambios ni ediciones entre main y la aplicación nueva. Una copia: 576 triángulos; tres: 1.728; dos: 1.152. Dimensiones STL coherentes con la etiqueta de vista previa redondeada a 0,1 mm, eje Z vertical y coordenadas finitas.
+- Abrir Batch no modifica JSON. Se rechazan 25 copias y se conserva el documento; creación de 3 copias, 2 columnas y 5 mm. Deshacer/Rehacer exactos; STL idéntico después de Rehacer.
+- Móvil 375 × 812: aplicación táctil de una serie de dos copias; guardado IndexedDB, recarga/reapertura, JSON y STL estrictamente idénticos; sigue visible el perfil Personalizado.
+- Distribución 4 × 1 demasiado ancha: exportación bloqueada, JSON guardado y reabierto sin cambios. Sin malla después de recargar, exportación geométrica ausente y Batch accesible; reparación a 2 copias / 2 columnas, STL exacto y regreso al cortador único con STL original.
+- V2 creada con el editor nativo de puentes y promovida a V3: fuente y puentes conservados, triángulos duplicados; perfil Fino aplicado realmente a la fuente de serie; extremo del puente movido con teclado, distribución conservada; guardado/recarga y JSON/STL exactos.
+- Escritorio 1365 × 900 en claro/oscuro y móvil oscuro: campos/acciones de al menos 44 px, foco de teclado de 3 px, sin desbordamiento horizontal. Capturas de controles centrados, comprobaciones DOM de visibilidad y ausencia de obstrucciones, luego inspección visual. El título o el final del texto pueden quedar fuera de pantalla por el desplazamiento normal del panel móvil; los controles seleccionados sí están visibles, sin afirmar que se capturó todo el panel.
+- Cero errores de página/consola y cero solicitudes fallidas. Las 225 huellas de `src/`, HEAD, rama y estado permanecieron idénticas antes y después; las huellas también se mantuvieron después de la batería final. Navegador y servidores detenidos; el ejecutor comprobó que los puertos 4354/4355 estaban cerrados.
 
-Le premier run navigateur `/workspace/reports/cutter-series-browser-ZMfVGW/` est **FAIL** : il a exposé l’impasse après réouverture d’une série trop grande. Correctifs transformés en tests RED/GREEN, puis qualification complète et run final ci-dessus. Ne pas utiliser cette première capture comme validation du code final.
+La primera ejecución de navegador `/workspace/reports/cutter-series-browser-ZMfVGW/` fue **FAIL**: reveló la imposibilidad de reparar una serie demasiado grande tras reabrir. Se transformaron los defectos en pruebas ROJO/VERDE, se corrigieron y se completó la calificación final anterior. No utilizar esa primera captura como validación del código final.
 
-## Limites
+## Límites
 
-Chromium uniquement, toucher émulé ; pas de Safari/Firefox, téléphone physique, lecteur d’écran, slicer, impression ni essai mécanique/alimentaire. Corpus navigateur : cercle SVG et SVG à un pont simple ; chaînes intermédiaires, annulation et documents malformés couverts par tests, pas rejoués intégralement en navigateur. Pas de nouveau parcours raster/photo ni benchmark de performance des séries maximales. Smoke/benchmark historiques qualifient leurs propres pipelines, pas une promesse de débit pour 24 copies. V3 refuse un Cutter incomplet pour l’export mais le document reste reprenable. Ancien Batch libre toujours hors persistance canonique. CI et CodeQL non exécutés au moment de cette qualification locale ; leur exécution sur le SHA publié est désormais autorisée et reste un prérequis à la fusion. Les contrôles distants ne lèvent pas les limites de recette ci-dessus.
+Solo Chromium, tacto emulado; sin Safari/Firefox, teléfono físico, lector de pantalla, laminador, impresión ni pruebas mecánicas o alimentarias. Conjunto de navegador: círculo SVG y SVG con un puente sencillo; estados intermedios, cancelación y documentos malformados cubiertos por pruebas, pero no reproducidos íntegramente en navegador. No hubo nuevo flujo raster/foto ni benchmark de rendimiento de series máximas. Las pruebas funcionales y benchmarks históricos califican sus respectivos procesos, no prometen velocidad para 24 copias. V3 rechaza exportar un cortador incompleto, pero permite recuperar el documento. El Batch libre anterior sigue fuera de la persistencia canónica. La integración continua y CodeQL no se habían ejecutado en el momento de esta calificación local; su ejecución sobre el SHA publicado estaba autorizada y seguía siendo requisito para fusionar. Los controles remotos no eliminan las limitaciones de la prueba funcional descrita.
+
+> **Nota CookieForge:** resultados, autorizaciones y rutas de esta validación pertenecen al proyecto original. La traducción no constituye una nueva ejecución de pruebas.
