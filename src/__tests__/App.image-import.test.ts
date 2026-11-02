@@ -183,7 +183,7 @@ it.each(['new-image', 'shape', 'open', 'unmount'])('a late raster is invalidated
     await upload(new File([svg], 'latest.svg', { type: 'image/svg+xml' }));
     await vi.waitFor(() => expect(session.getDocument()?.source.fileName).toBe('latest.svg'));
   } else if (transition === 'shape') {
-    click('Bibliothèque de formes'); await tick(); click('Utiliser la forme Circle');
+    click('Biblioteca de formas'); await tick(); click('Usar la forma Círculo');
     await vi.waitFor(() => expect(session.getDocument()?.source.fileName).toBe('circle.svg'));
   } else if (transition === 'open') {
     click('Projets locaux'); await vi.waitFor(() => expect(document.querySelector('button[aria-label="Ouvrir Other"]')).not.toBeNull());
@@ -205,7 +205,7 @@ it('opening a project invalidates conversion immediately, even while the dirty d
 });
 it('start screen routes to the existing shape library and local project library', async () => {
   setup(); await vi.waitFor(() => expect(document.querySelector('.start-screen')).not.toBeNull());
-  click('Formes'); await tick(); expect(document.querySelector('button[aria-label="Utiliser la forme Circle"]')).not.toBeNull();
+  click('Formas'); await tick(); expect(document.querySelector('button[aria-label="Usar la forma Círculo"]')).not.toBeNull();
   click('Importer un dessin'); await vi.waitFor(() => expect(document.querySelector('.start-screen')).not.toBeNull()); click('Reprendre un projet');
   await vi.waitFor(() => expect(document.querySelector('button[aria-label="Ouvrir Other"]')).not.toBeNull());
 });
