@@ -65,10 +65,10 @@ it.each([1, 2] as const)('V%s creates one history step, keeps editable profiles/
     await ready(session);
   }
   const saved = session.getDocument()!, binary = stl(), codec = encodeProject(saved);
-  await click('Projets locaux'); await click('Guardar proyecto');
+  await click('Proyectos locales'); await click('Guardar proyecto');
   await vi.waitFor(() => expect(records.get(saved.id)).toEqual(saved));
   await unmount(app!); app = undefined; document.body.innerHTML = '';
-  session = setup(null, records); await click('Projets locaux');
+  session = setup(null, records); await click('Proyectos locales');
   await vi.waitFor(() => expect(document.querySelector(`[aria-label="Abrir Series V${version}"]`)).not.toBeNull());
   await click(`Abrir Series V${version}`); await ready(session);
   expect(encodeProject(session.getDocument())).toBe(codec); expect(stl()).toEqual(binary);
@@ -108,7 +108,7 @@ it('invalid layout preserves the last series; accepted oversized layout blocks o
   expect(document.querySelector('.alert-error')?.textContent).toMatch(/plateau/i);
   expect(document.querySelectorAll('.advanced-export .export-btn')).toHaveLength(1);
   expect(document.querySelector<HTMLButtonElement>('.advanced-export .export-btn')!.disabled).toBe(true);
-  await click('Projets locaux'); await click('Guardar proyecto'); await vi.waitFor(() => expect(records.get(before!.id)).toEqual(session.getDocument()));
+  await click('Proyectos locales'); await click('Guardar proyecto'); await vi.waitFor(() => expect(records.get(before!.id)).toEqual(session.getDocument()));
   session.updateSeries({ copies: 2, columns: 2, spacingMm: 5 }); await ready(session);
   expect(get(generationState).result?.artifacts[0].validation.shells).toBe(2);
 }, 30_000);
