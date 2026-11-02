@@ -65,7 +65,7 @@ it('lists recovery on startup without auto-restoring or writing', async () => {
 it('keeps empty startup unobstructed and exposes the empty recovery list from Local projects', async () => {
   const { session, put } = setup(null, { empty: true }); await tick(); await tick();
   expect(document.querySelector('[aria-label="Brouillons de récupération"]')).toBeNull(); expect(session.getDocument()).toBeNull(); expect(put).not.toHaveBeenCalled();
-  click('Projets locaux'); await vi.waitFor(() => expect(document.body.textContent).toContain('Aucun brouillon de récupération dans ce navigateur'));
+  click('Proyectos locales'); await vi.waitFor(() => expect(document.body.textContent).toContain('No hay borradores de recuperación en este navegador'));
   expect(button('Actualiser les brouillons de récupération').disabled).toBe(false);
 });
 it('resumes the exact stored document through the real orchestrator as dirty, retaining library and source draft', async () => {
@@ -73,7 +73,7 @@ it('resumes the exact stored document through the real orchestrator as dirty, re
   await vi.waitFor(() => expect(session.getDocument()).toEqual(expected.document)); await ready();
   expect(get(generationState).result?.document).toEqual(expected.document);
   expect(drafts.get(expected.draftId)).toEqual(expected); expect(JSON.stringify([...saved])).toBe(libraryBefore); expect(projectPut).not.toHaveBeenCalled();
-  click('Projets locaux'); await tick(); expect(document.body.textContent).toContain('Modifications non enregistrées');
+  click('Proyectos locales'); await tick(); expect(document.body.textContent).toContain('Cambios sin guardar');
 });
 it('cancel resume retains document, epoch, history, generation and drafts', async () => {
   const { session, drafts, expected } = setup(fixture('Current')); await ready(); await listed();
@@ -89,7 +89,7 @@ it.each(['rename', 'viewport', 'params', 'replace', 'raster', 'open'] as const)(
   else if (change === 'viewport') session.updateViewport({ showGrid: true, showAxes: false, showWallThickness: false });
   else if (change === 'params') session.updateParameters('cutter', { totalHeight: 37 });
   else if (change === 'replace') session.replace(fixture('B'));
-  else if (change === 'open') { click('Projets locaux'); await vi.waitFor(() => expect(document.querySelector('button[aria-label="Ouvrir Library B"]')).not.toBeNull()); click('Ouvrir Library B'); await prompt(); click('Ignorer les modifications'); await vi.waitFor(() => expect(session.getDocument()?.id).toBe('B')); }
+  else if (change === 'open') { click('Proyectos locales'); await vi.waitFor(() => expect(document.querySelector('button[aria-label="Abrir Library B"]')).not.toBeNull()); click('Abrir Library B'); await prompt(); click('Ignorer les modifications'); await vi.waitFor(() => expect(session.getDocument()?.id).toBe('B')); }
   else { const input = document.querySelector<HTMLInputElement>('input[type="file"]')!; Object.defineProperty(input, 'files', { value: [new File(['x'], 'new.png', { type: 'image/png' })] }); input.dispatchEvent(new Event('change', { bubbles: true })); await vi.waitFor(() => expect(raster.started).toHaveBeenCalledTimes(1)); }
   const latest = session.getDocument(), epoch = session.getSessionEpoch(); gate.resolve();
   await vi.waitFor(() => expect(resume().disabled).toBe(false));
@@ -112,12 +112,12 @@ it('the synchronous handler rejects a stale enabled resume button once the workf
 it('delete cancellation performs no mutation; confirmation deletes and focuses refresh', async () => {
   const { drafts, deletion } = setup(); await listed(); remove().click(); await prompt(); click('Annuler');
   await vi.waitFor(() => expect(remove().disabled).toBe(false)); expect(deletion).not.toHaveBeenCalled(); expect(drafts.size).toBe(1);
-  remove().focus(); remove().click(); await prompt(); click('Supprimer le brouillon');
+  remove().focus(); remove().click(); await prompt(); click('Eliminar borrador');
   await vi.waitFor(() => expect(drafts.size).toBe(0)); await vi.waitFor(() => expect(document.activeElement).toBe(button('Actualiser les brouillons de récupération')));
 });
 it('delete binds the displayed version through the prompt and guards double click', async () => {
   const { expected, drafts, deletion } = setup(); await listed(); const control = remove(); control.click(); control.click(); await prompt();
-  drafts.set(expected.draftId, parseProjectRecoveryEnvelope({ ...expected, document: fixture('Changed draft') })); click('Supprimer le brouillon');
+  drafts.set(expected.draftId, parseProjectRecoveryEnvelope({ ...expected, document: fixture('Changed draft') })); click('Eliminar borrador');
   await vi.waitFor(() => expect(deletion).toHaveBeenCalledTimes(1)); expect(drafts.get(expected.draftId)?.document.name).toBe('Changed draft');
   await vi.waitFor(() => expect(document.body.textContent).toContain('Recovery snapshot changed or missing')); await vi.waitFor(() => expect(resume().getAttribute('aria-label')).toContain('Changed draft'));
 });
@@ -142,14 +142,14 @@ it.each(['get', 'dialog'] as const)('unmount cancels late %s without replacing o
 it('explicit save retains recovery drafts and independent saved-local status', async () => {
   const { expected, drafts } = setup(); await listed(); resume().click(); await ready();
   window.dispatchEvent(new Event('pagehide')); await vi.waitFor(() => expect(drafts.size).toBe(2));
-  click('Projets locaux'); await tick(); click('Enregistrer le projet'); await vi.waitFor(() => expect(document.body.textContent).toContain('Enregistré localement'));
+  click('Proyectos locales'); await tick(); click('Guardar proyecto'); await vi.waitFor(() => expect(document.body.textContent).toContain('Guardado localmente'));
   expect(drafts.get(expected.draftId)).toEqual(expected); expect(drafts.size).toBe(2); expect(document.body.textContent).toContain('Récupération enregistrée');
 });
 it('recovery storage failure keeps project export backup available and retry works', async () => {
   let fail = true; const { drafts } = setup(fixture('Current'), { put: async () => { if (fail) throw new Error('recovery disk full'); } }); await listed();
-  click('Réessayer l’enregistrement de récupération'); await vi.waitFor(() => expect(document.body.textContent).toContain('recovery disk full')); click('Projets locaux'); await tick();
-  expect(button('Exporter le projet').disabled).toBe(false); const anchor = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {}); click('Exporter le projet');
-  await vi.waitFor(() => expect(anchor).toHaveBeenCalledTimes(1)); fail = false; click('Réessayer l’enregistrement de récupération'); await vi.waitFor(() => expect(drafts.size).toBe(2)); anchor.mockRestore();
+  click('Reintentar guardado de recuperación'); await vi.waitFor(() => expect(document.body.textContent).toContain('recovery disk full')); click('Proyectos locales'); await tick();
+  expect(button('Exportar proyecto').disabled).toBe(false); const anchor = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {}); click('Exportar proyecto');
+  await vi.waitFor(() => expect(anchor).toHaveBeenCalledTimes(1)); fail = false; click('Reintentar guardado de recuperación'); await vi.waitFor(() => expect(drafts.size).toBe(2)); anchor.mockRestore();
 });
 it.each(['rename', 'raster'] as const)('rejects edits and source starts during the unsaved-changes resume prompt (%s)', async change => {
   const { session, expected, drafts } = setup(fixture('Current')); await listed(); resume().click(); await prompt();
