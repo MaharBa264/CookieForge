@@ -1,407 +1,198 @@
-# Analyse fonctionnelle — Cookiecad Designer V6
+# Análisis funcional — Cookiecad Designer V6
 
-> Date d’observation : 2026-07-23
-> Cible : <https://app.cookiecad.com/>
-> Objet : benchmark fonctionnel pour `cookie-cutter-designer`, sans reproduction de code, d’identité visuelle ou de contenu propriétaire.
+> **Observación histórica:** 23/07/2026.  
+> **Producto:** https://app.cookiecad.com/  
+> **Propósito:** comparar funcionalidades con Cookie Cutter Designer sin copiar código, apariencia ni contenido propietario.
+>
+> CookieForge es una aplicación personal. Los precios, cuentas y niveles Premium que figuran aquí únicamente documentan la competencia; no se pretende implementar suscripciones, pagos, funciones bloqueadas, backend ni biblioteca en la nube. Las condiciones comerciales pueden haber cambiado.
 
-> Le produit cible est une application personnelle : les tarifs, comptes et marqueurs Premium de Cookiecad servent uniquement à identifier les fonctionnalités concurrentes. Aucun abonnement, paiement, paywall, backend ou stockage cloud n’est à reproduire.
+## 1. Método y limitaciones
 
-## 1. Méthode et limites
+El estudio combinó exploración sin cuenta de Cookiecad Designer V6, ejemplos públicos configurados, novedades V6, documentación oficial, página pública Premium e inspección de opciones serializadas en enlaces públicos compartidos.
 
-Cette analyse combine :
+Se utilizaron cuatro clasificaciones: **observado** (visible públicamente), **confirmado** (publicado por una fuente oficial), **Premium** (marcado con estrella o listado en esa oferta) y **desconocido** (función identificada sin nivel comercial confirmado).
 
-- l’exploration sans compte de Cookiecad Designer V6 ;
-- les exemples publics préconfigurés ;
-- les notes de version V6 ;
-- la documentation publique officielle ;
-- la page publique Cookiecad Premium ;
-- l’inspection des réglages sérialisés dans les liens de partage publics.
+No se utilizaron cuentas, suscripciones, pruebas de pago, pagos ni mecanismos para eludir accesos. No se verificaron internamente los algoritmos geométricos ni la calidad de los archivos producidos.
 
-Les statuts utilisés sont :
+## 2. Fuentes oficiales
 
-- **observé** : présent dans l’interface publique ;
-- **confirmé** : décrit par une source officielle ;
-- **Premium** : marqué par l’étoile Premium ou explicitement listé sur la page Premium ;
-- **inconnu** : le produit existe, mais son niveau d’offre actuel n’est pas confirmé.
-
-Aucun compte, abonnement, essai, paiement ou contournement de contrôle d’accès n’a été utilisé. Les calculs géométriques internes et la qualité réelle des fichiers générés n’ont pas été audités.
-
-## 2. Sources officielles
-
-| Source | URL |
+| Fuente | URL |
 |---|---|
-| Designer V6 | <https://app.cookiecad.com/> |
-| Notes de version V6 | <https://app.cookiecad.com/whats-new> |
-| Offre Premium | <https://app.cookiecad.com/premium> |
-| Documentation Designer | <https://docs.cookiecad.com/cookiecad-designer/> |
-| Vue d’ensemble | <https://docs.cookiecad.com/cookiecad-designer/features-overview/> |
-| Anciennes notes de version | <https://docs.cookiecad.com/cookiecad-designer/whats-new/> |
+| Designer V6 | https://app.cookiecad.com/ |
+| Novedades de V6 | https://app.cookiecad.com/whats-new |
+| Plan Premium | https://app.cookiecad.com/premium |
+| Manual del diseñador | https://docs.cookiecad.com/cookiecad-designer/ |
+| Funcionalidades | https://docs.cookiecad.com/cookiecad-designer/features-overview/ |
+| Novedades anteriores | https://docs.cookiecad.com/cookiecad-designer/whats-new/ |
 
-## 3. Positionnement produit
+## 3. Posicionamiento
 
-Cookiecad transforme une image ou un dessin en outil imprimable en 3D. Le produit vise les pâtissiers, créateurs en pâte polymère, céramistes et utilisateurs d’imprimantes 3D ne maîtrisant pas la CAO.
+Cookiecad convierte imágenes o dibujos en utensilios imprimibles en 3D. Está dirigido a pasteleros, artesanos de arcilla polimérica, ceramistas y usuarios de impresoras sin conocimientos avanzados de CAD.
 
-La promesse centrale est un flux court :
+Flujo propuesto: **importar o elegir una figura → escoger tipo de objeto → ajustar parámetros → examinar el modelo en 3D → descargar, compartir o guardar el proyecto**.
 
-1. importer ou choisir une forme ;
-2. choisir le type d’objet ;
-3. modifier des paramètres métier ;
-4. inspecter le résultat en 3D ;
-5. télécharger, partager ou conserver le projet.
+## 4. Navegación y estructura
 
-## 4. Navigation et structure
+Se observó una navegación principal con **Designer** (Diseñador), **My Library** (Mi biblioteca), **Docs** (Documentación), **Shop Filament** (Tienda de filamento), **Community** (Comunidad), selección de tema sistema/claro/oscuro, inicio de sesión e indicador V6.
 
-Navigation principale observée :
+En el diseñador aparecían: aviso Premium, selector `Thing to make` (qué crear), búsqueda y perfiles de ajustes, controles organizados en acordeones, pestañas **3D Preview** (vista 3D) y **Edit Image** (editar imagen), exportaciones, archivo nuevo, enlaces para compartir, edición CADit y agregado a biblioteca.
 
-- **Designer** ;
-- **My Library** ;
-- **Docs** ;
-- **Shop Filament** ;
-- **Community** ;
-- thème système/clair/sombre ;
-- connexion ;
-- indication de version V6.
+## 5. Entrada y preparación de imágenes
 
-Dans le Designer :
+### 5.1 Fuentes admitidas
 
-- bandeau Premium ;
-- sélecteur « Thing to make » ;
-- recherche de réglages ;
-- profil de paramètres ;
-- réglages regroupés en accordéons ;
-- onglets **3D Preview** et **Edit Image** ;
-- téléchargement et options d’export ;
-- nouveau fichier, partage, édition CADit et ajout à la bibliothèque.
+PNG, JPG/JPEG, WebP y SVG; arrastrar/soltar, selección de archivo, pegado con `Ctrl/Cmd+V`, figuras predeterminadas y ejemplos de diseños.
 
-## 5. Entrées et préparation de l’image
+### 5.2 Edición integrada
 
-### 5.1 Sources acceptées
+V6 anuncia un editor integrado de bocetos CADit, edición dentro del diseñador, guardado automático cada dos minutos, restauración del original y opciones para compartir o bifurcar bocetos editados.
 
-- PNG ;
-- JPG/JPEG ;
-- WebP ;
-- SVG ;
-- glisser-déposer ;
-- sélection de fichier ;
-- collage depuis le presse-papiers avec `Ctrl/Cmd+V` ;
-- formes et designs d’exemple.
+### 5.3 Tratamiento de contornos
 
-### 5.2 Édition intégrée
+Tres operaciones diferenciadas:
 
-V6 annonce un éditeur de croquis CADit intégré :
+- **Imprint:** conservar las líneas para generar detalles.
+- **Edge Trace:** seguir el límite de una región sólida.
+- **Outline:** mantener únicamente el contorno exterior.
 
-- édition du dessin dans le Designer ;
-- autosauvegarde toutes les deux minutes ;
-- restauration de l’original ;
-- partage et fork des croquis édités.
+Entre las novedades V6: varias formas detectadas visibles, margen de `Outline All` ajustable, contornos circulares más precisos, opción «solo bordes interiores», errores claros de importación y reintentos.
 
-### 5.3 Traitement des contours
+## 6. Catálogo de objetos
 
-Trois intentions métier sont distinguées :
-
-- **Imprint** pour conserver les traits et créer des détails ;
-- **Edge Trace** pour tracer les contours d’une région pleine ;
-- **Outline** pour ne conserver que l’enveloppe extérieure.
-
-V6 ajoute notamment :
-
-- affichage de plusieurs formes détectées ;
-- marge réglable pour `Outline All` ;
-- contour circulaire plus ajusté ;
-- option « inner edges only » ;
-- erreurs d’import explicites et possibilité de réessayer.
-
-## 6. Catalogue des objets
-
-| Type | Statut public observé | Finalité |
+| Objeto | Nivel público observado | Función |
 |---|---|---|
-| Cutter | Free | Découpe d’un contour |
-| Imprint Cutter | Free | Découpe et impression de détails |
-| Sandwich Cutter | Premium | Découpe et scellement de sandwich |
-| Cake Pop Mold | Premium | Moule, poussoir et plateau éventuel |
-| Cake Topper | Premium | Décoration avec image, texte et pics |
-| Stencil | Premium | Plaque ajourée répétée |
-| Cutter + Stamp | Premium | Paire cutter/tampon séparée et ajustée |
-| Stamp | Premium | Tampon autonome |
-| Cutter Set | Premium | Série proportionnelle d’un même dessin |
-| Practice Cookie | Premium | Support d’entraînement décoratif |
-| Multi Cutter | Premium | Répétition en lignes et colonnes |
+| Cortante (Cutter) | Gratis | Cortar un contorno |
+| Cortante con impresión (Imprint Cutter) | Gratis | Cortar y marcar detalles |
+| Cortante de sándwich | Premium | Cortar y sellar sándwiches |
+| Molde de cake pops | Premium | Molde, empujador y posible bandeja |
+| Adorno para torta | Premium | Imagen, texto y varillas decorativas |
+| Plantilla (Stencil) | Premium | Placa perforada repetitiva |
+| Cortante + sello | Premium | Pareja separada con medidas coordinadas |
+| Sello (Stamp) | Premium | Sello independiente |
+| Conjunto de cortantes | Premium | Tamaños proporcionales del mismo diseño |
+| Galletita de práctica | Premium | Superficie para practicar decoración |
+| Múltiples cortantes | Premium | Repeticiones por filas y columnas |
 
-Cette classification reflète les étoiles visibles dans le sélecteur V6 sans compte. La page Premium publique, plus ancienne sur certains points, ne décrit pas nécessairement tout le catalogue V6.
+Los niveles reflejan estrellas observadas sin cuenta. La página Premium, en parte anterior al catálogo V6, no necesariamente enumera todos los objetos.
 
-## 7. Réglages communs
+## 7. Parámetros comunes
 
-### 7.1 Taille
+### 7.1 Dimensiones
 
-- unité globale : mm ou pouces ;
-- taille finale ;
-- dimension pilote : largeur, hauteur ou côté le plus long ;
-- taille utilisateur sérialisée dans le lien de partage.
+Unidad general en mm o pulgadas; tamaño final; dimensión controlada por ancho, alto o lado más largo; tamaño de usuario serializado en el enlace compartido.
 
-### 7.2 Lame
+### 7.2 Filos
 
-- profondeur de lame ;
-- épaisseur ;
-- deuxième lame extérieure de support ;
-- profondeur et épaisseur de la deuxième lame ;
-- lame symétrique centrée sur le tracé ;
-- pointe affinée avec largeur et hauteur de chanfrein ;
-- bord supérieur arrondi ;
-- lame Fondant avec taper intérieur ;
-- largeur du taper Fondant.
+Profundidad y espesor; segundo filo exterior de refuerzo con su propia profundidad/espesor; filo centrado simétricamente sobre el trazado; punta afinada con bisel de ancho y altura configurables; borde superior redondeado; filo para fondant con ángulo interior y ancho regulable.
 
-### 7.3 Base et poignée
+### 7.3 Bases y agarres
 
-- hauteur et largeur de base ;
-- poignée rectangulaire ou ronde ;
-- poignée symétrique ;
-- barres centrales multiples ;
-- angle, position et largeur des barres ;
-- option de barre pleine.
+Altura y ancho de base; agarre circular o rectangular; simetría; múltiples barras centrales con ángulo, posición y ancho; barra central maciza opcional.
 
-### 7.4 Imprint et Stamp
+### 7.4 Marcas interiores y sellos
 
-- profondeur par rapport à la lame ;
-- largeur de base d’imprint ;
-- courbe plate, arrondie ou chanfreinée ;
-- cible de la courbe : trous, régions pleines ou les deux ;
-- amplitude et inset de la courbe ;
-- inversion emboss/deboss ;
-- suppression du contour extérieur ;
-- contours intérieurs seulement ;
-- miroir ;
-- tolérance entre cutter et tampon ;
-- épaisseur du dos et hauteur du relief.
+Profundidad respecto del filo; ancho de base del detalle; perfil plano/redondeado/biselado; aplicación a huecos, regiones rellenas o ambas; amplitud y desplazamiento interior; inversión relieve/grabado; eliminación de contorno exterior; conservar solo bordes internos; espejado; tolerancia cortante/sello; espesor posterior y altura del relieve.
 
-### 7.5 Texte et plaque nominative
+### 7.5 Texto y placas identificadoras
 
-Texte de paroi :
+**Texto sobre pared:** tipografía, contenido, tamaño, interlineado, extrusión, posición y agregado al sello.
 
-- police ;
-- contenu ;
-- taille et interligne ;
-- extrusion ;
-- position ;
-- ajout au tampon.
+**Placas:** texto y tipografía; respaldo rectangular o siguiendo el texto; márgenes horizontales/verticales; espesor, solapamiento y altura; posición; destino en cortante, sello o ambos.
 
-Plaque nominative :
+### 7.6 Apariencia y opciones experimentales
 
-- texte et police ;
-- backing rectangulaire ou offset suivant le texte ;
-- padding horizontal et vertical ;
-- épaisseur et chevauchement ;
-- hauteur du texte ;
-- position ;
-- destination cutter, tampon ou les deux.
+Materiales para vista previa, líneas de malla, espejo, resolución, simplificación, desplazamiento de contornos interior/exterior, espesor mínimo obligatorio, opciones internas de triangulación y diagnóstico.
 
-### 7.6 Apparence et expérimental
+## 8. Funciones especializadas
 
-- matériaux d’aperçu ;
-- lignes de maillage ;
-- miroir ;
-- résolution ;
-- simplification ;
-- offset intérieur/extérieur ;
-- épaisseur minimale forcée ;
-- options de triangulation et de diagnostic internes.
+### 8.1 Cortante + sello y agarre separado
 
-## 8. Fonctions spécialisées
+Pareja de sólidos independientes; holgura de ensamble ajustable; agarre separado; conexión roscada o alojamiento para pegar/biselar; encastre posterior del sello; ubicación automática o manual X/Y; profundidad y diámetro del encastre; holgura; altura, diámetro y redondeo inferior del agarre; resolución circular.
 
-### 8.1 Cutter + Stamp et Stamp Grip
+### 8.2 Múltiples cortantes y conjuntos
 
-- paire de solides séparés ;
-- jeu d’assemblage configurable ;
-- poignée séparée ;
-- connexion filetée ou logement collé/biseauté ;
-- socket ajouté au dos du tampon ;
-- placement automatique ou manuel ;
-- position X/Y ;
-- profondeur et diamètre du socket ;
-- clearance ;
-- hauteur, diamètre et arrondi inférieur de la poignée ;
-- résolution circulaire.
+**Multi Cutter:** filas, columnas, distancia y repetición de una misma herramienta.
 
-### 8.2 Multi Cutter et Cutter Set
+**Cutter Set:** varios tamaños proporcionales del mismo dibujo y exportación conjunta coherente.
 
-Multi Cutter :
+### 8.3 Plantilla
 
-- lignes ;
-- colonnes ;
-- espacement ;
-- répétition du même outil.
+Tamaño del patrón; grilla rectangular/diagonal; filas, columnas, espaciado y márgenes; dimensiones a partir de grilla o exteriores; espesor; detalles interiores opcionales; barras para unir islas; optimización de regiones repetidas.
 
-Cutter Set :
+### 8.4 Cortante de sándwich
 
-- plusieurs tailles proportionnelles issues du même dessin ;
-- export ou téléchargement d’un ensemble cohérent.
+Forma, tamaño, distancia y profundidad de los dientes; ancho de sellado; holgura entre sello de borde y cortante; dientes redondeados y radio; contorno exterior desplazado del sello; sello complementario opcional.
 
-### 8.3 Stencil
+### 8.5 Molde de cake pops
 
-- taille du motif ;
-- grille rectangulaire ou diagonale ;
-- lignes et colonnes ;
-- espacement et marge ;
-- taille par grille ou dimensions extérieures ;
-- épaisseur du support ;
-- détails intérieurs optionnels ;
-- barres de connexion des îlots ;
-- optimisation des régions répétées.
+Molde macizo con alojamiento del empujador; empujador de una o dos piezas; cara exterior o con detalles interiores; placa posterior; holguras para empujador y palito; bandeja opcional; rotación, márgenes, espesor, profundidad de encastre, holgura de bandeja y distribución de piezas para impresión.
 
-### 8.4 Sandwich Cutter
+### 8.6 Adorno para tortas
 
-- forme, taille, espacement et profondeur des dents ;
-- largeur de scellement ;
-- jeu entre tampon de bord et cutter ;
-- dents arrondies et rayon ;
-- offset extérieur du tampon ;
-- tampon complémentaire optionnel.
+Imagen, texto o ambos; relieve de imagen; respaldo que une detalles finos y su desplazamiento; alturas de base/texto/imagen; mensaje multilínea; tipografía, tamaño, interlineado y posición; varillas con longitud/ancho/posición; reutilización de placas y perfiles de profundidad.
 
-### 8.5 Cake Pop Mold
+## 9. Visor, conservación y exportaciones
 
-- moule rempli avec trou de poussoir ;
-- poussoir monobloc ou deux pièces ;
-- face outline ou imprint ;
-- plaque arrière ;
-- clearance du poussoir ;
-- clearance du passage de bâton ;
-- plateau optionnel ;
-- rotation, marge, épaisseur, profondeur d’encastrement et clearance du plateau ;
-- rangement des pièces pour l’impression.
+### 9.1 Vista previa
 
-### 8.6 Cake Topper
+Órbita 3D; rotación más allá de las vistas superior/inferior; zoom para encuadrar todas las piezas; renderizado bajo demanda para ahorrar energía; alternativa WebGL1; material similar a un laminador y líneas de malla opcionales.
 
-- image seule, texte seul ou combinaison ;
-- relief d’image ;
-- backing connectant les détails fins ;
-- offset du backing ;
-- hauteurs de base, texte et image ;
-- message multi-ligne ;
-- police, taille, interligne et position ;
-- pic : longueur, largeur et position ;
-- plaque nominative et courbes de profondeur réutilisées.
+### 9.2 Compartir y conservar
 
-## 9. Aperçu, partage et exports
+URL con parámetros; enlaces cortos con sesión; diseños compartidos; biblioteca privada; perfiles de configuración; guardado de imágenes y STL; organización de favoritos.
 
-### 9.1 Aperçu
+### 9.3 Exportaciones
 
-- aperçu 3D orbital ;
-- rotation au-delà des vues haut/bas ;
-- zoom automatique sur toutes les pièces ;
-- rendu à la demande pour limiter l’énergie ;
-- fallback WebGL1 ;
-- matériau d’aperçu type slicer ;
-- affichage optionnel des lignes.
+STL, 3MF y PDF del contorno. La documentación indicaba cuenta gratuita para descargar STL y sesión iniciada para agregar diseños a `My Library`.
 
-### 9.2 Partage et persistance
+## 10. Cookiecad Premium — Comparación comercial fuera de alcance
 
-- URL contenant les réglages ;
-- liens courts pour les utilisateurs connectés ;
-- partage de design ;
-- bibliothèque privée ;
-- profils de réglages ;
-- stockage des images et STL ;
-- organisation des favoris.
+### 10.1 Precios observados en la fecha del estudio
 
-### 9.3 Exports
+| Modalidad | Precio observado | Período de prueba anunciado |
+|---|---|---|
+| Mensual | USD 14,99 al mes | 3 semanas |
+| Anual | USD 150 al año (USD 12,50 al mes) | 3 semanas |
+| Prueba sin pago | Gratis | 2 semanas, sin tarjeta |
 
-- STL ;
-- 3MF ;
-- PDF du contour ;
-- téléchargement STL soumis à la création d’un compte gratuit selon la documentation ;
-- ajout à My Library soumis à connexion.
+La coexistencia de dos duraciones de prueba en una página era una ambigüedad de contenido, no una regla a copiar. **No son precios vigentes verificados.**
 
-## 10. Offre Premium Cookiecad — benchmark hors périmètre produit
+### 10.2 Funcionalidades publicitadas
 
-### 10.1 Tarifs observés
+Cortante y sello separados; biblioteca privada; perfiles; parámetros experimentales; engrosamiento de detalles interiores; barra central sólida; inversión de relieve/grabado; dirección de desplazamientos; resolución; conjuntos de cortantes; almacenamiento STL.
 
-| Offre | Prix | Essai affiché |
-|---|---:|---|
-| Mensuel | 14,99 USD/mois | 3 semaines |
-| Annuel | 150 USD/an, soit 12,50 USD/mois | 3 semaines |
-| Essai sans paiement | gratuit | 2 semaines, sans carte |
+## 11. Fortalezas de experiencia de usuario
 
-La coexistence de deux durées d’essai sur la même page doit être considérée comme une ambiguïté de contenu, pas comme une règle métier à reproduire.
+Terminología de pastelería y fabricación en vez de jerga CAD; numerosos ejemplos; opciones progresivas en acordeones; búsqueda de ajustes; cambio de tipo sin abandonar el flujo; enlaces compartibles; parámetros serializados; separación entre vista previa y edición 2D; perfiles y presentación clara de Premium.
 
-### 10.2 Périmètre explicitement listé
+## 12. Debilidades y riesgos observados
 
-- Cutter + Stamp séparés ;
-- bibliothèque privée ;
-- profils de réglages ;
-- réglages expérimentaux ;
-- épaississement des détails intérieurs ;
-- barre centrale pleine ;
-- inversion emboss/deboss ;
-- direction des offsets ;
-- résolution ;
-- Cutter Sets ;
-- stockage des STL.
+Excesiva densidad de opciones; parámetros difíciles sin ayuda; discrepancias entre nivel Gratis/Premium en páginas antiguas y V6; dos duraciones de prueba; enlaces compartidos muy largos; parámetros internos de depuración geométrica visibles; documentación incompleta de novedades V6; falta de garantías públicas detalladas sobre topología y orientación de exportaciones.
 
-## 11. Forces UX observées
+## 13. Aprendizajes para la aplicación personal
 
-- vocabulaire métier plutôt que vocabulaire CAO ;
-- nombreux exemples prêts à modifier ;
-- réglages progressifs en accordéons ;
-- recherche transversale ;
-- changement de type sans quitter le flux ;
-- partage par lien ;
-- paramètres sérialisés ;
-- séparation nette entre aperçu et édition 2D ;
-- presets de profil ;
-- découverte claire de Premium.
+**Conservar como principios:** catálogo de objetos; ejemplos completos; perfiles; búsqueda; edición 2D; intercambio de proyectos; tipos especializados con ajustes específicos.
 
-## 12. Faiblesses et risques observés
+**Diferenciarse:** validación geométrica visible y bloqueante; dimensiones finales medidas; orientación de fabricación comprobada; diagnóstico de espesores; prioridad local y sin cuenta; funciones locales sin categorías de pago; biblioteca, proyectos y perfiles almacenados en navegador y exportables; formatos abiertos; no simular laminado ni generación G-code.
 
-- densité importante de réglages ;
-- certains contrôles avancés sont difficiles à comprendre sans aide ;
-- statut Free/Premium incohérent entre la page Premium ancienne et le catalogue V6 ;
-- deux promesses d’essai différentes sur la même page ;
-- une URL complète de partage peut devenir très longue ;
-- la présence d’un paramètre de triangulation « debug » expose une complexité interne ;
-- la documentation publique ne couvre pas toutes les nouveautés V6 ;
-- la qualité topologique et l’orientation fabrication des exports ne sont pas garanties publiquement avec le niveau de détail du dépôt local.
+## 14. Conclusión
 
-## 13. Leçons pour notre produit personnel
+Cookiecad V6 aportaba una comparación funcional amplia, en particular para objetos especiales y asistentes de diseño. El repositorio original poseía una buena base de verificación geométrica, pero necesitaba evolucionar del modelo Cortante/Sello a un catálogo extensible de recetas y flujos integrados.
 
-À reprendre comme principes :
+## 15. Propuestas complementarias no atribuidas a Cookiecad
 
-- catalogue métier explicite ;
-- exemples complets ;
-- profils ;
-- recherche de réglages ;
-- édition 2D intégrée ;
-- partage de projets ;
-- modes spécialisés avec paramètres dédiés.
+Las siguientes ideas procedían de una propuesta externa transmitida por la persona propietaria del proyecto, **no** de funcionalidades verificadas de Cookiecad:
 
-À différencier :
+- Pluma con vértices de esquina y manejadores Bézier.
+- Primitivas: rectángulo, elipse, polígono regular y estrella.
+- Grilla configurable y ajuste a grilla, puntos y ejes.
+- Traslación, rotación, escala y espejo numéricos.
+- Capas 2D con visibilidad, bloqueo y orden.
+- Texto convertido en trazados con fuente editable conservada.
+- STL separados por función para modelos de varias piezas.
+- Exportación SVG del contorno 2D.
+- Captura de imagen del visor.
+- PWA sin conexión.
+- Medición del rendimiento del lienzo con hasta 10.000 puntos.
 
-- validation géométrique visible et bloquante ;
-- dimensions finales mesurées ;
-- orientation fabrication garantie ;
-- diagnostics d’épaisseur ;
-- fonctionnement local-first sans compte obligatoire ;
-- toutes les fonctionnalités disponibles localement, sans niveaux Free/Premium ;
-- projets, presets et bibliothèque stockés dans le navigateur et exportables en fichiers ;
-- formats ouverts et projets exportables ;
-- aucune fonctionnalité fictive de slicing ou G-code.
-
-## 14. Conclusion
-
-Cookiecad V6 constitue un benchmark fonctionnel large, surtout pour les objets spécialisés et l’expérience guidée. `cookie-cutter-designer` possède déjà une meilleure fondation de validation print-ready, mais doit remplacer son modèle binaire Cutter/Stamp par un catalogue extensible de recettes métier et intégrer ses composants avancés dans des flux cohérents.
-
-## 15. Idées produit complémentaires non attribuées à Cookiecad
-
-Les éléments suivants proviennent d’une proposition externe transmise par le propriétaire du projet. Ils enrichissent l’idéation, mais n’ont pas été observés ni confirmés comme fonctionnalités de Cookiecad V6 :
-
-- outil plume avec points d’angle et poignées de Bézier ;
-- primitives rectangle, ellipse, polygone régulier et étoile ;
-- grille configurable et aimantation à la grille, aux points et aux axes ;
-- transformations numériques : translation, rotation, échelle et miroir ;
-- calques 2D avec visibilité, verrouillage et ordre ;
-- texte converti en chemins, avec conservation d’une source éditable ;
-- export STL séparé par rôle pour les recettes multi-pièces ;
-- export SVG du contour 2D ;
-- capture d’image du viewport ;
-- fonctionnement PWA hors ligne ;
-- test de performance du canvas sur des documents allant jusqu’à 10 000 points.
-
-Ces idées sont évaluées dans le PRD selon leur valeur pour une application personnelle. Elles ne justifient ni changement de stack, ni backend, ni compte, ni paiement. Les propositions DXF, G-code, supports d’impression, cutters articulés, collaboration temps réel et marketplace restent hors périmètre tant qu’un besoin personnel vérifié ne les justifie pas.
+El PRD debía evaluar esas ideas según su utilidad personal. No justificaban otro conjunto tecnológico, backend, cuentas o pagos. DXF, G-code, soportes de impresión, cortantes articulados, colaboración en tiempo real y mercado de modelos quedaban fuera del alcance hasta demostrar una necesidad concreta.
