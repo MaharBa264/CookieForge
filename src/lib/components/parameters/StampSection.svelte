@@ -16,7 +16,7 @@
 
   function reject(cause: unknown, field: 'imprintMode' | 'stampDepth'): void {
     failedSnapshot = session?.getDocument() ?? null;
-    failure = { field, message: cause instanceof Error ? cause.message : 'Impossible de modifier le tampon.' };
+    failure = { field, message: cause instanceof Error ? cause.message : 'No se pudo modificar el sello.' };
   }
   function choose(imprintMode: StampImprintMode): void {
     if (!session) return;
@@ -31,7 +31,7 @@
 </script>
 
 <div class="param-control">
-  <div class="imprint-choice" role="group" aria-label="Mode d’empreinte du tampon">
+  <div class="imprint-choice" role="group" aria-label="Tipo de relieve del sello">
     {#each modes as imprintMode}
       <button
         type="button"
@@ -40,17 +40,17 @@
         aria-describedby={failure?.field === 'imprintMode' ? 'stampImprint-hint stampImprint-error' : 'stampImprint-hint'}
         disabled={!session || $session?.kind !== 'stamp'}
         on:click={() => choose(imprintMode)}
-      >{imprintMode === 'raised' ? 'Relief' : 'Creux'}</button>
+      >{imprintMode === 'raised' ? 'Relieve' : 'Hueco'}</button>
     {/each}
   </div>
-  <p id="stampImprint-hint" class="param-hint">Relief ajouté ou empreinte retirée de la face d’impression ; la poignée reste au dos.</p>
+  <p id="stampImprint-hint" class="param-hint">El relieve sobresale o se graba en la cara de impresión; el agarre permanece detrás.</p>
   {#if failure?.field === 'imprintMode'}
     <p id="stampImprint-error" class="param-error" role="alert">{failure.message}</p>
     {#if $params.stampDepth > STAMP_IMPRINT_LIMITS.maximumRecessDepthMm}
-      <button type="button" class="reduce-depth" on:click={() => updateDepth(STAMP_IMPRINT_LIMITS.maximumRecessDepthMm)}>Réduire la profondeur à 3 mm</button>
+      <button type="button" class="reduce-depth" on:click={() => updateDepth(STAMP_IMPRINT_LIMITS.maximumRecessDepthMm)}>Reducir la profundidad a 3 mm</button>
     {/if}
   {/if}
-  <label for="stampDepth">{mode === 'recessed' ? 'Profondeur du creux' : 'Profondeur du tampon'} : {$params.stampDepth.toFixed(1)} mm</label>
+  <label for="stampDepth">{mode === 'recessed' ? 'Profundidad del hueco' : 'Profundidad del sello'} : {$params.stampDepth.toFixed(1)} mm</label>
   <input
     id="stampDepth"
     data-field="stampDepth"
@@ -59,16 +59,16 @@
     max={mode === 'recessed' ? '3' : '5'}
     step={mode === 'recessed' ? '0.1' : '0.5'}
     value={$params.stampDepth}
-    aria-valuetext={`${$params.stampDepth.toFixed(1)} millimètres`}
+    aria-valuetext={`${$params.stampDepth.toFixed(1)} milímetros`}
     aria-invalid={Boolean(depthError)}
     aria-describedby={describedBy}
     on:input={(event) => updateDepth(Number(event.currentTarget.value))}
   />
   <p id="stampDepth-hint" class="param-hint">
     {#if mode === 'recessed'}
-      0,1–3 mm · Base de 4 mm ; épaisseur conservée : {(STAMP_IMPRINT_LIMITS.baseThicknessMm - $params.stampDepth).toFixed(1)} mm (minimum 1 mm). À vérifier dans un slicer avant impression.
+      0,1–3 mm · Base de 4 mm; espesor restante: {(STAMP_IMPRINT_LIMITS.baseThicknessMm - $params.stampDepth).toFixed(1)} mm (minimum 1 mm). Verificá el modelo en el laminador antes de imprimir.
     {:else}
-      1–5 mm · Hauteur du relief au-dessus de la base de 4 mm.
+      1–5 mm · Altura del relieve sobre la base de 4 mm.
     {/if}
   </p>
   {#if depthError}
