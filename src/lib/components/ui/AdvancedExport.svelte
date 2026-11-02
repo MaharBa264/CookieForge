@@ -25,9 +25,9 @@
   let binaryFormat = true;
 
   const formats = [
-    { id: 'stl' as ExportFormat, name: 'STL', icon: '📦', description: 'Maillage validé, axe Z vertical, compatible avec les logiciels de découpe' },
-    { id: 'obj' as ExportFormat, name: 'OBJ', icon: '🔷', description: 'Maillage Wavefront validé pour les outils 3D compatibles' },
-    { id: '3mf' as ExportFormat, name: '3MF', icon: '📐', description: 'Fichier conforme aux normes, en millimètres, avec métadonnées' }
+    { id: 'stl' as ExportFormat, name: 'STL', icon: '📦', description: 'Malla validada, eje Z vertical y compatible con programas de laminado' },
+    { id: 'obj' as ExportFormat, name: 'OBJ', icon: '🔷', description: 'Malla Wavefront validada para herramientas 3D compatibles' },
+    { id: '3mf' as ExportFormat, name: '3MF', icon: '📐', description: 'Archivo normalizado en milímetros, con metadatos' }
   ];
 
   function handleExport() {
@@ -60,9 +60,9 @@
 
 <div class="advanced-export">
   <div class="panel-header">
-    <h3>💾 Export avancé</h3>
+    <h3>💾 Exportación avanzada</h3>
     <button type="button" class="toggle-btn" aria-expanded={showPanel}
-      aria-label={showPanel ? 'Masquer les options d’export' : 'Afficher les options d’export'}
+      aria-label={showPanel ? 'Ocultar opciones de exportación' : 'Mostrar opciones de exportación'}
       on:click={() => showPanel = !showPanel}>
       {showPanel ? '▼' : '▶'}
     </button>
@@ -72,7 +72,7 @@
     <div class="panel-content">
       <!-- Format Selection -->
       <div class="format-section">
-        <h4>Format d’export</h4>
+        <h4>Formato de exportación</h4>
         <div class="format-grid">
           {#each formats as format}
             <button
@@ -96,16 +96,16 @@
           <h4>Options STL</h4>
           <label class="checkbox-option">
             <input type="checkbox" bind:checked={binaryFormat} />
-            <span>Format binaire (fichier plus léger)</span>
+            <span>Formato binario (archivo más liviano)</span>
           </label>
           <p class="format-note">
-            Les fichiers STL ne définissent pas d’unité ; les dimensions exportées sont destinées aux logiciels de découpe qui les interprètent en millimètres.
+            Los archivos STL no indican unidades. Las dimensiones exportadas están pensadas para programas de laminado que las interpreten en milímetros.
           </p>
         </div>
       {/if}
 
       <p class="slicer-note">
-        Générez le G-code adapté à votre imprimante avec un logiciel de découpe fiable comme OrcaSlicer, PrusaSlicer, Bambu Studio ou Cura.
+        Generá el G-code para tu impresora con un laminador confiable, como OrcaSlicer, PrusaSlicer, Bambu Studio o Cura.
       </p>
 
       <!-- Export Info -->
@@ -115,11 +115,11 @@
           <span class="info-value">{formats.find(f => f.id === selectedFormat)?.name}</span>
         </div>
         <div class="info-row">
-          <span class="info-label">Taille estimée :</span>
+          <span class="info-label">Tamaño estimado:</span>
           <span class="info-value">{estimatedSize}</span>
         </div>
         <div class="info-row">
-          <span class="info-label">Nom du fichier :</span>
+          <span class="info-label">Nombre de archivo:</span>
           <span class="info-value filename-preview">
             {filename.replace(/\.[^/.]+$/, '')}.{selectedFormat}
           </span>
@@ -133,7 +133,7 @@
       <button class="export-btn" on:click={handleExport} disabled={!mesh || unavailableReason !== null}
         aria-describedby={unavailableReason ? 'geometry-export-reason' : undefined}>
         <span class="btn-icon">💾</span>
-        <span>Exporter en {selectedFormat.toUpperCase()}</span>
+        <span>Exportar en {selectedFormat.toUpperCase()}</span>
       </button>
     </div>
   {/if}
