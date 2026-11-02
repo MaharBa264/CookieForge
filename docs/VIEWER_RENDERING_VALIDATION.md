@@ -1,47 +1,49 @@
-# Validation du rendu et du zoom du viewer
+# Validación del renderizado y el zoom del visor
 
-## Périmètre qualifié
+## Alcance validado
 
-Branche `fix/viewer-shading-zoom`, issue de `origin/main` vérifié au commit `61c14edc8e070de10833248a135c215e2cfba139`. La qualification ci-dessous précède la publication ; ses empreintes de sources ont été revérifiées avant commit. Le statut de fusion et de déploiement est à relire dans GitHub, pas à déduire de ce rapport. La preview Cloudflare existante n’a pas été remplacée par la qualification locale.
+Rama original `fix/viewer-shading-zoom`, creada desde `origin/main` verificado en el commit `61c14edc8e070de10833248a135c215e2cfba139`. La validación siguiente precedió a la publicación; las huellas del código se volvieron a verificar antes del commit. El estado de fusión y despliegue debe consultarse en GitHub, no deducirse de este informe. La vista previa existente de Cloudflare no fue reemplazada por esta validación local.
 
-La géométrie de fabrication et les formats de projet sont inchangés. Le viewer construit une copie indépendante des buffers, avec normales lissées sur les courbes et séparées aux arêtes franches. Les positions et l’ordre des triangles restent identiques. Les matériaux métier sont partagés en lecture seule ; la carte d’épaisseur possède ses propres clones et lit les mesures de la géométrie source. La sélection conserve le lien avec la pièce source pour les anciens viewers éditables.
+La geometría de fabricación y los formatos de proyecto no cambian. El visor construye una copia independiente de los buffers, con normales suavizadas en las curvas y separadas en las aristas pronunciadas. Las posiciones y el orden de los triángulos permanecen idénticos. Los materiales de la aplicación se comparten en modo de solo lectura; el mapa de espesor tiene sus propias copias y lee las mediciones de la geometría de origen. La selección mantiene el vínculo con la pieza original para los visores editables anteriores.
 
-Le zoom dispose de limites relatives à la taille, d’un plan de clipping rapproché adapté, d’un zoom vers le pointeur et de boutons +/− nommés, accessibles au clavier et d’au moins 44 px. Le bouton Ajuster la vue rétablit le cadrage.
+El zoom tiene límites relativos al tamaño, un plano de recorte cercano adaptado, acercamiento hacia el puntero y botones +/− identificados, accesibles mediante teclado y de al menos 44 px. El botón Ajustar vista restablece el encuadre.
 
-## Preuves réellement obtenues
+## Evidencias realmente obtenidas
 
-Rapport complet : `/workspace/reports/viewer-shading-zoom-v69081tb/`.
+Informe completo: `/workspace/reports/viewer-shading-zoom-v69081tb/`.
 
-| Vérification | Résultat |
+| Verificación | Resultado |
 |---|---|
-| TDD sur le viewer réel monté avec renderer de test | 5 assertions RED avant correction ; GREEN après correction |
-| Tests ciblés : rendu, ressources, viewport, heatmap, gardes d’export | 31/31 |
-| Suite complète | 1 249/1 249, 95 fichiers |
-| Typecheck Svelte/TypeScript | 0 erreur, 0 avertissement |
-| Smoke exports | 4/4 |
-| Build de production et budgets | réussis |
-| Corpus cercle/ellipse/œuf | 24/24 contrôles ; 24 STL identiques octet pour octet à la référence pré-correction |
-| Chromium réel desktop | cercle et œuf × emporte-pièce/Relief/Creux à 75 mm ; exports avant/après zoom et heatmap identiques |
-| Chromium mobile simulé, 390×844 | cercle × emporte-pièce/Relief/Creux ; boutons, clavier, heatmap et exports identiques |
-| Thème sombre mobile | bascule par le bouton réel ; classe `dark-mode` et fond de scène `111827` contrôlés |
-| Zoom natif desktop | rapprochement au-delà de l’ancienne limite, cible réellement observée via les appels des contrôles |
-| Ressources | clones libérés sans disposer les sources ; serveur et navigateur de qualification arrêtés |
+| Desarrollo guiado por pruebas sobre el visor real con renderizador de prueba | 5 aserciones ROJAS antes de la corrección; VERDES después |
+| Pruebas específicas: renderizado, recursos, visor, mapa de calor y protecciones de exportación | 31/31 |
+| Batería completa | 1.249/1.249, 95 archivos |
+| Comprobación de tipos Svelte/TypeScript | 0 errores, 0 advertencias |
+| Pruebas funcionales de exportación | 4/4 |
+| Compilación de producción y presupuestos | Correctos |
+| Conjunto círculo/elipse/huevo | 24/24 controles; 24 STL idénticos byte por byte a la referencia anterior a la corrección |
+| Chromium real en escritorio | Círculo y huevo × cortador/Relieve/Hueco a 75 mm; exportaciones idénticas antes y después del zoom y mapa de calor |
+| Chromium móvil simulado, 390 × 844 | Círculo × cortador/Relieve/Hueco; botones, teclado, mapa de calor y exportaciones idénticas |
+| Tema oscuro móvil | Cambio mediante el botón real; clase `dark-mode` y fondo de escena `111827` verificados |
+| Zoom nativo de escritorio | Acercamiento más allá del límite anterior, con objetivo realmente observado mediante llamadas de los controles |
+| Recursos | Copias liberadas sin destruir los originales; servidor y navegador de validación detenidos |
 
-Les exports du corpus portent sur tampons 10/75/200 mm et emporte-pièces 75/200 mm, sans poignée, avec plateau de qualification suffisamment grand. Ils ne valident pas de nouveaux paramètres ou contours hors de ce corpus.
+Las exportaciones del conjunto cubren sellos de 10/75/200 mm y cortadores de 75/200 mm, sin agarre, con una plataforma de prueba suficientemente grande. No validan parámetros nuevos ni contornos fuera de este conjunto.
 
-### Traçabilité et tentatives
+### Trazabilidad e intentos
 
-`runtime-inputs.json` rattache les captures au HEAD de base, aux sources locales non commitées et à un build isolé dont chaque fichier est hashé. Les fichiers servis utilisés par Chromium ont été comparés à ce build, et les empreintes des sources ont été contrôlées après les gates. Ne pas présenter ces captures comme celles du commit publié.
+`runtime-inputs.json` relaciona las capturas con el HEAD de base, los archivos locales sin commit y una compilación aislada en la que cada archivo tiene su hash. Los archivos servidos a Chromium se compararon con esa compilación y se verificaron las huellas del código después de las comprobaciones. No presentar estas capturas como si correspondieran al commit publicado.
 
-Le premier runner a utilisé trop peu d’événements de molette pour atteindre la distance attendue. Le second a terminé les six cas desktop, mais échoué plus tard sur la sonde mobile : elle repliait le panneau d’export pendant son ouverture automatique. Les preuves de ces tentatives sont conservées. Les six cas desktop ont été relus individuellement avec leurs hashes ; la recette mobile séparée, corrigée pour attendre l’état ARIA du panneau, s’est terminée avec succès. Un premier essai de thème utilisait la mauvaise classe et n’a pas été retenu : le thème sombre a ensuite été vérifié par le contrôle réel. Aucune modification produit n’a servi à masquer ces erreurs de sonde.
+El primer ejecutor utilizó demasiado pocos eventos de rueda para alcanzar la distancia esperada. El segundo terminó los seis casos de escritorio, pero falló después en la comprobación móvil: plegaba el panel de exportación durante su apertura automática. Se conservaron las evidencias de estos intentos. Los seis casos de escritorio se revisaron individualmente con sus hashes; la prueba móvil independiente, corregida para esperar el estado ARIA del panel, terminó correctamente. Un primer intento del tema utilizó la clase equivocada y se descartó: luego se verificó el tema oscuro mediante el control real. No se modificó el producto para ocultar esos errores del sistema de pruebas.
 
-## Limites
+## Límites
 
-- Pas de nouvelle impression physique : l’absence d’impact de cette correction sur la fabrication est prouvée par l’identité des fichiers STL, pas par un essai matériel.
-- Pas d’iPhone/Safari réel, de nouvelle qualification Firefox/WebKit ni de lecteur d’écran. Le mobile et les cibles tactiles sont simulés en Chromium.
-- Les courbes restent les mêmes approximations polygonales : aucune résolution de contour augmentée ni simplification cachée. Le lissage concerne l’éclairage seulement.
-- L’image originale de Rza était inaccessible dans le sandbox ; la correction traite le défaut reproduit, sans prétendre identifier son pixel exact.
+- No hubo una nueva impresión física: la ausencia de efectos de esta corrección sobre la fabricación se demuestra mediante identidad de archivos STL, no con una prueba material.
+- Sin iPhone/Safari real, nueva validación de Firefox/WebKit ni lector de pantalla. El móvil y las zonas táctiles se simularon en Chromium.
+- Las curvas siguen siendo las mismas aproximaciones poligonales: no se aumentó la resolución de los contornos ni se aplicó simplificación oculta. El suavizado afecta únicamente la iluminación.
+- La imagen original de Rza no estaba accesible en el entorno aislado; la corrección aborda el defecto reproducido sin afirmar que se identificó su píxel exacto.
 
-## Reprise
+## Reanudación
 
-Préserver `AGENT_CONTEXT.md`, maintenu localement et exclu du commit. Rza a autorisé le commit et la fusion de ce lot ; la publication passe par une PR et les contrôles du HEAD exact. Toute actualisation distincte de la preview Cloudflare exige le GO applicable. Message : `fix viewer lighting and detail zoom without changing exports`.
+Conservar `AGENT_CONTEXT.md`, mantenido localmente y excluido del commit. Rza autorizó el commit y la fusión de este lote; la publicación debía realizarse mediante una solicitud de incorporación y verificaciones sobre el HEAD exacto. Cualquier actualización independiente de la vista previa de Cloudflare requería la autorización correspondiente. Mensaje de commit original: `fix viewer lighting and detail zoom without changing exports`.
+
+> **Nota CookieForge:** este informe describe pruebas históricas del proyecto de origen. Traducirlo no equivale a ejecutarlas nuevamente.
