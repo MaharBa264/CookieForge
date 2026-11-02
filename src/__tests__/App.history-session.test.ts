@@ -59,7 +59,7 @@ it('real Undo/Redo returns to the exact saved codec and clean workflow in the sa
   session.updateSketch(svg.replace('r="20"', 'r="25"')); await tick();
   const edited = session.getDocument()!; const codecB = encodeProject(edited);
   await dirty(true); await parameters();
-  await click('Annuler'); await click('Annuler');
+  await click('Deshacer'); await click('Deshacer');
   expect(encodeProject(session.getDocument())).toBe(codecA);
   expect(get(params).targetSize).toBe(saved.parameters.targetSize);
   await vi.waitFor(() => expect(get(generationState).result?.document).toEqual(saved), { timeout: 10000 });
@@ -84,7 +84,7 @@ it('records rename and viewport interleaved with geometry, rather than silently 
   session.updateViewport({ showGrid: false, showAxes: true }); await tick(); const viewport = session.getDocument()!;
   await editSize(95); const latest = session.getDocument()!;
   for (const snapshot of [viewport, renamed, geometry, saved]) {
-    await parameters(); await click('Annuler');
+    await parameters(); await click('Deshacer');
     expect(encodeProject(session.getDocument())).toBe(encodeProject(snapshot));
   }
   await dirty(false);
@@ -103,9 +103,9 @@ it('opening B clears A history and Undo cannot cross project boundaries', async 
   await vi.waitFor(() => expect(session.getDocument()?.id).toBe('B'));
   const opened = encodeProject(session.getDocument());
   await parameters();
-  expect(button('Annuler').disabled).toBe(true);
-  await click('Annuler'); expect(encodeProject(session.getDocument())).toBe(opened);
-  await editSize(95); await parameters(); await click('Annuler');
+  expect(button('Deshacer').disabled).toBe(true);
+  await click('Deshacer'); expect(encodeProject(session.getDocument())).toBe(opened);
+  await editSize(95); await parameters(); await click('Deshacer');
   expect(encodeProject(session.getDocument())).toBe(opened);
   await dirty(false);
 });
@@ -120,14 +120,14 @@ it('keeps a newer metadata edit made by a restore observer in exact scoped histo
       session.rename('Observer rename');
     }
   });
-  await parameters(); await click('Annuler');
+  await parameters(); await click('Deshacer');
   const renamed = session.getDocument()!;
   expect(renamed.name).toBe('Observer rename');
   expect(historyStore.getCurrentState()?.document).toBe(renamed);
   expect(historyStore.getCurrentState()?.sessionEpoch).toBe(session.sessionEpoch);
   expect(historyStore.canRedo()).toBe(false);
   unsubscribe();
-  await parameters(); await click('Annuler');
+  await parameters(); await click('Deshacer');
   expect(session.getDocument()?.name).toBe('A');
   await parameters(); await click('Rehacer');
   expect(encodeProject(session.getDocument())).toBe(encodeProject(renamed));
