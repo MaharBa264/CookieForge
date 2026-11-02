@@ -1061,14 +1061,14 @@
           class="category-btn"
           class:active={activeCategory === 'shapes'}
           on:click={() => activeCategory = 'shapes'}
-          title="Bibliothèque de formes"
-          aria-label="Bibliothèque de formes"
+          title="Biblioteca de formas"
+          aria-label="Biblioteca de formas"
           aria-current={activeCategory === 'shapes' ? 'page' : undefined}
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
           </svg>
-          <span class="nav-label" aria-hidden="true">Bibliothèque de formes</span>
+          <span class="nav-label" aria-hidden="true">Biblioteca de formas</span>
         </button>
 
         <button
