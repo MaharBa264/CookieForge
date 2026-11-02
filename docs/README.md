@@ -9,27 +9,28 @@ El idioma principal de CookieForge es el **español**. Esta página registra el 
 - [Cómo colaborar](../CONTRIBUTING.md)
 - [Convenciones de idioma](CONVENCIONES_ES.md)
 
-## Documentación técnica heredada pendiente de traducción
+## Inventario de documentación técnica heredada
 
-Se conserva temporalmente en su idioma original para evitar perder información técnica, resultados de pruebas y advertencias. Antes de considerarla documentación definitiva de CookieForge, hay que traducirla y verificar que siga describiendo el código actual.
+Los documentos ya traducidos se identifican a continuación. Los restantes se conservan temporalmente en su idioma original para no perder resultados de pruebas ni advertencias. La traducción no implica que las pruebas históricas se hayan repetido en CookieForge.
 
 ### Arquitectura y mantenimiento
 
-- `AGENT_CONTEXT.md`, `CLAUDE.md`, `SECURITY.md`, `ADVANCED_FEATURES.md`, `FEATURES_COMPLETE.md`
-- `docs/AGENT_DECISIONS.md`, `docs/MAINTENANCE.md`, `docs/PROJECT_INVARIANTS.md`, `docs/DEPENDENCY_BUNDLE_BUDGETS.md`
+- Pendientes: `AGENT_CONTEXT.md`, `CLAUDE.md`, `ADVANCED_FEATURES.md`, `FEATURES_COMPLETE.md`
+- Traducido: [SECURITY.md](../SECURITY.md)
+- Traducidos: [AGENT_DECISIONS.md](AGENT_DECISIONS.md), [MAINTENANCE.md](MAINTENANCE.md), [PROJECT_INVARIANTS.md](PROJECT_INVARIANTS.md), [DEPENDENCY_BUNDLE_BUDGETS.md](DEPENDENCY_BUNDLE_BUDGETS.md)
 
 ### Validación y pruebas
 
 - `docs/CUTTER_SERIES_VALIDATION.md`
-- `docs/LOCAL_PROJECT_RECOVERY_VALIDATION.md`
-- `docs/LOCAL_PROJECT_WORKFLOW_VALIDATION.md`
+- [LOCAL_PROJECT_RECOVERY_VALIDATION.md](LOCAL_PROJECT_RECOVERY_VALIDATION.md) — traducido
+- [LOCAL_PROJECT_WORKFLOW_VALIDATION.md](LOCAL_PROJECT_WORKFLOW_VALIDATION.md) — traducido
 - `docs/MANUAL_ISLAND_BRIDGES_VALIDATION.md`
 - `docs/PHOTO_IMPORT_VALIDATION.md`
 - `docs/RECESSED_STAMP_VALIDATION.md`
 - `docs/SKETCH_WORKSPACE_VALIDATION.md`
 - `docs/STAMP_QUALIFICATION.md`
-- `docs/TRACING_PRESETS_VALIDATION.md`
-- `docs/UNIFIED_IMAGE_IMPORT_VALIDATION.md`
+- [TRACING_PRESETS_VALIDATION.md](TRACING_PRESETS_VALIDATION.md) — traducido
+- [UNIFIED_IMAGE_IMPORT_VALIDATION.md](UNIFIED_IMAGE_IMPORT_VALIDATION.md) — traducido
 - `docs/VIEWER_RENDERING_VALIDATION.md`
 - `docs/WALL_PROFILES_VALIDATION.md`
 
@@ -66,4 +67,4 @@ El cierre verificable se registra en [PLAN_CIERRE_FASE_3.md](PLAN_CIERRE_FASE_3.
 4. Mantener la documentación histórica claramente identificada.
 5. Revisar enlaces y ejecutar las pruebas automáticas después de cada lote.
 
-**Estado:** traducción en curso. Las guías principales están en español; los documentos técnicos de la lista todavía no lo están.
+**Estado:** traducción en curso. El [README principal](../README.md), la guía de inicio, la guía para colaborar y varios documentos técnicos e informes de validación ya están en español. La traducción íntegra del README histórico se publicará como archivo separado, conservando [UPSTREAM_README.md](../UPSTREAM_README.md) sin cambios. La interfaz y los demás documentos aún requieren revisión.
