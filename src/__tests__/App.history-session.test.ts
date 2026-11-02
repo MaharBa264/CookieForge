@@ -35,7 +35,7 @@ async function parameters() {
   await click('Réglages');
 }
 async function dirty(expected: boolean) {
-  await click('Projets locaux');
+  await click('Proyectos locales');
   expect(document.querySelector('.project-manager [role="status"]')?.textContent).toBe(expected ? 'Modifications non enregistrées' : 'Enregistré localement');
 }
 async function editSize(value: number) {
@@ -51,7 +51,7 @@ beforeEach(() => {
 afterEach(async () => { if (app) await unmount(app); app = undefined; document.body.innerHTML = ''; historyStore.clear(); setParams({ ...DEFAULT_PARAMS }); });
 it('real Undo/Redo returns to the exact saved codec and clean workflow in the same session', async () => {
   const { session, records } = setup();
-  await click('Projets locaux'); await click('Enregistrer le projet');
+  await click('Proyectos locales'); await click('Guardar proyecto');
   await vi.waitFor(() => expect(document.querySelector('.project-manager [role="status"]')?.textContent).toBe('Enregistré localement'));
   const saved = session.getDocument()!; const codecA = encodeProject(records.get('A')); const epoch = session.sessionEpoch;
   await editSize(90);
@@ -63,7 +63,7 @@ it('real Undo/Redo returns to the exact saved codec and clean workflow in the sa
   expect(encodeProject(session.getDocument())).toBe(codecA);
   expect(get(params).targetSize).toBe(saved.parameters.targetSize);
   await vi.waitFor(() => expect(get(generationState).result?.document).toEqual(saved), { timeout: 10000 });
-  await dirty(false); await parameters(); await click('Rétablir'); await click('Rétablir');
+  await dirty(false); await parameters(); await click('Rehacer'); await click('Rehacer');
   expect(encodeProject(session.getDocument())).toBe(codecB);
   await dirty(true);
   expect(session.sessionEpoch).toBe(epoch);
@@ -73,11 +73,11 @@ it('real Undo/Redo returns to the exact saved codec and clean workflow in the sa
 });
 it('records rename and viewport interleaved with geometry, rather than silently rolling metadata back', async () => {
   const { session } = setup();
-  await click('Projets locaux'); await click('Enregistrer le projet');
+  await click('Proyectos locales'); await click('Guardar proyecto');
   await vi.waitFor(() => expect(document.querySelector('.project-manager [role="status"]')?.textContent).toBe('Enregistré localement'));
   const saved = session.getDocument()!;
   await editSize(90); const geometry = session.getDocument()!;
-  await click('Projets locaux');
+  await click('Proyectos locales');
   const name = document.querySelector<HTMLInputElement>('#project-name')!;
   name.value = 'Renamed'; name.dispatchEvent(new Event('input', { bubbles: true })); await tick();
   const renamed = session.getDocument()!;
@@ -89,17 +89,17 @@ it('records rename and viewport interleaved with geometry, rather than silently 
   }
   await dirty(false);
   for (const snapshot of [geometry, renamed, viewport, latest]) {
-    await parameters(); await click('Rétablir');
+    await parameters(); await click('Rehacer');
     expect(encodeProject(session.getDocument())).toBe(encodeProject(snapshot));
   }
   await dirty(true);
 });
 it('opening B clears A history and Undo cannot cross project boundaries', async () => {
   const { session } = setup();
-  await editSize(90); await click('Projets locaux'); await click('Enregistrer le projet');
+  await editSize(90); await click('Proyectos locales'); await click('Guardar proyecto');
   await vi.waitFor(() => expect(document.querySelector('.project-manager [role="status"]')?.textContent).toBe('Enregistré localement'));
-  await vi.waitFor(() => expect(document.querySelector('button[aria-label="Ouvrir B"]')).not.toBeNull());
-  await click('Ouvrir B');
+  await vi.waitFor(() => expect(document.querySelector('button[aria-label="Abrir B"]')).not.toBeNull());
+  await click('Abrir B');
   await vi.waitFor(() => expect(session.getDocument()?.id).toBe('B'));
   const opened = encodeProject(session.getDocument());
   await parameters();
@@ -129,7 +129,7 @@ it('keeps a newer metadata edit made by a restore observer in exact scoped histo
   unsubscribe();
   await parameters(); await click('Annuler');
   expect(session.getDocument()?.name).toBe('A');
-  await parameters(); await click('Rétablir');
+  await parameters(); await click('Rehacer');
   expect(encodeProject(session.getDocument())).toBe(encodeProject(renamed));
   expect(encodeProject(session.getDocument())).not.toBe(encodeProject(saved.document));
 });
