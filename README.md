@@ -57,6 +57,6 @@ Los avances experimentales se desarrollan en la rama `feature/advanced-contour-e
 
 ## Origen, autoría y licencia
 
-Basado en **Cookie Cutter Designer**, creado por [razorglyon](https://github.com/razorglyon/cookie-cutter-designer), bajo licencia **MIT**. Se conservan el archivo [LICENSE](LICENSE) y la documentación original en [UPSTREAM_README.md](UPSTREAM_README.md) como referencia histórica y de atribución.
+Basado en **Cookie Cutter Designer**, creado por [razorglyon](https://github.com/razorglyon/cookie-cutter-designer), bajo licencia **MIT**. Se conservan el archivo [LICENSE](LICENSE) y la documentación original en [UPSTREAM_README.md](UPSTREAM_README.md) como referencia histórica y de atribución. También está disponible su [traducción completa al español](UPSTREAM_README_ES.md).
 
 La documentación principal de CookieForge se mantiene en español. Los nombres de APIs, comandos y formatos técnicos permanecen sin traducir cuando corresponde.
