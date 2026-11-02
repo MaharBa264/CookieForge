@@ -1,102 +1,104 @@
-# Qualification Stamp — géométrie validée localement
+# Calificación de sellos — Geometría validada localmente
 
-## Verdict courant
+## Veredicto vigente
 
-**Cœur 10 mm sans poignée corrigé dans les deux modes, validation locale du 2026-10-13.** Les deux anciennes assertions positives passent désormais ; le corpus et la suite complète sont verts. Aucun seuil de dégénérescence abaissé, aucun contour simplifié, aucun format V1–V3 changé.
+**Corazón de 10 mm sin agarre corregido en ambos modos; validación local del 13/10/2026.** Las dos pruebas positivas que antes fallaban ahora aprueban; el conjunto de casos y la batería completa también. No se redujo ningún umbral de degeneración, no se simplificaron contornos ni se modificaron los formatos V1–V3.
 
-Branche `fix/stamp-qualification`, issue du commit local vérifié `319d8cd`, remote `razorglyon/cookie-cutter-designer`. Le correctif complète l’extension précédemment non commitée. Aucun push, PR, fusion, déploiement ni lot B–E. La géométrie et Chromium sont qualifiés sur les cas ci-dessous ; **Firefox/WebKit et l’impression physique restent des réserves distinctes**.
+Rama original `fix/stamp-qualification`, creada desde el commit local verificado `319d8cd`, remoto `razorglyon/cookie-cutter-designer`. La corrección completa la ampliación que antes no estaba confirmada en Git. Sin publicación, solicitud de incorporación, fusión, despliegue ni lotes B–E. La geometría y Chromium se calificaron en los casos siguientes; **Firefox/WebKit y la impresión física siguen siendo limitaciones independientes**.
 
-## Cause et correctif du cœur miniature
+## Causa y corrección del corazón pequeño
 
-Les contours étaient corrects. Sur le cœur échantillonné à 48 segments par courbe, Earcut choisissait près de la pointe de minuscules oreilles : une facette avait une aire double d’environ 3,32e-6 mm². Le validateur final la rejetait selon son seuil existant, puis signalait une surface ouverte après exclusion des triangles dégénérés de son analyse. Ce signal ne devait pas être masqué par un seuil plus faible ou un remplissage.
+Los contornos eran correctos. En el corazón muestreado con 48 segmentos por curva, Earcut elegía triángulos diminutos cerca de la punta: una faceta tenía un área doble de aproximadamente 3,32e-6 mm². El validador final la rechazaba según el umbral existente y luego informaba una superficie abierta al excluir los triángulos degenerados de su análisis. No correspondía ocultar esa señal reduciendo el umbral ni rellenando la superficie.
 
-`stampBodyGeometry.ts` conserve la triangulation antérieure lorsqu’elle produit des triangles sûrs. Sinon :
+`stampBodyGeometry.ts` conserva la triangulación anterior cuando produce triángulos seguros. En caso contrario:
 
-- un capot sans trou essaie un éventail vers un sommet **intérieur** ;
-- un capot avec un trou cherche une bande triangulée qui consomme chaque arête des deux contours ; des points d’appui **intérieurs** permettent de raccorder les deux côtés d’une pointe concave sans créer une petite oreille ;
-- chaque remplacement doit avoir des triangles positifs au même seuil, la totalité des arêtes originales avec la bonne orientation, des arêtes intérieures appariées et l’aire attendue. À défaut, il est refusé.
+- Una tapa sin huecos intenta un abanico hacia un vértice **interior**.
+- Una tapa con un hueco busca una banda triangulada que utilice cada arista de ambos contornos; puntos de apoyo **interiores** permiten conectar los dos lados de una punta cóncava sin crear triángulos diminutos.
+- Cada reemplazo debe tener triángulos con área positiva según el mismo umbral, todas las aristas originales con orientación correcta, aristas interiores emparejadas y el área esperada. Si no cumple, se rechaza.
 
-Les points d’appui ne modifient ni les bords ni le SVG. Aucun rééchantillonnage, retrait ou déplacement d’un sommet de contour, ni rebouchage de la cavité. Le maillage final et le STL restent soumis aux validateurs inchangés. Les recherches sont bornées en états et en essais.
+Los puntos de apoyo no modifican los bordes ni el SVG. No se vuelve a muestrear, eliminar ni desplazar ningún vértice de contorno, ni se tapa la cavidad. La malla final y el STL siguen sometidos a los validadores sin cambios. Las búsquedas tienen límites de estados e intentos.
 
-## Contrat démontré — RED puis GREEN
+## Contrato demostrado — ROJO y después VERDE
 
-Preuves fraîches : `/workspace/reports/stamp-qualification-heart10-msx6cikz/`. Copie des changements et de la note avant reprise dans `before/` ; diagnostic exploratoire archivé hors de `src`.
+Evidencias nuevas: `/workspace/reports/stamp-qualification-heart10-msx6cikz/`. Copia de los cambios y de la nota previa a reanudar en `before/`; diagnóstico exploratorio archivado fuera de `src`.
 
-- `red-heart10.log` : les **deux** anciens tests positifs échouent avant patch, pour triangles dégénérés/surface ouverte.
-- `red-cap-contract.log` : deux tests de contrat du générateur planaire échouent avant patch pour la même cause.
-- `stampBodyGeometry.test.ts` exerce ensuite **16 variantes** : Relief/Creux, quatre débuts cycliques et les deux sens de parcours. Pour chacune : **288 arêtes du dessin conservées**, aire des capots, volume analytique, coque unique et chaque triangle au-dessus du seuil.
-- Les deux tests originaux ne sont ni ignorés, ni transformés en rejets attendus. Les empreintes historiques restent vertes ; les **16 STL précédemment réussis** du corpus sont identiques octet par octet après correctif.
+- `red-heart10.log`: las **dos** pruebas positivas anteriores fallan antes de la corrección por triángulos degenerados/superficie abierta.
+- `red-cap-contract.log`: dos pruebas de contrato del generador plano fallan antes de la corrección por la misma causa.
+- `stampBodyGeometry.test.ts` ejercita luego **16 variantes**: Relieve/Hueco, cuatro posiciones cíclicas de inicio y ambos sentidos de recorrido. Para cada una: **288 aristas del dibujo conservadas**, área de tapas, volumen analítico, una única envolvente y todos los triángulos por encima del umbral.
+- Las dos pruebas originales no se omiten ni se convierten en rechazos esperados. Las huellas históricas siguen aprobando; los **16 STL que ya funcionaban** son idénticos byte por byte después de la corrección.
 
-## Résultats réellement obtenus
+## Resultados realmente obtenidos
 
-Toutes les commandes lourdes reçoivent le TMP isolé validé par `/workspace/.hermes-tools/workspace-tmp.py`. `GOMAXPROCS=2`, `UV_THREADPOOL_SIZE=2`, Vitest un worker sans parallélisme de fichiers ; journaux, commandes, timeouts et empreintes conservés.
+Todos los comandos exigentes utilizan el directorio temporal aislado validado por `/workspace/.hermes-tools/workspace-tmp.py`. `GOMAXPROCS=2`, `UV_THREADPOOL_SIZE=2`, Vitest con un solo proceso y sin paralelismo entre archivos; se conservaron registros, comandos, tiempos agotados y huellas.
 
-| Gate | Résultat final |
+| Comprobación | Resultado final |
 |---|---|
-| Tests ciblés géométrie/recette/App | **86/86**, 5 fichiers |
-| Corpus étendu | **20/20**, dont les deux cœurs 10 mm |
-| Suite complète | **1 241/1 241**, 93 fichiers, 0 échec ; 333,73 s côté lanceur |
-| Typecheck | **0 erreur, 0 avertissement** |
-| Build / budgets existants | **Réussis** |
-| Smoke export | **4/4** |
-| PrusaSlicer | **20/20 fichiers découpés** |
-| Chromium desktop et viewport mobile | **Réussi**, deux modes 10 mm, aperçu/sauvegarde/réouverture/STL |
-| Axe automatisé | **0 violation détectée** sur les deux états audités ; 25 règles passées desktop, 24 mobile |
+| Pruebas específicas de geometría/receta/aplicación | **86/86**, 5 archivos |
+| Conjunto ampliado | **20/20**, incluidos ambos corazones de 10 mm |
+| Batería completa | **1.241/1.241**, 93 archivos, 0 fallas; 333,73 s desde el ejecutor |
+| Tipado | **0 errores, 0 advertencias** |
+| Compilación y presupuestos existentes | **Correctos** |
+| Pruebas funcionales de exportación | **4/4** |
+| PrusaSlicer | **20/20 archivos laminados** |
+| Chromium en escritorio y ventana móvil | **Correcto**, ambos modos de 10 mm, vista previa/guardado/reapertura/STL |
+| Auditoría automatizada axe | **0 infracciones detectadas** en los dos estados examinados; 25 reglas aprobadas en escritorio y 24 en móvil |
 
-`qualification-inputs.json` rattache le résultat à **236 empreintes source** et à l’inventaire du build. Elles sont identiques aux sources avant/après navigateur et à la collecte finale ; les assets servis sont comparés au build. Les mises à jour documentaires et l’en-tête de note postérieurs ne changent pas ces sources.
+`qualification-inputs.json` vincula los resultados con **236 huellas de archivos fuente** y el inventario de compilación. Coinciden con el código antes/después del navegador y con la recopilación final; los recursos servidos se compararon con la compilación. Las actualizaciones documentales y el encabezado de nota posteriores no modificaron esas fuentes.
 
-Les anciennes preuves `/workspace/reports/stamp-qualification-85bcwu8c/` restent consultables, mais leurs **1 223 succès / 2 échecs** ne sont plus le verdict courant. Les échecs de sondes et essais retirés restent des diagnostics, jamais comptés comme réussites.
+Las evidencias anteriores en `/workspace/reports/stamp-qualification-85bcwu8c/` siguen disponibles, pero sus **1.223 éxitos / 2 fallas** ya no son el veredicto vigente. Las fallas de sondas e intentos descartados permanecen como diagnóstico, nunca como éxitos.
 
-## STL et slicing réellement vérifiés
+## STL y laminado realmente comprobados
 
-La collecte fraîche comprend **18 STL du corpus** et **2 téléchargements Chromium 10 mm**, soit **20 fichiers**. PrusaSlicer 2.9.2 reconnaît chacun comme manifold et constitué d’une pièce ; découpage terminé, G-code non vide, extrusion réelle, couches ordonnées et hauteur finale contrôlés. Aucune réparation annoncée dans les journaux ; ce n’est pas une affirmation d’absence de toute normalisation interne du slicer.
+La recopilación nueva incluye **18 STL del conjunto** y **2 descargas Chromium de 10 mm**, en total **20 archivos**. PrusaSlicer 2.9.2 reconoce cada uno como geometría manifold de una sola pieza; el laminado terminó con G-code no vacío, extrusión real, capas ordenadas y altura final comprobada. Los registros no anuncian reparaciones; eso no demuestra que el laminador no realice ninguna normalización interna.
 
-Chaque STL du cœur 10 mm contient **1 174 triangles**, **58 784 octets**, des arêtes partagées deux fois avec orientations opposées, une coque connectée et un volume signé positif. Le plus petit carré de norme du produit vectoriel vaut environ **1,87e-6**, pour le seuil inchangé **1e-10**. Le contrôle porte sur les coordonnées effectivement sérialisées, pas seulement sur la représentation JSCAD.
+Cada STL del corazón de 10 mm contiene **1.174 triángulos**, **58.784 bytes**, aristas compartidas dos veces con orientaciones opuestas, una envolvente conectada y volumen firmado positivo. El menor cuadrado de la norma del producto vectorial es aproximadamente **1,87e-6**, frente al umbral inalterado **1e-10**. La comprobación utiliza las coordenadas efectivamente serializadas, no solo la representación JSCAD.
 
-| Mode, sans poignée | Dimensions du STL | Couches à 0,2 mm | Volume |
+| Modo, sin agarre | Dimensiones STL | Capas de 0,2 mm | Volumen |
 |---|---|---|---|
-| Relief, profondeur 2 mm | 10 × 10 × 6 mm | **30**, dernière Z=6 mm | ≈488,8876 mm³ |
-| Creux, profondeur 3 mm | 10 × 10 × 4 mm | **20**, dernière Z=4 mm | ≈266,6686 mm³ |
+| Relieve, profundidad 2 mm | 10 × 10 × 6 mm | **30**, última Z=6 mm | ≈488,8876 mm³ |
+| Hueco, profundidad 3 mm | 10 × 10 × 4 mm | **20**, última Z=4 mm | ≈266,6686 mm³ |
 
-Le fond creux est à 1 mm, contrôlé par raycast et par les plans du STL. Les aires et volumes correspondent au même contour Float32, avec toutes ses arêtes, et non à une version simplifiée.
+El fondo del hueco es de 1 mm, verificado mediante raycast y planos del STL. Áreas y volúmenes corresponden al mismo contorno Float32, con todas sus aristas, no a una versión simplificada.
 
-Rapports `slicing-corpus.json`, `sliced-extra/results.json` et `verified-results.json`. Les empreintes des STL effectivement lus par le slicer et de leurs G-codes sont relues.
+Informes `slicing-corpus.json`, `sliced-extra/results.json` y `verified-results.json`. Se volvieron a leer las huellas de los STL que utilizó el laminador y de sus G-code.
 
-Profil hypothétique de qualification : lit 1 200 × 1 200 mm pour les grandes tailles du corpus, buse 0,4 mm, filament 1,75 mm, couches 0,2 mm, trois périmètres, cinq couches pleines dessus/dessous et remplissage 15 %. **G-codes de contrôle, pas prêts pour l’imprimante de Rza** : imprimante, matériau, calibration, supports, adhérence et tolérances matérielles inconnus. Aucune impression physique effectuée.
+Perfil hipotético de calificación: plataforma de 1.200 × 1.200 mm para los tamaños grandes del conjunto, boquilla de 0,4 mm, filamento de 1,75 mm, capas de 0,2 mm, tres perímetros, cinco capas sólidas superiores/inferiores y relleno del 15 %. **G-code de comprobación, no preparado para la impresora de Rza**: se desconocen impresora, material, calibración, soportes, adhesión y tolerancias físicas. No se imprimió ninguna pieza.
 
-Les essais antérieurs supplémentaires à 0,1 mm et avec poignée restent dans le rapport du run précédent ; ils ne sont pas présentés comme des slicings réexécutés dans ce run. Les tests géométriques/recette/App correspondants passent de nouveau dans la suite complète.
+Las pruebas adicionales anteriores a 0,1 mm y con agarre permanecen en el informe de la ejecución previa; no se presentan como laminados repetidos en esta ejecución. Las pruebas correspondientes de geometría, receta y aplicación volvieron a aprobar en la batería completa.
 
-## Parcours Chromium frais — deux modes 10 mm
+## Recorrido nuevo en Chromium — Ambos modos de 10 mm
 
-Rapport `browser-UOFovg/browser-result.json` dans le répertoire de preuves fraîches. Desktop **1 365 × 900**, viewport mobile **390 × 844** ; captures inspectées. Pas d’essai sur téléphone réel.
+Informe `browser-UOFovg/browser-result.json` dentro del directorio de evidencias nuevas. Escritorio **1365 × 900**, ventana móvil **390 × 844**; capturas inspeccionadas. No se probó en un teléfono físico.
 
-- Forme Heart réelle de la bibliothèque, taille 10 mm saisie dans le champ numérique, choix « Sans poignée », Relief à 2 mm puis sélection Creux à 3 mm au clavier.
-- Aperçu WebGL réel, contrôles sélectionnés et absence de débordement ; téléchargements binaires des deux modèles.
-- Sauvegarde, vraie lecture IndexedDB, rechargement complet et réouverture explicite pour le Creux ; puis sauvegarde/rechargement/réouverture également pour le Relief. **JSON exact et STL identique après reprise dans chaque mode**.
-- SHA-256 Relief : `a742d8c49d48149038adad6ae18871702aee4448dfc318bc16305815ed3baa63`.
-- SHA-256 Creux : `a819cc63ff3a55530501688cda0152bc72213cda444da18e86b96a5902b9a2f1`.
-- Les deux téléchargements sont également identiques aux STL de génération directe. Bascules entre modes sans export du mesh précédent.
-- **56 assets** servis comparés au build ; aucune erreur de page, serveur et navigateur arrêtés.
-- Une première sonde de taille a échoué car elle utilisait Home comme pour un slider. Le champ réel est numérique avec événement change : le runner a été corrigé en saisie puis Tab, sans changement produit.
+- Figura Heart real de la biblioteca, tamaño 10 mm ingresado en campo numérico, opción «Sin agarre», Relieve a 2 mm y luego Hueco a 3 mm seleccionado mediante teclado.
+- Vista previa WebGL real, controles seleccionados, sin desbordamiento y descarga de los dos modelos binarios.
+- Guardado, lectura real de IndexedDB, recarga completa y reapertura explícita para Hueco; después también guardado/recarga/reapertura para Relieve. **JSON exacto y STL idéntico después de recuperar cada modo**.
+- SHA-256 Relieve: `a742d8c49d48149038adad6ae18871702aee4448dfc318bc16305815ed3baa63`.
+- SHA-256 Hueco: `a819cc63ff3a55530501688cda0152bc72213cda444da18e86b96a5902b9a2f1`.
+- Ambas descargas son idénticas a los STL generados directamente. Cambiar de modo no exporta una malla anterior.
+- **56 recursos** servidos comparados con la compilación; sin errores de página; servidor y navegador detenidos.
+- Una primera sonda de tamaño falló porque usaba Home como para un control deslizante. El campo real es numérico y emite un evento `change`: se corrigió el ejecutor para escribir y presionar Tab, sin modificar el producto.
 
-Les audits axe sont automatisés et limités à ces états : ils ne certifient pas une accessibilité complète ni un essai avec lecteur d’écran humain.
+Las auditorías axe son automáticas y se limitan a esos estados: no certifican accesibilidad completa ni pruebas con un lector de pantalla utilizado por una persona.
 
-## Compatibilité et limites conservées
+## Compatibilidad y límites conservados
 
-- Corps planaires sans poignée uniquement ; les raccordements de poignée ne sont pas devinés. Un résultat non validable reste refusé.
-- Les formats V1/V2/V3, paramètres legacy, codecs, session, UI, manifeste et lockfile sont inchangés par cette extension. `geometryRoute` reste une indication volatile Three.js, pas un champ persisté.
-- Cercle et cœur dans les deux modes à **10 / 200 / 1 000 mm**, contour ondulé 512 sommets, convexe 1 000 sommets et motif à 25 trous : tous les cas du corpus passent. Gardes >2 Mio, paths et points conservées.
-- Pas de qualification de tous les SVG autorisés, des poignées aux tailles extrêmes, des plafonds de 10 000/50 000 points ou de leurs performances maximales.
-- Les notes longues de Limace/Sangsue restent hors périmètre ; le contrôle global des notes peut donc rester rouge, indépendamment de la suite applicative verte.
+- Solo cuerpos planos sin agarre; no se inventan conexiones para el agarre. Se rechazan los resultados que no pueden validarse.
+- Los formatos V1/V2/V3, parámetros heredados, códecs, sesión, interfaz, manifiesto y archivo de bloqueo no cambian con esta ampliación. `geometryRoute` sigue siendo un indicador temporal de Three.js, no un campo persistido.
+- Círculo y corazón en ambos modos a **10 / 200 / 1.000 mm**, contorno ondulado de 512 vértices, convexo de 1.000 vértices y patrón con 25 huecos: todos los casos del conjunto aprueban. Se conservan las protecciones para más de 2 MiB, trazados y puntos.
+- No se calificaron todos los SVG admitidos, los agarres a tamaños extremos, los límites de 10.000/50.000 puntos ni su rendimiento máximo.
+- Las notas extensas de Limace/Sangsue siguen fuera de alcance; por eso la comprobación global de notas puede seguir en rojo independientemente de que la batería de aplicación apruebe.
 
-## Firefox/WebKit — réserve indépendante, non levée
+## Firefox/WebKit — Limitación independiente, no resuelta
 
-Les tentatives précédentes restent inchangées : Firefox 146.0.1 ouvre une page HTML headless mais la sonde WebGL2 renvoie false ; WebKit 26.0 échoue à créer une page. Xvfb/proot isolés échouent avec `execve(.../Xvfb): Permission denied`. La cause centrale exacte n’est pas affirmée.
+Los intentos anteriores no cambiaron: Firefox 146.0.1 abre una página HTML sin interfaz gráfica, pero la sonda WebGL2 devuelve `false`; WebKit 26.0 no logra crear una página. Xvfb/proot aislados fallan con `execve(.../Xvfb): Permission denied`. No se afirma conocer la causa raíz exacta.
 
-**Parcours Firefox/WebKit non qualifiés, non réessayés dans ce correctif géométrique.** Carte `t_2742c31d` assignée à `default`, bloquée avant modification centrale. Aucune autorisation d’installation système, modification Docker/Hermes, redémarrage ou publication n’en découle. Safari/iPhone réel et lecteur d’écran restent non testés.
+**Los recorridos Firefox/WebKit no están calificados ni se repitieron con esta corrección geométrica.** Tarjeta `t_2742c31d` asignada a `default`, bloqueada antes de modificar componentes centrales. No se desprende ninguna autorización para instalar software del sistema, cambiar Docker/Hermes, reiniciar ni publicar. Safari/iPhone físico y lector de pantalla tampoco se probaron.
 
-## Reprise et Git
+## Reanudación y Git
 
-- Branche **`fix/stamp-qualification`**, base **`319d8cd882e9940de7afd72a1233c8fde8062dc3`**, remote attendu vérifié. Le commit local de correction, une fois créé, est identifiable par Git et `final-state.json` dans le répertoire de preuves fraîches.
-- Validations rattachées au contenu source, pas au seul SHA de la base. Avant commit, fichiers et message annoncés ; pas de publication autorisée.
-- Texte préexistant d’`AGENT_CONTEXT.md` préservé intégralement, sauf l’en-tête de reprise géré par l’agent ; note exclue du commit, index vide en fin de livraison. Aucun stash/reset destructeur.
+- Rama original **`fix/stamp-qualification`**, base **`319d8cd882e9940de7afd72a1233c8fde8062dc3`**, remoto esperado verificado. El commit local de corrección, una vez creado, puede identificarse con Git y `final-state.json` en el directorio de evidencias nuevas.
+- Validaciones vinculadas al contenido fuente, no solo al SHA de base. Antes del commit se anunciaron archivos y mensaje; no había autorización para publicar.
+- Texto previo de `AGENT_CONTEXT.md` preservado íntegramente salvo el encabezado de reanudación administrado por el agente; nota excluida del commit, índice vacío al terminar. No hubo operaciones destructivas de stash/reset.
+
+> **Nota CookieForge:** esta calificación y sus cifras son históricas del proyecto original. No se ejecutaron nuevamente las pruebas al traducir el informe.
