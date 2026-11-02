@@ -51,5 +51,5 @@ it('keyboard editing and empty state use the actual session', async () => {
  const { session } = setup(); const point = document.querySelector('circle')!;
  point.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true })); await tick();
  expect(session.getDocument()?.sketch.svg).toContain('M11 10');
- session.clear(); await tick(); expect(document.body.textContent).toContain('Importez ou ouvrez un projet');
+ session.clear(); await tick(); expect(document.body.textContent).toContain('Importá o abrí un proyecto');
 });
