@@ -1,51 +1,52 @@
-# Invariants de cookie-cutter-designer
+# Invariantes del proyecto Cookie Cutter Designer
 
-Référence durable complémentaire à `AGENT_CONTEXT.md`. Les résultats de livraison datés restent dans les documents de validation et Git. Les anciennes notes intégrales sont conservées dans le commit applicatif `5c74083baec230788468fa70c9bada5c1caecda3` et dans sa fusion ; ce fichier conserve les décisions utiles à la suite, pas leurs anciens statuts.
+Referencia técnica duradera complementaria a `AGENT_CONTEXT.md`. Los resultados fechados de cada entrega permanecen en los documentos de validación y en Git. Las notas históricas completas se conservan en el commit original `5c74083baec230788468fa70c9bada5c1caecda3` y su fusión. Este archivo registra las decisiones útiles para continuar, no los estados antiguos.
 
-## Document, édition et ressources
+> **Contexto CookieForge:** las referencias a infraestructura, cuentas y autorizaciones del proyecto original son históricas. No sustituyen las reglas ni los permisos actuales de CookieForge.
 
-- Document V1 canonique : source SVG originale distincte de sketch ; identité, nom, paramètres et préférences conservés. Raster original non persisté, undo non durable après reload.
-- Atelier dans Advanced Creation : `SketchWorkspace.svelte` + `sketchCommands.ts`, lecture du sketch courant et mutation via session.updateSketch. Déplacement souris/tactile/clavier/coordonnées ; add/delete/close sur contour linéaire unique ; miroir horizontal/rotation 90° centrés viewBox. M/L/C/Q/Z et contrôles conservés, sans polygonisation. Primitives/transform/styles/commandes non prises en charge conservés et signalés en lecture seule. Pas de pinceau/texte/calques/snapping/plume complète/restaurer-original dédié.
-- Drag local jusqu’au release, un commit gardé par snapshot exact + epoch. Escape/pointercancel/blur/perte capture annulent ; navigation/remplacement/history invalident le brouillon. Historique et génération existants réutilisés ; autres outils legacy non déclarés migrés.
-- `.ccd.json` strict, limite 10 Mio ; validation avant remplacement. Annuler préserve le document ; drainer écritures acceptées avant fermeture stockage.
-- Récupération IndexedDB séparée, reprise explicite ; bibliothèque modifiée uniquement explicitement ; brouillons par onglet/époque, pas de collaboration implicite.
-- Gardes lifetime/source/epoch jusqu’à publication. Export geometry exige mesh/epoch/ready/document cohérents ; JSON indépendant. Ownership/disposal Three.js conservés. Batch externe non sauvegardable V1.
-- Loft raster : chemin legacy conservé pour cardinalités égales ; fusion périmétrique monotone pour cardinalités différentes sans rééchantillonnage. Changements du nombre de composants refusés ; validateurs et fixtures historiques inchangés par l’atelier.
-- Budgets finaux UTF-8 après preload Vite : 200 KiB entry, 600 KiB chunks ; découpage runtime/addons ≠ baisse garantie du transfert total.
+## Documento, edición y recursos
 
-## Import photographique
+- Documento canónico V1: fuente SVG original separada del boceto; se conservan identidad, nombre, parámetros y preferencias. El raster original no se persiste; deshacer no sobrevive a una recarga.
+- Taller de Creación Avanzada: `SketchWorkspace.svelte` y `sketchCommands.ts` leen el boceto actual y lo modifican mediante `session.updateSketch`. Permiten mover con mouse, táctil, teclado o coordenadas; agregar, borrar y cerrar un contorno lineal único; reflejar horizontalmente y rotar 90° respecto del centro de `viewBox`. Se conservan M/L/C/Q/Z y sus controles sin convertirlos a polígonos. Las primitivas, transformaciones, estilos y órdenes no admitidos se conservan y se indican como de solo lectura. No incluye pincel, texto, capas, ajuste magnético, pluma completa ni una función específica para restaurar el original.
+- El arrastre permanece local hasta soltar; se confirma un único cambio protegido por instantánea exacta y época. Escape, `pointercancel`, pérdida de foco o captura cancelan; navegar, reemplazar o cambiar el historial invalida el borrador. Se reutilizan historial y generación existentes; no se declara migrada ninguna otra herramienta heredada.
+- Formato `.ccd.json` estricto, límite de 10 MiB; validar antes de reemplazar. Cancelar conserva el documento; vaciar las escrituras aceptadas antes de cerrar el almacenamiento.
+- Recuperación de IndexedDB independiente, reanudación explícita; la biblioteca solo cambia por una acción explícita. Los borradores se separan por pestaña y época, sin colaboración implícita.
+- Mantener las comprobaciones de ciclo de vida, fuente y época hasta publicar. Exportar geometría requiere coherencia entre malla, época, estado listo y documento; JSON es independiente. Se mantiene la propiedad y liberación de recursos Three.js. Batch externo no se puede guardar en V1.
+- Extrusión gradual de raster: conservar el procedimiento heredado para igual cantidad de vértices; para cantidades distintas, usar fusión perimetral monótona sin remuestreo. Rechazar cambios en la cantidad de componentes; el taller no modifica los validadores ni los archivos de prueba históricos.
+- Límites finales UTF-8 después de la precarga de Vite: 200 KiB para entrada y 600 KiB para fragmentos. Separar entorno de ejecución y complementos no garantiza reducir la transferencia total.
 
-- `photoSettings.ts` : seuil null=auto ; polarité dark/light ; crop normalisé ; minComponentArea0 et fillHolesfalse par défaut. Aucun choix destructif implicite.
-- `photoProcessing.ts` : segmentation luminance/alpha, diagnostics/topologie ; Worker `photoProcessor.worker.ts` : décodage, budgets, ImageTracer noir uniquement et contrôle des trous. `photoImport.ts` : Worker propriétaire par requête, timeout/abort/cleanup.
-- App stage un brouillon gardé par document/snapshot/epoch/sourceRevision ; `PhotoImportReview` prépare sans mutation puis applique explicitement. Retrace conserve source/id/nom/paramètres, réutilise l’historique canonique. Raster et réglages restent volatiles, pas de schéma V2.
-- Fixtures photographiques attribuées coins/coffee/chelsea dans `src/lib/import/__tests__/fixtures/photos/`. Test Node déterministe et vrai décodage Chromium complémentaires ; aucun détour cloud.
+## Importación fotográfica
 
-## Profils de paroi
+- `photoSettings.ts`: umbral `null` significa automático; polaridad oscura/clara; recorte normalizado; `minComponentArea` igual a 0 y `fillHoles` igual a `false` por defecto. No hay decisiones destructivas implícitas.
+- `photoProcessing.ts`: segmentación por luminancia/alfa, diagnósticos y topología. Worker `photoProcessor.worker.ts`: decodificación, presupuestos, ImageTracer solo en negro y control de huecos. `photoImport.ts`: Worker propio por solicitud, tiempo máximo, cancelación y limpieza.
+- La aplicación prepara un borrador protegido por documento, instantánea, época y `sourceRevision`; `PhotoImportReview` prepara sin modificar y aplica solo por confirmación explícita. Volver a trazar conserva fuente, ID, nombre y parámetros, y reutiliza el historial canónico. Raster y ajustes son temporales; no se crea un esquema V2.
+- Archivos de prueba fotográficos atribuidos a coins/coffee/chelsea en `src/lib/import/__tests__/fixtures/photos/`. Se complementan pruebas deterministas de Node y decodificación real en Chromium; no se recurre a la nube.
 
-- `domain/wallProfiles.ts` définit Fin (0,8 mm / 5°), Standard (1 mm / 7°), Robuste (1,5 mm / 10°). `CutterSection.svelte` applique uniquement `wallThickness` + `taperAngle` via une mise à jour atomique du port UI existant ; le document de session reste propriétaire des données. Taille, hauteurs, poignée, sketch/source et ponts conservés. Choix actif calculé par égalité exacte des deux valeurs ; sinon Personnalisé. Aucun identifiant de profil persisté, nouveau schéma, migration ou nouveau découpage géométrique. Les contrôles gardent leurs bornes/pas et affichent maintenant aussi les valeurs fractionnaires historiques sans arrondi trompeur.
+## Perfiles de pared
 
-## Série de Cutters
+- `domain/wallProfiles.ts` define Fino (0,8 mm / 5°), Estándar (1 mm / 7°) y Robusto (1,5 mm / 10°). `CutterSection.svelte` aplica únicamente `wallThickness` y `taperAngle` mediante una actualización atómica de la interfaz existente; el documento de sesión sigue siendo dueño de los datos. Se conservan tamaño, alturas, agarre, boceto/fuente y puentes. El perfil activo se calcula por igualdad exacta de ambos valores; si no coincide, es Personalizado. No se persisten identificadores de perfil ni se crean esquema, migración o proceso geométrico nuevos. Los controles mantienen límites y pasos, y muestran valores fraccionarios históricos sin redondeos engañosos.
 
-- V3 = source unique homogène, paramètres communs, ponts et disposition (`copies`, `columns`, `spacingMm`). Aucun mesh sérialisé. V1/V2 inchangés hors utilisation de la série ; une ancienne application refuse V3 comme version future.
-- Retour au Cutter unique sans perte : V2 s’il y a des ponts, sinon V1. Taille, profils, poignées et ponts restent ceux de la source commune.
-- Copies 1–24, colonnes 1–copies, espace 0,5–40 mm, total 500 000 triangles ; plateau mesuré depuis la géométrie complète poignée comprise. Le garde de triangles ne constitue pas une mesure de performance maximale.
-- Le Cutter source doit être complet/connecté. Chaque copie possède ses géométries et matériaux ; le prototype est libéré. Annulation ou erreur n’exposent pas de série partielle.
-- Une disposition impossible reste sauvegardable/exportable en JSON, mais pas en géométrie. Batch doit rester accessible sans mesh après réouverture pour réparer ; ne pas corriger le document implicitement.
-- Ouvrir/saisir Batch ne modifie pas le projet ; Créer/Appliquer publie une modification atomique dans l’historique. Le Batch libre historique est explicitement non enregistrable.
-- Hors lot : monobloc, connexions entre copies, dessins/tailles différents, Stamp, placement libre/optimiseur avancé, socle/paroi/tranchant indépendants.
+## Serie de cortadores
 
-## Artefacts temporaires et exécution
+- V3: una fuente única homogénea, parámetros comunes, puentes y disposición (`copies`, `columns`, `spacingMm`). No se serializa ninguna malla. V1/V2 no cambian fuera de la función de serie; una aplicación antigua rechaza V3 como versión futura.
+- Volver a un cortador único sin pérdida: V2 si hay puentes, o V1 si no los hay. Tamaño, perfiles, agarres y puentes siguen perteneciendo a la fuente común.
+- Entre 1 y 24 copias; entre 1 y tantas columnas como copias; separación de 0,5 a 40 mm; total máximo de 500.000 triángulos. La superficie ocupada se mide desde la geometría completa, incluido el agarre. El límite de triángulos no constituye una medición de rendimiento máximo.
+- El cortador original debe estar completo y conectado. Cada copia posee sus propias geometrías y materiales; se libera el prototipo. Una cancelación o error no expone series parciales.
+- Una disposición imposible puede guardarse y exportarse como JSON, pero no como geometría. Batch debe seguir accesible sin malla después de reabrir para poder repararlo; no corregir el documento implícitamente.
+- Abrir o introducir datos en Batch no modifica el proyecto; Crear/Aplicar publica un cambio atómico en el historial. El Batch libre histórico no admite guardado.
+- Fuera de alcance: pieza monobloque, conexiones entre copias, dibujos o tamaños diferentes, sellos, ubicación libre u optimización avanzada, y bases, paredes o filos independientes.
 
-- Smoke et benchmark allouent chacun un répertoire privé unique par `mkdtempSync(join(tmpdir(), prefix))`, donc respectent toujours TMPDIR. Suppression de la suppression/réutilisation du chemin smoke partagé ; artefacts conservés pour inspection, chemins exacts publiés via stdout. README adapté aux chemins non stables.
+## Archivos temporales y ejecución
 
-- Toujours fournir le TMP isolé de la racine Git via `/workspace/.hermes-tools/workspace-tmp.py`. Échec du helper ou sortie vide : bloquer la commande. Sérialiser les gates ; smoke et benchmark fixent déjà maxWorkers.
-- Avant Chromium, vérifier les ressources réelles ; le runner possède son navigateur/serveur localhost et les arrête dans `finally`. Après timeout, arrêter uniquement ses propres enfants et conserver les journaux échoués. Reprendre les contrôles manquants sur les mêmes empreintes, sans compter une interruption comme un succès.
-- La comparaison HTTP de l’artefact prouve la version servie, pas un essai sur téléphone, lecteur d’écran, slicer ou imprimante. Les recettes navigateur restent limitées à leurs corpus réellement exercés.
+- Las pruebas funcionales y los benchmarks asignan cada uno un directorio privado único mediante `mkdtempSync(join(tmpdir(), prefix))`, respetando siempre TMPDIR. Se elimina el borrado o reutilización de la ruta compartida de pruebas funcionales; los artefactos se conservan para inspección y sus rutas exactas se publican por salida estándar. El README se adaptó a rutas no estables.
+- En el entorno original, suministrar siempre el directorio temporal aislado de la raíz Git mediante `/workspace/.hermes-tools/workspace-tmp.py`. Si falla el auxiliar o devuelve una ruta vacía, bloquear el comando. Ejecutar las comprobaciones secuencialmente; las pruebas funcionales y benchmarks ya limitan `maxWorkers`.
+- Antes de Chromium, verificar los recursos reales. El ejecutor controla su propio navegador y servidor local y los detiene en `finally`. Tras un tiempo de espera agotado, detener solo sus propios procesos secundarios y conservar los registros fallidos. Reanudar las comprobaciones faltantes sobre las mismas versiones, sin contabilizar una interrupción como éxito.
+- Comparar por HTTP el artefacto demuestra qué versión se sirvió, no que se probó en teléfono, lector de pantalla, laminador o impresora. Las pruebas de navegador solo avalan los casos efectivamente ejecutados.
 
-## Publication
+## Publicación
 
-- Compte `razorglyon` par commande, selon `/workspace/AGENTS.md` ; jamais `gh auth switch/login` ni édition de `hosts.yml`.
-- GO distinct selon la portée commit/push/PR/ready/fusion/déploiement ; ne pas transformer un ancien GO en autorisation d’un nouveau lot. Jamais de bypass, suppression de branche ou force-push implicites.
-- Vérifier protections, base, HEAD et contrôles du SHA exact. Distinguer analyse CodeQL et verdict externe. Sur le squash, exiger les workflows attendus selon leurs déclencheurs, sans prétendre que les contrôles externes de PR ont été réexécutés.
-- Après squash, prouver l’égalité des arbres et préserver l’ancienne branche. Pour le chantier suivant, créer une branche depuis `origin/main` vérifié ; la divergence des SHA ne prouve pas un lot non livré.
-- Pour Pages, vérifier déploiement/SHA, paquet réellement uploadé et tous ses fichiers publics. `.nojekyll` vide peut être une métadonnée de packaging absente du paquet, uniquement après preuve ; aucune exclusion générale des fichiers cachés.
+- **Procedimiento histórico del proyecto original:** cuenta `razorglyon` por comando, según `/workspace/AGENTS.md`; no ejecutar `gh auth switch/login` ni editar `hosts.yml`.
+- Las autorizaciones originales eran independientes para commit, push, solicitud de incorporación, marcar lista, fusión y despliegue. Una autorización antigua no habilita una etapa nueva. No eludir protecciones, eliminar ramas ni publicar forzadamente sin permiso.
+- Verificar protecciones, rama base, HEAD y comprobaciones del SHA exacto. Diferenciar el análisis CodeQL de un veredicto externo. Al fusionar mediante squash, exigir los workflows previstos por sus disparadores sin afirmar que las comprobaciones externas de una solicitud se ejecutaron nuevamente.
+- Después de squash, comprobar la igualdad de árboles y preservar la rama anterior. Para el siguiente trabajo, crear una rama desde `origin/main` verificado; una diferencia de SHA no demuestra que falte entregar cambios.
+- En Pages, verificar despliegue/SHA, paquete realmente cargado y todos sus archivos públicos. Un `.nojekyll` vacío puede faltar por metadatos de empaquetado, pero solo después de comprobarlo; no excluir genéricamente los archivos ocultos.
