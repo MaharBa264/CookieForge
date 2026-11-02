@@ -46,6 +46,18 @@ Se conserva temporalmente en su idioma original para evitar perder información 
 - [README original](../UPSTREAM_README.md): se conserva **sin reemplazar** para atribución y consulta del proyecto de origen.
 - [Licencia MIT](../LICENSE): se conserva su texto legal original, sin traducir ni sustituirlo.
 
+## Prioridad de traducción para cerrar la fase 3
+
+La traducción completa sigue pendiente. El orden acordado es:
+
+1. Arquitectura y decisiones técnicas.
+2. Informes de validación geométrica, importación y persistencia.
+3. Documentos de planificación y características.
+4. Revisión de cadenas visibles de la interfaz y pruebas asociadas.
+5. Verificación de enlaces, comandos y pruebas automáticas.
+
+El cierre verificable se registra en [PLAN_CIERRE_FASE_3.md](PLAN_CIERRE_FASE_3.md).
+
 ## Criterios para continuar la traducción
 
 1. Traducir íntegramente el contenido, sin borrar restricciones ni resultados de validación.
