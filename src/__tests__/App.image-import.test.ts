@@ -58,14 +58,14 @@ beforeEach(() => {
 afterEach(async () => { if (app) await unmount(app); vi.restoreAllMocks(); app = undefined; document.body.innerHTML = ''; setParams({ ...DEFAULT_PARAMS }); });
 it('shows an explicit contrast default and photo choice before importing', async () => {
   setup();
-  await vi.waitFor(() => expect(document.querySelector('select[aria-label="Préréglage de vectorisation"]')).not.toBeNull());
-  const select = document.querySelector<HTMLSelectElement>('select[aria-label="Préréglage de vectorisation"]')!;
+  await vi.waitFor(() => expect(document.querySelector('select[aria-label="Perfil de vectorización"]')).not.toBeNull());
+  const select = document.querySelector<HTMLSelectElement>('select[aria-label="Perfil de vectorización"]')!;
   expect(select.value).toBe('contrast');
-  expect([...select.options].map(option => option.textContent)).toEqual(['Dessin contrasté', 'Photo — préparation guidée']);
+  expect([...select.options].map(option => option.textContent)).toEqual(['Dibujo contrastado', 'Foto — preparación guiada']);
 });
 
 function choosePreset(value: string) {
-  const select = document.querySelector<HTMLSelectElement>('select[aria-label="Préréglage de vectorisation"]')!;
+  const select = document.querySelector<HTMLSelectElement>('select[aria-label="Perfil de vectorización"]')!;
   for (const option of select.options) option.selected = option.value === value;
   select.dispatchEvent(new Event('change', { bubbles: true }));
 
