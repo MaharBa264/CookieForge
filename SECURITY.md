@@ -1,109 +1,102 @@
-# Security Policy
+# Política de seguridad
 
-## Supported Versions
+> **Adaptación a CookieForge:** esta política traduce la documentación heredada de Cookie Cutter Designer. Las referencias a controles, plazos de respuesta y servicios del proyecto original no deben interpretarse como garantías o configuraciones verificadas en CookieForge. El workflow de calidad confirmado de CookieForge es `.github/workflows/quality-cookieforge.yml`.
 
-We take security seriously. The following versions of Cookie Cutter Designer are currently supported with security updates:
+## Versiones compatibles
 
-| Version | Supported          |
-| ------- | ------------------ |
-| Latest (main) | :white_check_mark: |
-| < Latest | :x: |
+La recomendación del proyecto original es utilizar la versión más reciente de `main`. Las versiones anteriores no reciben mantenimiento garantizado.
 
-We recommend always using the latest version from the `main` branch.
+| Versión | Compatibilidad declarada originalmente |
+|---|---|
+| Más reciente (`main`) | Sí |
+| Anteriores | No |
 
-## Security Features
+## Funciones y controles de seguridad
 
-### Automated Security Scanning
+### Análisis automatizado
 
-This project uses multiple layers of security protection:
+El proyecto original documenta varias capas de protección:
 
-- **CodeQL Analysis**: Automated code scanning on pushes, pull requests, and a weekly schedule
-- **Dependency Audit**: `pnpm audit --audit-level=moderate` in the quality workflow
-- **Dependabot Version Updates**: Grouped patch/minor updates; major upgrades are reviewed manually
-- **Protected Integration**: Quality checks run before deployment from `main`
+- **CodeQL:** análisis del código en publicaciones, solicitudes de incorporación y una programación semanal.
+- **Auditoría de dependencias:** `pnpm audit --audit-level=moderate`.
+- **Dependabot:** actualizaciones agrupadas de correcciones y versiones menores; revisión manual de actualizaciones mayores.
+- **Integración protegida:** comprobaciones de calidad antes de publicar desde `main`.
 
-### Code Review Process
+En CookieForge, la existencia y activación de estos controles adicionales debe comprobarse por separado; no se deben asumir a partir de esta documentación.
 
-All code changes go through:
+### Revisión del código
 
-1. Automated security scans (CodeQL)
-2. Dependency audit, type checking, and build verification
-3. Manual code review by maintainers
-4. Approval before merge
+El proceso recomendado por el proyecto original incluye:
 
-## Reporting a Vulnerability
+1. Análisis automatizados de seguridad (CodeQL).
+2. Auditoría de dependencias, comprobación de tipos y compilación.
+3. Revisión manual por las personas responsables del mantenimiento.
+4. Aprobación antes de incorporar cambios.
 
-If you discover a security vulnerability, please follow responsible disclosure:
+## Cómo informar una vulnerabilidad
 
-### Do NOT
+Si encontrás una vulnerabilidad, seguí un procedimiento de divulgación responsable.
 
-- Open a public GitHub issue
-- Discuss the vulnerability publicly
-- Exploit the vulnerability
+**No hagas lo siguiente:**
 
-### DO
+- Abrir una incidencia pública de GitHub con los detalles explotables.
+- Difundir públicamente la vulnerabilidad antes de coordinar una solución.
+- Explotarla contra otros usuarios o sistemas.
 
-1. **Email the maintainer** privately at the email listed in the GitHub profile
-2. **Include details**:
-   - Description of the vulnerability
-   - Steps to reproduce
-   - Potential impact
-   - Suggested fix (if you have one)
+**En cambio:**
 
-### Response Timeline
+1. Contactá de forma privada a quien mantiene el repositorio mediante los canales de seguridad habilitados en GitHub o la información de contacto publicada en su perfil.
+2. Incluí una descripción del problema, pasos para reproducirlo, impacto potencial y, si tenés, una propuesta de corrección.
 
-- **24-48 hours**: Initial response acknowledging receipt
-- **7 days**: Assessment and severity classification
-- **30 days**: Fix development and testing
-- **Release**: Security patch with credit to reporter (if desired)
+### Plazos indicados por el proyecto original
 
-## Security Best Practices for Users
+- **24–48 horas:** confirmación inicial de recepción.
+- **7 días:** evaluación y clasificación de gravedad.
+- **30 días:** desarrollo y pruebas de la corrección.
+- **Publicación:** parche de seguridad con reconocimiento a quien informó el problema, si así lo desea.
 
-When using Cookie Cutter Designer:
+Estos plazos son **históricos del proyecto original**; CookieForge todavía no ha asumido formalmente un compromiso de respuesta equivalente.
 
-### File Upload Safety
+## Recomendaciones de seguridad para usuarios
 
-- Only upload files from trusted sources
-- The app processes SVG/PNG/JPG files in the browser
-- No files are uploaded to external servers
-- All processing happens client-side
+### Importación de archivos
 
-### 3D Printing Safety
+- Importá preferentemente archivos de fuentes confiables.
+- La aplicación procesa SVG, PNG y JPG en el navegador.
+- El flujo local de importación no necesita subir los archivos a servidores externos.
+- El procesamiento principal se realiza del lado del cliente.
 
-- Always inspect generated STL files before printing
-- Use food-safe filament (PLA or PETG) for cookie cutters
-- Follow 3D printing best practices
-- Hand wash only - do not use dishwasher
+### Seguridad en impresión 3D
 
-### Browser Security
+- Revisá los STL generados antes de imprimir.
+- **No presupongas que PLA, PETG ni otro filamento son aptos para contacto alimentario.** La aptitud depende de la certificación del material, los aditivos, la máquina, la superficie y las condiciones de limpieza.
+- Seguí las buenas prácticas de impresión 3D.
+- Evitá el lavavajillas salvo que el material y el proceso permitan expresamente ese uso; preferí la limpieza manual cuando corresponda.
 
-- Use a modern, updated browser
-- Keep JavaScript enabled (required for the app)
-- The app runs entirely in your browser - no server-side processing
+### Seguridad del navegador
 
-## Dependencies Security
+- Usá un navegador moderno y actualizado.
+- Mantené JavaScript habilitado: la aplicación lo necesita.
+- El funcionamiento principal se ejecuta en el navegador, sin procesamiento remoto obligatorio.
 
-We actively monitor and update dependencies:
+## Seguridad de dependencias
 
-- **Automated audit** on pushes and pull requests
-- **Weekly Dependabot version checks** for compatible updates
-- **Manual review** of all dependency updates
-- **Lock file** (pnpm-lock.yaml) for reproducible builds
+Las prácticas documentadas originalmente incluyen auditorías automatizadas en publicaciones y solicitudes de incorporación, comprobaciones semanales de Dependabot, revisión manual de actualizaciones y el archivo `pnpm-lock.yaml` para instalaciones reproducibles.
 
-## Third-Party Services
+## Servicios externos
 
-This project uses:
+El proyecto original documenta:
 
-- **GitHub Pages**: Static hosting (read-only)
-- **GitHub Actions**: CI/CD pipeline (isolated builds)
-- **Google Gemini API**: Optional image/SVG features send requests directly from the browser when the user configures an API key
-- **No analytics or tracking service configured by default**
+- **GitHub Pages:** alojamiento estático de solo lectura.
+- **GitHub Actions:** integración y entrega continuas en ejecuciones aisladas.
+- **API de Google Gemini:** funciones opcionales de imagen/SVG que envían solicitudes directamente desde el navegador cuando el usuario configura una clave.
+- **Analítica:** ningún servicio de seguimiento configurado de forma predeterminada.
 
-Gemini API keys are stored and used client-side. Treat them as exposed browser credentials: restrict their quota and API scope, and never commit them to the repository.
+Las claves de Gemini se almacenan y utilizan del lado del cliente. Deben tratarse como credenciales potencialmente expuestas: restringí cuotas y permisos, y nunca las incorpores al repositorio.
 
-## Security Headers
+## Cabeceras de seguridad
 
-When self-hosting, ensure your web server includes:
+Al alojar la aplicación en un servidor propio, el proyecto original recomienda configurar:
 
 ```http
 Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'
@@ -112,28 +105,22 @@ X-Content-Type-Options: nosniff
 Referrer-Policy: no-referrer
 ```
 
-## Audit Trail
+**Advertencia:** esta política CSP heredada permite `unsafe-inline`; no debe considerarse una configuración óptima sin una revisión específica del despliegue.
 
-Security-related changes are tracked:
+## Trazabilidad
 
-- Commits and pull requests preserve an attributable change history
-- Pull requests include security scan results
-- Release notes highlight security fixes
+Los cambios de seguridad se documentan mediante commits y solicitudes de incorporación; los resultados de análisis pueden adjuntarse a las solicitudes y las notas de versión deben destacar las correcciones de seguridad.
 
-## Contact
+## Contacto
 
-For security concerns, contact:
+- **Incidencias de GitHub:** errores generales que no comprometan la seguridad.
+- **Canales privados del responsable:** vulnerabilidades que requieran divulgación coordinada.
+- **GitHub Security Advisories:** avisos de seguridad, cuando estén habilitados.
 
-- **GitHub Issues**: For general bugs (non-security)
-- **Private Email**: For security vulnerabilities (check GitHub profile)
-- **GitHub Security Advisories**: For disclosed vulnerabilities
+## Reconocimientos
 
-## Acknowledgments
+Se agradece a quienes informan vulnerabilidades de manera responsable. El proyecto original contempla reconocer sus aportes en las notas de versión, este documento y los agradecimientos del proyecto.
 
-We appreciate security researchers who responsibly disclose vulnerabilities. Contributors will be credited in:
+¡Gracias por ayudar a mantener CookieForge seguro! 🔒
 
-- Release notes
-- SECURITY.md (this file)
-- Project acknowledgments
-
-Thank you for helping keep Cookie Cutter Designer secure! 🔒
+**Archivo original conservado:** [docs/originales/SECURITY.md](docs/originales/SECURITY.md).
