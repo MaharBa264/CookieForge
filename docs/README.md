@@ -15,7 +15,8 @@ Los documentos ya traducidos se identifican a continuación. Los restantes se co
 
 ### Arquitectura y mantenimiento
 
-- Pendientes: `AGENT_CONTEXT.md`, `CLAUDE.md`, `ADVANCED_FEATURES.md`, `FEATURES_COMPLETE.md`
+- Traducidos: [CLAUDE.md](../CLAUDE.md) y [ADVANCED_FEATURES.md](../ADVANCED_FEATURES.md)
+- Pendientes: `AGENT_CONTEXT.md`, `FEATURES_COMPLETE.md`
 - Traducido: [SECURITY.md](../SECURITY.md)
 - Traducidos: [AGENT_DECISIONS.md](AGENT_DECISIONS.md), [MAINTENANCE.md](MAINTENANCE.md), [PROJECT_INVARIANTS.md](PROJECT_INVARIANTS.md), [DEPENDENCY_BUNDLE_BUDGETS.md](DEPENDENCY_BUNDLE_BUDGETS.md)
 
@@ -40,11 +41,13 @@ Los documentos ya traducidos se identifican a continuación. Los restantes se co
 - `docs/product/COOKIECAD_V6_ANALYSIS.md`
 - `docs/product/COOKIE_CUTTER_DESIGNER_PRD.md`
 - `docs/product/FEATURE_GAP_MATRIX.md`
-- `GEMINI_API_SETUP.md` y `GEMINI_API_TECHNICAL.md`
+- Traducido: [GEMINI_API_SETUP.md](../GEMINI_API_SETUP.md)
+- Pendiente: `GEMINI_API_TECHNICAL.md`
 
 ### Referencia histórica
 
 - [README original](../UPSTREAM_README.md): se conserva **sin reemplazar** para atribución y consulta del proyecto de origen.
+- [README original traducido íntegramente al español](../UPSTREAM_README_ES.md): consulta en nuestro idioma sin modificar el original.
 - [Licencia MIT](../LICENSE): se conserva su texto legal original, sin traducir ni sustituirlo.
 
 ## Prioridad de traducción para cerrar la fase 3
@@ -67,4 +70,4 @@ El cierre verificable se registra en [PLAN_CIERRE_FASE_3.md](PLAN_CIERRE_FASE_3.
 4. Mantener la documentación histórica claramente identificada.
 5. Revisar enlaces y ejecutar las pruebas automáticas después de cada lote.
 
-**Estado:** traducción en curso. El [README principal](../README.md), la guía de inicio, la guía para colaborar y varios documentos técnicos e informes de validación ya están en español. La traducción íntegra del README histórico se publicará como archivo separado, conservando [UPSTREAM_README.md](../UPSTREAM_README.md) sin cambios. La interfaz y los demás documentos aún requieren revisión.
+**Estado:** traducción en curso. El [README principal](../README.md), la guía de inicio, la guía para colaborar y varios documentos técnicos e informes de validación ya están en español. La [traducción íntegra del README histórico](../UPSTREAM_README_ES.md) ya está publicada por separado; [UPSTREAM_README.md](../UPSTREAM_README.md) permanece intacto. La interfaz y los demás documentos aún requieren revisión.
