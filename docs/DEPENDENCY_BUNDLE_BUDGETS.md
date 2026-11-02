@@ -1,23 +1,25 @@
-# Dependency bundle budgets
+# Límites de tamaño de dependencias y paquetes JavaScript
 
-## Scope
+## Alcance
 
-Svelte 5.57.2, svelte-check 4.7.6, Vite 7.3.7 and Three.js 0.186.1, consolidated from Dependabot #61/#56. No application or persistence logic changed. Limits remain 200 KiB per entry and 600 KiB per other JavaScript chunk.
+Svelte 5.57.2, svelte-check 4.7.6, Vite 7.3.7 y Three.js 0.186.1, consolidados a partir de las solicitudes de Dependabot #61/#56 del proyecto original. No se modificó la lógica de la aplicación ni de persistencia. Los límites siguen siendo **200 KiB por archivo de entrada** y **600 KiB por cada otro fragmento JavaScript**.
 
-The previous configuration grouped Three.js core and all examples (controls, loaders, exporters) into one chunk. Separate those addons from the core and cache the shared Svelte runtime independently. This reduces individual chunk sizes, not necessarily total startup transfer: synchronous dependencies remain synchronous and may be preloaded.
+La configuración anterior agrupaba el núcleo de Three.js y todos sus ejemplos (controles, cargadores y exportadores) en un único fragmento. La solución separa esos complementos del núcleo y permite almacenar en caché, de forma independiente, el entorno compartido de Svelte. Esto reduce el tamaño de cada fragmento, pero no necesariamente la transferencia total al inicio: las dependencias síncronas siguen siendo síncronas y pueden precargarse.
 
-The budget plugin now runs in the post generateBundle phase and counts UTF-8 bytes, including Vite preload rewriting. Three regressions cover phase, exact boundaries and non-ASCII bytes. Final files were measured independently after build.
+El complemento que controla el presupuesto ahora se ejecuta en la fase `post generateBundle` y cuenta bytes UTF-8, incluida la reescritura de precarga de Vite. Tres pruebas de regresión cubren la fase, los límites exactos y los bytes de caracteres no ASCII. Los archivos finales se midieron independientemente después de compilar.
 
-## Actual local evidence
+## Evidencia local obtenida
 
-- Before fix, combined dependency update failed: `three-vendor` 601.6 KiB >600 KiB. Existing #61 CI also showed entry 201.2 KiB >200 KiB.
-- Frozen install successful; audit: no known vulnerabilities.
-- `pnpm check`: 0 errors / 0 warnings.
-- Full Vitest suite: 968 passing tests /64 files, single thread worker, no file parallelism.
-- Production build successful, 677 modules; final entry 162738 bytes, Three.js core 561528 bytes, addons 53740 bytes, Svelte runtime 46981 bytes. Every final JS file below its applicable budget. Thresholds not raised.
-- Chromium smoke against `vite preview` serving actual dist, disposable browser storage: PNG import, current geometry generation and STL download, local save/reload/reopen, 375px no horizontal overflow, zero page/console errors or failed requests.
-- Smoke script outside repository: `/workspace/reports/dependency-bundle-smoke.mjs`. Initial harness attempts failed because export navigation/panel opening was missing; one diagnostic attempt timed out. These are not counted as successful validations. Final complete execution returned all assertions successful and closed browser/server.
+- Antes de la corrección, la actualización conjunta de dependencias fallaba: `three-vendor` ocupaba 601,6 KiB, por encima del límite de 600 KiB. La integración continua existente de #61 también mostraba un archivo de entrada de 201,2 KiB, superior al límite de 200 KiB.
+- Instalación con archivo de bloqueo congelado correcta; auditoría sin vulnerabilidades conocidas.
+- `pnpm check`: 0 errores y 0 advertencias.
+- Batería completa de Vitest: **968 pruebas aprobadas en 64 archivos**, con un solo proceso de trabajo y sin paralelismo entre archivos.
+- Compilación de producción correcta, 677 módulos; archivo de entrada final de 162738 bytes, núcleo de Three.js de 561528 bytes, complementos de 53740 bytes y entorno de Svelte de 46981 bytes. Todos los archivos JavaScript finales quedaron por debajo de su presupuesto correspondiente. No se aumentaron los límites.
+- Prueba funcional con Chromium sobre `vite preview` sirviendo la compilación real, con almacenamiento descartable del navegador: importación PNG, generación de geometría actual y descarga STL, guardado/recarga/reapertura local, ausencia de desbordamiento horizontal a 375 px y cero errores de página, consola o solicitudes fallidas.
+- Script de prueba fuera del repositorio: `/workspace/reports/dependency-bundle-smoke.mjs`. Los intentos iniciales fallaron porque faltaba abrir el panel o navegar hasta la exportación; un intento de diagnóstico agotó el tiempo de espera. Esos intentos **no** se cuentan como validaciones exitosas. La última ejecución completa aprobó todas las aserciones y cerró el navegador y el servidor.
 
-## Limits and delivery
+## Límites y publicación
 
-Not a device or physical printing certification; existing antialiased-circle geometry limitation unchanged. No UI redesign. Dependabot heads are replaced only after verified integration. Require actual Quality/CodeQL checks on PR head and post-merge runs on exact main SHA. Keep branch protections; no admin bypass, force-push or branch deletion. Rollback with dedicated revert PR.
+No constituye una certificación del dispositivo ni de impresión física; permanece sin cambios la limitación geométrica existente de los círculos suavizados (*antialiased*). No se rediseñó la interfaz. Las ramas de Dependabot se reemplazan únicamente después de verificar la integración. Se requieren las comprobaciones reales de Quality/CodeQL en el commit de la solicitud de incorporación y las ejecuciones posteriores a la fusión sobre el SHA exacto de `main`. Deben conservarse las protecciones de rama: sin excepciones de administrador, publicaciones forzadas ni eliminación de ramas. La reversión se realiza mediante una solicitud de incorporación específica que revierta los cambios.
+
+> **Contexto:** las cifras y los números de solicitudes anteriores son evidencia histórica del proyecto original, no resultados medidos nuevamente en CookieForge.
