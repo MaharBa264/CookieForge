@@ -50,7 +50,7 @@ it('offers five stable named mobile destinations and a full-height create entry 
   expect(document.querySelector('.panel-content')?.textContent).toMatch(/import|dessin/i);
   mobileButton('Créer').click(); await tick();
   expect(document.querySelector('[aria-label="Outils de création"]')).not.toBeNull();
-  click('Importer une image'); await tick();
+  click('Importar una imagen'); await tick();
   expect(document.querySelector('.app-layout')?.classList.contains('mobile-choosing')).toBe(false);
   await vi.waitFor(() => expect(document.querySelector('.start-screen')).not.toBeNull());
 });
@@ -70,7 +70,7 @@ it('separates sketch, bridges and batch in the mobile creation flow without chan
   expect(document.querySelector('.panel-content')?.textContent).toMatch(/série|copies/i);
   expect(session.getDocument()).toBe(initial);
   mobileButton('Régler').click(); await tick();
-  expect(document.querySelector('.history-controls button[title^="Annuler"]')).not.toBeNull();
+  expect(document.querySelector('.history-controls button[title^="Deshacer"]')).not.toBeNull();
   mobileButton('Projet').click(); await tick();
   expect(document.querySelector('.panel-content')?.textContent).toMatch(/projet/i);
 });
