@@ -11,37 +11,37 @@
   export let onDelete: (draft: ProjectRecoveryEnvelope) => void;
 </script>
 
-<section class="recovery-panel" aria-label="Brouillons de récupération">
-  <h3>Brouillons de récupération</h3>
+<section class="recovery-panel" aria-label="Borradores de recuperación">
+  <h3>Borradores de recuperación</h3>
   <p role="status">
-    {#if $recovery.saving}Enregistrement du brouillon de récupération…
-    {:else if $recovery.pending}Récupération en attente…
-    {:else if $recovery.error}Récupération non enregistrée
-    {:else if $recovery.savedAt}Récupération enregistrée à {$recovery.savedAt}
-    {:else}Aucune sauvegarde de récupération confirmée pour cette session{/if}
+    {#if $recovery.saving}Guardando el borrador de recuperación…
+    {:else if $recovery.pending}Recuperación pendiente…
+    {:else if $recovery.error}Recuperación sin guardar
+    {:else if $recovery.savedAt}Recuperación guardada el {$recovery.savedAt}
+    {:else}No hay una copia de recuperación confirmada en esta sesión{/if}
   </p>
-  {#if $recovery.error}<p role="alert">Impossible d’enregistrer la récupération : {$recovery.error.message} Réessayez ou exportez une sauvegarde du projet.</p>{/if}
+  {#if $recovery.error}<p role="alert">No se pudo guardar la recuperación: {$recovery.error.message} Volvé a intentarlo o exportá una copia del proyecto.</p>{/if}
   {#if actionError}<p role="alert">{actionError}</p>{/if}
   <div class="actions">
-    <button type="button" data-recovery-refresh aria-label="Actualiser les brouillons de récupération" disabled={busy || $recovery.loading} on:click={onRefresh}>Actualiser les brouillons de récupération</button>
-    <button type="button" disabled={$recovery.disposed || $recovery.saving} on:click={onFlush}>Réessayer l’enregistrement de récupération</button>
+    <button type="button" data-recovery-refresh aria-label="Actualizar borradores de recuperación" disabled={busy || $recovery.loading} on:click={onRefresh}>Actualizar borradores de recuperación</button>
+    <button type="button" disabled={$recovery.disposed || $recovery.saving} on:click={onFlush}>Reintentar guardado de recuperación</button>
   </div>
-  {#if $recovery.loading}<p role="status">Chargement des brouillons de récupération…</p>{/if}
-  {#if $recovery.listError}<p role="alert">Impossible de charger les brouillons de récupération : {$recovery.listError.message}</p><button type="button" disabled={busy || $recovery.loading} on:click={onRefresh}>Réessayer le chargement des brouillons de récupération</button>{/if}
-  {#if $recovery.loaded && !$recovery.drafts.length}<p>Aucun brouillon de récupération dans ce navigateur.</p>{/if}
+  {#if $recovery.loading}<p role="status">Cargando borradores de recuperación…</p>{/if}
+  {#if $recovery.listError}<p role="alert">No se pudieron cargar los borradores de recuperación: {$recovery.listError.message}</p><button type="button" disabled={busy || $recovery.loading} on:click={onRefresh}>Reintentar carga de borradores de recuperación</button>{/if}
+  {#if $recovery.loaded && !$recovery.drafts.length}<p>No hay borradores de recuperación en este navegador.</p>{/if}
   <ul>
     {#each $recovery.drafts as draft (draft.draftId)}
       <li data-draft-id={draft.draftId}>
         <strong>{draft.document.name}</strong>
         <time datetime={draft.savedAt}>{draft.savedAt}</time>
         <div class="actions">
-          <button type="button" data-recovery-resume aria-label={`Reprendre le brouillon ${draft.document.name}, ${draft.savedAt}`} disabled={busy || $recovery.disposed} on:click={() => onResume(draft)}>Reprendre le brouillon</button>
-          <button type="button" data-recovery-delete aria-label={`Supprimer le brouillon ${draft.document.name}, ${draft.savedAt}`} disabled={busy || $recovery.disposed} on:click={() => onDelete(draft)}>Supprimer le brouillon</button>
+          <button type="button" data-recovery-resume aria-label={`Continuar borrador ${draft.document.name}, ${draft.savedAt}`} disabled={busy || $recovery.disposed} on:click={() => onResume(draft)}>Continuar borrador</button>
+          <button type="button" data-recovery-delete aria-label={`Eliminar borrador ${draft.document.name}, ${draft.savedAt}`} disabled={busy || $recovery.disposed} on:click={() => onDelete(draft)}>Eliminar borrador</button>
         </div>
       </li>
     {/each}
   </ul>
-  <p class="hint">Les brouillons de récupération sont distincts des projets enregistrés et restent disponibles après l’enregistrement du projet. Ils restent dans ce navigateur et sur ce site. Exportez un fichier projet .ccd.json pour une sauvegarde transférable. Fermer ou forcer l’arrêt du navigateur peut interrompre un enregistrement en attente.</p>
+  <p class="hint">Los borradores de recuperación son independientes de los proyectos guardados y siguen disponibles después de guardar el proyecto. Permanecen en este navegador y en este sitio. Exportá un archivo .ccd.json para conservar una copia transferible. Cerrar el navegador o forzar su cierre puede interrumpir un guardado pendiente.</p>
 </section>
 
 <style>
