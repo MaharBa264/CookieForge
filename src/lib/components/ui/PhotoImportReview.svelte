@@ -66,7 +66,7 @@
       preparedSettings = key;
     } catch (cause) {
       if (alive && !abort.signal.aborted && token === revision) {
-        error = cause instanceof Error ? cause.message : 'La préparation a échoué. Essayez un recadrage plus serré.';
+        error = cause instanceof Error ? cause.message : 'Falló la preparación. Probá con un recorte más ajustado.';
       }
     } finally {
       if (controller === abort) { controller = null; pending = false; }
@@ -94,57 +94,57 @@
 </script>
 
 <svelte:window on:keydown={event => { if (event.key === 'Escape') { event.preventDefault(); cancel(); } }} />
-<section class="photo-review" aria-label="Préparation de la photo">
-  <h3 bind:this={reviewHeading} tabindex="-1">Préparer la photo</h3>
-  <p>Un objet contrasté sur un fond simple donne le meilleur contour. Recadrez autour de la forme voulue, ajustez le seuil puis vérifiez l’aperçu. Rien ne remplace votre dessin avant confirmation.</p>
+<section class="photo-review" aria-label="Preparación de fotografía">
+  <h3 bind:this={reviewHeading} tabindex="-1">Preparar fotografía</h3>
+  <p>Una figura con buen contraste sobre un fondo sencillo da mejores contornos. Recortá alrededor de la forma, ajustá el umbral y revisá la vista previa. Tu dibujo no se reemplaza hasta que confirmes.</p>
   <div class="previews">
     <figure>
-      {#if originalUrl}<div class="original-crop"><img src={originalUrl} alt="Original à recadrer" /><div class="crop-outline" aria-hidden="true" style:left={`${cropX}%`} style:top={`${cropY}%`} style:width={`${cropWidth}%`} style:height={`${cropHeight}%`}></div></div>{/if}
+      {#if originalUrl}<div class="original-crop"><img src={originalUrl} alt="Original para recortar" /><div class="crop-outline" aria-hidden="true" style:left={`${cropX}%`} style:top={`${cropY}%`} style:width={`${cropWidth}%`} style:height={`${cropHeight}%`}></div></div>{/if}
       <figcaption>Original : {file.name}</figcaption>
     </figure>
     <figure>
-      {#if previewUrl}<img src={previewUrl} alt="Contour préparé" />
-      {:else}<div class="preview-empty">{pending ? 'Préparation…' : 'Aperçu à recalculer'}</div>{/if}
-      <figcaption>Le noir deviendra la forme ; le blanc représente le fond et les trous.</figcaption>
+      {#if previewUrl}<img src={previewUrl} alt="Contorno preparado" />
+      {:else}<div class="preview-empty">{pending ? 'Preparando…' : 'Vista previa pendiente de recalcular'}</div>{/if}
+      <figcaption>El negro representa la figura; el blanco, el fondo y los huecos.</figcaption>
     </figure>
   </div>
   <fieldset>
-    <legend>Recadrage (% de l’image originale)</legend>
+    <legend>Recorte (% de la imagen original)</legend>
     <div class="crop-fields">
-      <label>Gauche (%)<input aria-label="Recadrage photo : gauche" type="number" min="0" max="99" step="0.1" bind:value={cropX} /></label>
-      <label>Haut (%)<input aria-label="Recadrage photo : haut" type="number" min="0" max="99" step="0.1" bind:value={cropY} /></label>
-      <label>Largeur (%)<input aria-label="Recadrage photo : largeur" type="number" min="0.1" max="100" step="0.1" bind:value={cropWidth} /></label>
-      <label>Hauteur (%)<input aria-label="Recadrage photo : hauteur" type="number" min="0.1" max="100" step="0.1" bind:value={cropHeight} /></label>
+      <label>Izquierda (%)<input aria-label="Recorte de foto: izquierda" type="number" min="0" max="99" step="0.1" bind:value={cropX} /></label>
+      <label>Arriba (%)<input aria-label="Recorte de foto: arriba" type="number" min="0" max="99" step="0.1" bind:value={cropY} /></label>
+      <label>Ancho (%)<input aria-label="Recorte de foto: ancho" type="number" min="0.1" max="100" step="0.1" bind:value={cropWidth} /></label>
+      <label>Arribaeur (%)<input aria-label="Recorte de foto: arribaeur" type="number" min="0.1" max="100" step="0.1" bind:value={cropHeight} /></label>
     </div>
-    <p>Gauche + largeur et haut + hauteur ne doivent pas dépasser 100 %. Laissez un peu de fond autour de l’objet.</p>
+    <p>Izquierda + largeur et haut + hauteur ne doivent pas dépasser 100 %. Laissez un peu de fond autour de l’objet.</p>
   </fieldset>
-  <label>Objet à conserver
-    <select aria-label="Objet à conserver sur la photo" value={foreground} on:change={event => foreground = event.currentTarget.value as PhotoSettings['foreground']}>
-      <option value="dark">Sombre sur fond clair</option><option value="light">Clair sur fond sombre</option>
+  <label>Figura que se conserva
+    <select aria-label="Figura que se conserva en la foto" value={foreground} on:change={event => foreground = event.currentTarget.value as PhotoSettings['foreground']}>
+      <option value="dark">Oscura sobre fondo claro</option><option value="light">Clara sobre fondo oscuro</option>
     </select>
   </label>
-  <label class="check"><input type="checkbox" aria-label="Seuil automatique de la photo" bind:checked={automatic} /> Seuil automatique</label>
-  <label>Seuil : {automatic ? (fresh ? result?.diagnostics.threshold : 'automatique') : threshold} / 255
-    <input aria-label="Seuil de la photo" type="range" min="0" max="255" step="1" disabled={automatic} bind:value={threshold} />
+  <label class="check"><input type="checkbox" aria-label="Umbral automático de la foto" bind:checked={automatic} /> Umbral automático</label>
+  <label>Umbral: {automatic ? (fresh ? result?.diagnostics.threshold : 'automático') : threshold} / 255
+    <input aria-label="Umbral de la foto" type="range" min="0" max="255" step="1" disabled={automatic} bind:value={threshold} />
   </label>
-  <label>Retirer les îlots de bruit jusqu’à {minComponentArea} pixels (0 = tout conserver)
-    <input aria-label="Surface du bruit sur la photo" type="range" min="0" max="64" step="1" bind:value={minComponentArea} />
+  <label>Eliminar pequeñas regiones de ruido de hasta {minComponentArea} píxeles (0 = conservar todo)
+    <input aria-label="Tamaño del ruido en la foto" type="range" min="0" max="64" step="1" bind:value={minComponentArea} />
   </label>
-  <label class="check"><input type="checkbox" aria-label="Combler les trous de la photo" bind:checked={fillHoles} /> Silhouette extérieure : combler les trous</label>
-  {#if fillHoles}<p>Cette option supprime volontairement tous les trous intérieurs. Décochez-la pour les conserver.</p>{/if}
+  <label class="check"><input type="checkbox" aria-label="Rellenar los huecos de la foto" bind:checked={fillHoles} /> Silueta exterior: rellenar huecos</label>
+  {#if fillHoles}<p>Esta opción elimina todos los huecos interiores. Desmarcala para conservarlos.</p>{/if}
   {#if error}<p role="alert">{error}</p>{/if}
   {#if fresh && result}
-    <p role="status" aria-live="polite">{result.diagnostics.width} × {result.diagnostics.height} px traités ; {result.diagnostics.components} forme(s), {result.diagnostics.holes} trou(s), {result.diagnostics.removedComponents} îlot(s) retiré(s), {result.diagnostics.filledHoles} trou(s) comblé(s).</p>
+    <p role="status" aria-live="polite">{result.diagnostics.width} × {result.diagnostics.height} px procesados; {result.diagnostics.components} figura(s), {result.diagnostics.holes} hueco(s), {result.diagnostics.removedComponents} regiones eliminadas, {result.diagnostics.filledHoles} hueco(s) comblé(s).</p>
     {#each result.diagnostics.warnings as warning}<p class="warning">{warning}</p>{/each}
-    {#if !result.diagnostics.canApply}<p>Résultat non applicable. Recadrez davantage ou ajustez le seuil et le contraste de la photo.</p>{/if}
-  {:else if pending}<p role="status" aria-live="polite">Calcul dans un traitement local…</p>
-  {:else}<p role="status">Réglages modifiés : recalculez l’aperçu avant de l’appliquer.</p>{/if}
+    {#if !result.diagnostics.canApply}<p>No se puede aplicar el resultado. Ajustá el recorte, el umbral o el contraste.</p>{/if}
+  {:else if pending}<p role="status" aria-live="polite">Procesando localmente…</p>
+  {:else}<p role="status">Cambiaste los ajustes: recalculá la vista previa antes de aplicar.</p>{/if}
   <div class="actions">
-    <button type="button" class="btn" on:click={prepare}>Recalculer l’aperçu photo</button>
-    <button type="button" class="btn btn-primary" disabled={pending || !fresh || !result?.diagnostics.canApply} on:click={apply}>Appliquer le contour photo</button>
-    <button type="button" class="btn" on:click={cancel}>Annuler la préparation photo</button>
+    <button type="button" class="btn" on:click={prepare}>Recalcular vista previa</button>
+    <button type="button" class="btn btn-primary" disabled={pending || !fresh || !result?.diagnostics.canApply} on:click={apply}>Aplicar contorno de la foto</button>
+    <button type="button" class="btn" on:click={cancel}>Cancelar preparación</button>
   </div>
-  <p class="privacy">Traitement local uniquement. Les pixels et ces réglages restent en mémoire ; exportez le projet pour conserver le contour validé. L’aperçu 3D vérifiera ensuite sa géométrie.</p>
+  <p class="privacy">Procesamiento exclusivamente local. La imagen y estos ajustes permanecen en memoria; exportá el proyecto para guardar el contorno confirmado. Después, la vista 3D verificará su geometría.</p>
 </section>
 <style>
   .photo-review { display: grid; gap: var(--spacing-3, 12px); min-width: 0; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; }
