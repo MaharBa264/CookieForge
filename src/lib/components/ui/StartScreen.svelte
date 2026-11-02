@@ -4,14 +4,14 @@
   const dispatch = createEventDispatcher<{ upload: File; reject: string; shapes: void; projects: void }>();
 </script>
 
-<section class="start-screen" aria-label="Commencer un dessin">
-  <h2>Commencer un dessin</h2>
+<section class="start-screen" aria-label="Empezar un diseño">
+  <h2>Empezar un diseño</h2>
   <div class="start-actions">
-    <button type="button" class="btn" on:click={() => dispatch('shapes')}>Formes</button>
-    <button type="button" class="btn" on:click={() => dispatch('projects')}>Reprendre un projet</button>
+    <button type="button" class="btn" on:click={() => dispatch('shapes')}>Formas</button>
+    <button type="button" class="btn" on:click={() => dispatch('projects')}>Continuar un proyecto</button>
   </div>
   <FileUpload on:upload on:reject />
-  <p>Importez une image, choisissez une forme ou reprenez un projet enregistré dans ce navigateur.</p>
+  <p>Importá una imagen, elegí una forma o continuá un proyecto guardado en este navegador.</p>
 </section>
 
 <style>
