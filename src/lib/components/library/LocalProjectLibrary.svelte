@@ -57,35 +57,35 @@
   }
 </script>
 
-<section class="local-library" aria-label="Projets locaux" aria-busy={$workflow.library.loading || confirmingDelete}>
-  <h3>Projets locaux</h3>
-  <p class="hint">Stockés uniquement dans ce navigateur et sur ce site. Conservez un fichier projet exporté comme sauvegarde transférable.</p>
+<section class="local-library" aria-label="Proyectos locales" aria-busy={$workflow.library.loading || confirmingDelete}>
+  <h3>Proyectos locales</h3>
+  <p class="hint">Guardados únicamente en este navegador y en este sitio. Conservá un archivo de proyecto exportado como copia de seguridad transferible.</p>
   <button bind:this={refreshButton} type="button" disabled={busy || $workflow.library.loading}
-    on:click={() => refresh()}>Actualiser les projets locaux</button>
+    on:click={() => refresh()}>Actualizar proyectos locales</button>
   {#if $workflow.library.loading || !$workflow.library.loaded && !$workflow.library.listError}
-    <p role="status">Chargement des projets locaux…</p>
+    <p role="status">Cargando proyectos locales…</p>
   {/if}
   {#if $workflow.library.listError}
-    <p role="alert">Impossible de charger les projets locaux : {$workflow.library.listError.message} Actualisez pour réessayer.</p>
+    <p role="alert">No se pudieron cargar los proyectos locales: {$workflow.library.listError.message} Actualizá para volver a intentar.</p>
   {:else if $workflow.library.loaded && !$workflow.library.loading && !$workflow.library.documents.length}
-    <p role="status">Aucun projet local pour le moment. Enregistrez un projet pour le retrouver ici.</p>
+    <p role="status">Todavía no hay proyectos locales. Guardá uno para encontrarlo acá.</p>
   {/if}
   {#if confirmationError}<p role="alert">{confirmationError}</p>{/if}
   {#if $workflow.error && ($workflow.error.operation === 'open' || $workflow.error.operation === 'delete')}
     <p role="alert">{$workflow.error.message}</p>
   {/if}
-  {#if confirmingDelete}<p role="status">En attente de la confirmation de suppression…</p>{/if}
+  {#if confirmingDelete}<p role="status">Esperando confirmación para eliminar…</p>{/if}
   {#if $workflow.library.documents.length}
     <ul>
       {#each $workflow.library.documents as document (document.id)}
         <li>
           <h4>{document.name}</h4>
-          <p>{document.kind} · Mis à jour le <time datetime={document.updatedAt}>{document.updatedAt}</time></p>
+          <p>{document.kind} · Actualizado el <time datetime={document.updatedAt}>{document.updatedAt}</time></p>
           <div class="actions">
-            <button type="button" aria-label={`Ouvrir ${document.name}`} disabled={busy || $workflow.library.loading}
-              on:click={() => workflow.open(document.id)}>Ouvrir</button>
-            <button type="button" aria-label={`Supprimer ${document.name}`} disabled={busy || $workflow.library.loading}
-              on:click={(event) => remove(document, event)}>Supprimer</button>
+            <button type="button" aria-label={`Abrir ${document.name}`} disabled={busy || $workflow.library.loading}
+              on:click={() => workflow.open(document.id)}>Abrir</button>
+            <button type="button" aria-label={`Eliminar ${document.name}`} disabled={busy || $workflow.library.loading}
+              on:click={(event) => remove(document, event)}>Eliminar</button>
           </div>
         </li>
       {/each}
