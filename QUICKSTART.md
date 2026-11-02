@@ -1,127 +1,72 @@
-# Quick Start Guide - Cookie Cutter Designer
+# Guía de inicio rápido — CookieForge
 
-## Installation & Lancement
+## Requisitos e instalación
+
+Necesitás **Node.js 22.12 o posterior** y **pnpm 10**. Por ahora, esta es una aplicación web que se ejecuta localmente; el instalador de Windows todavía no está disponible.
 
 ```bash
-# 1. Installer les dépendances
-pnpm install
-
-# 2. Lancer le serveur de développement
+git clone https://github.com/MaharBa264/CookieForge.git
+cd CookieForge
+pnpm install --frozen-lockfile
 pnpm run dev
-
-# 3. Ouvrir dans votre navigateur
-# http://localhost:5173/
 ```
 
-## Utilisation Rapide
+Abrí la dirección que muestre la terminal, habitualmente `http://localhost:5173/`.
 
-### Option 1 : Test avec le Cercle
-1. Cliquer sur **"Or Try a Test Circle"**
-2. Ajuster les paramètres dans le panneau de gauche
-3. Voir la prévisualisation 3D en temps réel
-4. Cliquer sur **"Download STL File"** pour exporter
+## Crear un cortante o sello
 
-### Option 2 : Upload d'un Fichier
-1. Glisser-déposer un fichier SVG/PNG/JPG
-2. Ou cliquer pour parcourir vos fichiers
-3. L'application vectorisera automatiquement les images raster
-4. Ajuster les paramètres selon vos besoins
-5. Exporter le fichier STL
+1. Importá un archivo SVG, PNG o JPG, o utilizá la figura de prueba.
+2. Si importaste una imagen rasterizada, revisá el resultado de la vectorización.
+3. Elegí el modo **cortante** o **sello**, según el diseño.
+4. Ajustá tamaño, espesor de pared, altura y demás parámetros disponibles.
+5. Revisá la previsualización 3D y las advertencias de geometría.
+6. Exportá el modelo en STL, OBJ o 3MF para abrirlo en tu laminador de impresión 3D.
 
-## Paramètres Recommandés
+La interfaz original aún contiene algunas etiquetas en otros idiomas. Su traducción se está realizando por etapas.
 
-### Pour un Emporte-Pièce Standard
-- **Épaisseur des parois** : 1.0mm
-- **Hauteur de coupe** : 12mm
-- **Hauteur totale** : 20mm
-- **Angle de dépouille** : 7°
-- **Poignée** : Round (ronde)
+## Parámetros iniciales orientativos
 
-### Pour un Emporte-Pièce Fin et Délicat
-- **Épaisseur des parois** : 0.8mm
-- **Hauteur de coupe** : 10mm
-- **Hauteur totale** : 15mm
-- **Angle de dépouille** : 5°
-- **Poignée** : Flat (plate)
+| Tipo de pieza | Espesor de pared | Altura de corte | Altura total |
+|---|---:|---:|---:|
+| Cortante fino | 0,8 mm | 10 mm | 15 mm |
+| Cortante estándar | 1,0 mm | 12 mm | 20 mm |
+| Cortante robusto | 1,2 mm | 15 mm | 25 mm |
 
-### Pour un Emporte-Pièce Robuste
-- **Épaisseur des parois** : 1.2mm
-- **Hauteur de coupe** : 15mm
-- **Hauteur totale** : 25mm
-- **Angle de dépouille** : 10°
-- **Poignée** : Rectangular (rectangulaire)
+Son valores de partida, **no garantías de resistencia ni de aptitud alimentaria**. El resultado depende de la geometría, el material y la impresora.
 
-## Conseils d'Impression 3D
+## Consejos para preparar imágenes
 
-### Matériau
-- **PLA naturel** (non coloré) pour contact alimentaire
-- Température : 200-210°C
-- Plateau : 50-60°C
+- Preferí imágenes nítidas y de buen contraste.
+- Evitá detalles demasiado pequeños para la boquilla y el tamaño final de impresión.
+- Revisá los huecos interiores y las zonas aisladas del diseño.
+- En imágenes complejas, comprobá que los contornos resultantes coincidan con lo que querés imprimir.
+- Para diseños de varias alturas o relieves, esperá la integración del editor avanzado por trazado: todavía está en desarrollo.
 
-### Paramètres de Slicing
+## Antes de imprimir
+
+1. Abrí el STL o 3MF en un laminador como PrusaSlicer, OrcaSlicer o Cura.
+2. Comprobá las dimensiones en **milímetros** y la orientación de la pieza.
+3. Revisá paredes, capas, soportes y posibles detalles frágiles.
+4. Imprimí primero una pieza de prueba.
+5. Para uso alimentario, evaluá por separado el material, el proceso de fabricación y la limpieza. No presupongas que el PLA o cualquier otro filamento es apto para contacto con alimentos.
+
+## Si algo falla
+
+- **El diseño sale incompleto:** revisá el contraste de la imagen y los contornos vectorizados.
+- **Hay islas separadas:** comprobá las conexiones y los puentes entre partes del cortante.
+- **El modelo es frágil:** aumentá el espesor o simplificá detalles muy finos.
+- **No permite exportar:** leé los mensajes de validación; pueden señalar una geometría abierta o no imprimible.
+- **La imagen es demasiado compleja:** probá con una versión más simple o de mayor contraste.
+
+Para informar un problema, abrí una [incidencia en GitHub](https://github.com/MaharBa264/CookieForge/issues).
+
+## Verificar el código
+
+```bash
+pnpm run check
+pnpm run test:run -- --maxWorkers=1
+pnpm run build
+pnpm run test:smoke
 ```
-Hauteur de couche : 0.2mm
-Infill : 20%
-Périmètres : 2-3
-Vitesse : 40-50mm/s
-Orientation : Pointe de coupe vers le haut (imprimez à l'envers)
-Supports : Non nécessaires
-```
 
-### Test Avant Utilisation
-1. Imprimer un test avec de la pâte à modeler
-2. Vérifier la solidité des parois
-3. Tester le découpage avec de la vraie pâte
-4. Ajuster les paramètres si nécessaire
-
-## Résolution de Problèmes
-
-### L'emporte-pièce est trop fragile
-→ Augmenter l'épaisseur des parois à 1.2mm
-→ Augmenter le nombre de périmètres à 3
-
-### Le découpage n'est pas net
-→ Augmenter la hauteur de coupe
-→ Augmenter l'angle de dépouille à 8-10°
-
-### La pâte colle à l'emporte-pièce
-→ Augmenter l'angle de dépouille
-→ Utiliser de la farine sur la pâte
-
-### Le fichier STL est trop gros
-→ Réduire l'échelle de votre design
-→ Simplifier les détails de votre image
-
-## Formats de Fichiers Supportés
-
-| Format | Type | Recommandation |
-|--------|------|----------------|
-| SVG | Vectoriel | ⭐ Meilleur qualité |
-| PNG | Raster | ✓ Bon (sera vectorisé) |
-| JPG | Raster | ✓ Bon (sera vectorisé) |
-
-## Limites
-
-- Taille maximale de fichier : 10MB
-- Résolution d'image recommandée : 500-2000px
-- Formes complexes peuvent nécessiter simplification
-- Détails < 1mm peuvent ne pas être imprimables
-
-## Astuces Pro
-
-1. **Images simples fonctionnent mieux** : Silhouettes nettes donnent de meilleurs résultats
-2. **Testez d'abord** : Utilisez le cercle de test pour valider vos paramètres d'impression
-3. **Évitez les détails fins** : Les petits détails < 1mm ne seront pas bien imprimés
-4. **Utilisez la vectorisation** : Les PNG/JPG avec bon contraste donnent d'excellents résultats
-5. **Vérifiez les warnings** : L'application vous avertit des problèmes potentiels
-
-## Support
-
-Des problèmes ? Des questions ?
-- Ouvrir une issue sur GitHub
-- Vérifier les warnings dans le panneau de droite
-- Consulter le README.md pour plus de détails
-
----
-
-Bon design ! 🍪
+¡A diseñar! 🍪
