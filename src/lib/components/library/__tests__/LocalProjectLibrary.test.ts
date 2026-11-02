@@ -42,20 +42,20 @@ describe('LocalProjectLibrary', () => {
     expect(row.textContent).toContain(doc.name); expect(row.querySelector('b')).toBeNull();
     expect(row.textContent).toContain('cutter');
     expect(row.querySelector('time')?.getAttribute('datetime')).toBe(doc.updatedAt);
-    const open = button(`Ouvrir ${doc.name}`); expect(open.type).toBe('button'); open.focus();
+    const open = button(`Abrir ${doc.name}`); expect(open.type).toBe('button'); open.focus();
     expect(document.activeElement).toBe(open); open.click();
     await vi.waitFor(() => expect(session.getDocument()?.name).toBe(doc.name));
   });
   it('never bypasses workflow discard or representability guards', async () => {
     const confirmDiscard = vi.fn(async () => 'cancel' as const);
     const { session, doc } = setup(undefined, { confirmDiscard }); await loaded();
-    session.replace(projectDocument('stamp')); await tick(); button(`Ouvrir ${doc.name}`).click();
+    session.replace(projectDocument('stamp')); await tick(); button(`Abrir ${doc.name}`).click();
     await vi.waitFor(() => expect(confirmDiscard).toHaveBeenCalledTimes(1));
     expect(session.getDocument()?.kind).toBe('stamp');
   });
   it('reports open representability failures without replacing the session', async () => {
     const { doc, session } = setup(undefined, { assertRepresentable: () => { throw new Error('Unsupported model'); } });
-    await loaded(); button(`Ouvrir ${doc.name}`).click();
+    await loaded(); button(`Abrir ${doc.name}`).click();
     await vi.waitFor(() => expect(document.querySelector('[role=alert]')?.textContent).toContain('Unsupported model'));
     expect(session.getDocument()).toBeNull();
   });
@@ -64,36 +64,36 @@ describe('LocalProjectLibrary', () => {
     vi.mocked(backend.getAll).mockRejectedValueOnce(new Error('library unavailable'));
     await vi.waitFor(() => expect(document.querySelector('[role=alert]')?.textContent).toContain('library unavailable'));
     expect(document.body.textContent).not.toContain('Aucun projet local');
-    records.clear(); button('Actualiser les projets locaux').click();
+    records.clear(); button('Actualizar proyectos locales').click();
     await vi.waitFor(() => expect(document.body.textContent).toContain('Aucun projet local'));
     expect(document.querySelector('[role=alert]')).toBeNull();
   });
   it('defaults deletion to cancellation without native dialogs', async () => {
-    const { backend, doc } = setup(); await loaded(); button(`Supprimer ${doc.name}`).click(); await tick();
+    const { backend, doc } = setup(); await loaded(); button(`Eliminar ${doc.name}`).click(); await tick();
     expect(backend.delete).not.toHaveBeenCalled(); expect(document.querySelectorAll('li')).toHaveLength(1);
   });
   it('awaits injected confirmation, locks actions while pending and preserves cancellation', async () => {
     let confirm!: (value: boolean) => void;
     const onConfirmDelete = vi.fn(() => new Promise<boolean>(resolve => { confirm = resolve; }));
     const { backend, doc } = setup(onConfirmDelete); await loaded();
-    button(`Supprimer ${doc.name}`).click(); await tick();
+    button(`Eliminar ${doc.name}`).click(); await tick();
     expect(onConfirmDelete).toHaveBeenCalledWith(doc);
-    expect(button(`Ouvrir ${doc.name}`).disabled).toBe(true); expect(button(`Supprimer ${doc.name}`).disabled).toBe(true);
-    confirm(false); await vi.waitFor(() => expect(button(`Supprimer ${doc.name}`).disabled).toBe(false));
+    expect(button(`Abrir ${doc.name}`).disabled).toBe(true); expect(button(`Eliminar ${doc.name}`).disabled).toBe(true);
+    confirm(false); await vi.waitFor(() => expect(button(`Eliminar ${doc.name}`).disabled).toBe(false));
     expect(backend.delete).not.toHaveBeenCalled();
-    button(`Supprimer ${doc.name}`).click(); await tick(); confirm(true);
+    button(`Eliminar ${doc.name}`).click(); await tick(); confirm(true);
     await vi.waitFor(() => expect(document.body.textContent).toContain('Aucun projet local'));
     expect(backend.delete).toHaveBeenCalledWith(doc.id);
-    expect(document.activeElement).toBe(button('Actualiser les projets locaux'));
+    expect(document.activeElement).toBe(button('Actualizar proyectos locales'));
   });
   it('reports delete failures, retains rows and recovers from callback rejection', async () => {
     const onConfirmDelete = vi.fn(async () => true);
     const { backend, doc } = setup(onConfirmDelete); await loaded();
     onConfirmDelete.mockRejectedValueOnce(new Error('Dialog failed'));
-    button(`Supprimer ${doc.name}`).click();
+    button(`Eliminar ${doc.name}`).click();
     await vi.waitFor(() => expect(document.querySelector('[role=alert]')?.textContent).toContain('Dialog failed'));
-    expect(button(`Supprimer ${doc.name}`).disabled).toBe(false);
-    vi.mocked(backend.delete).mockRejectedValueOnce(new Error('delete denied')); button(`Supprimer ${doc.name}`).click();
+    expect(button(`Eliminar ${doc.name}`).disabled).toBe(false);
+    vi.mocked(backend.delete).mockRejectedValueOnce(new Error('delete denied')); button(`Eliminar ${doc.name}`).click();
     await vi.waitFor(() => expect(document.querySelector('[role=alert]')?.textContent).toContain('delete denied'));
     expect(document.querySelectorAll('li')).toHaveLength(1);
   });
@@ -112,7 +112,7 @@ describe('LocalProjectLibrary', () => {
       });
       const { backend, doc } = setup(confirm);
       await loaded();
-      trigger = button(`Supprimer ${doc.name}`);
+      trigger = button(`Eliminar ${doc.name}`);
       trigger.click();
       if (mode === 'double click') trigger.click();
       resolve(false);
@@ -128,7 +128,7 @@ describe('LocalProjectLibrary', () => {
     const { workflow, backend, doc } = setup(() => confirmation);
     await loaded();
     const deletion = vi.spyOn(workflow, 'delete');
-    button(`Supprimer ${doc.name}`).click();
+    button(`Eliminar ${doc.name}`).click();
     await tick();
     await unmount(component!);
     component = undefined;
@@ -147,13 +147,13 @@ describe('LocalProjectLibrary', () => {
       const h = setup(() => confirmation);
       await loaded();
       const deletion = vi.spyOn(h.workflow, 'delete');
-      button(`Supprimer ${h.doc.name}`).click();
+      button(`Eliminar ${h.doc.name}`).click();
       await tick();
       const next = createProjectWorkflow({ session: createDesignSessionStore(), storage: createProjectStorage(h.backend) });
       await next.list();
       h.workflowInput.set(next);
       await tick();
-      const unlockedAfterReplacement = !button(`Supprimer ${h.doc.name}`).disabled;
+      const unlockedAfterReplacement = !button(`Eliminar ${h.doc.name}`).disabled;
       if (outcome === 'confirm') resolve(true);
       else reject(new Error('Obsolete dialog failure'));
       await confirmation.catch(() => undefined);
@@ -162,7 +162,7 @@ describe('LocalProjectLibrary', () => {
       expect(h.backend.delete).not.toHaveBeenCalled();
       expect(document.body.textContent).not.toContain('Obsolete dialog failure');
       expect(unlockedAfterReplacement).toBe(true);
-      expect(button(`Supprimer ${h.doc.name}`).disabled).toBe(false);
+      expect(button(`Eliminar ${h.doc.name}`).disabled).toBe(false);
     });
   }
   it('disables row actions during workflow pending operations and shows initial loading', async () => {
@@ -171,14 +171,14 @@ describe('LocalProjectLibrary', () => {
     let release!: () => void;
     const gate = new Promise<void>(resolve => { release = resolve; });
     const importing = workflow.import({ size: 1, text: async () => { await gate; return 'invalid'; } }); await tick();
-    expect(button(`Ouvrir ${doc.name}`).disabled).toBe(true); expect(button(`Supprimer ${doc.name}`).disabled).toBe(true);
-    release(); await importing; await tick(); expect(button(`Ouvrir ${doc.name}`).disabled).toBe(false);
+    expect(button(`Abrir ${doc.name}`).disabled).toBe(true); expect(button(`Eliminar ${doc.name}`).disabled).toBe(true);
+    release(); await importing; await tick(); expect(button(`Abrir ${doc.name}`).disabled).toBe(false);
   });
   it('exposes explicit refresh without reacting in a list/subscription loop', async () => {
     const { backend, workflow, session } = setup(); await loaded();
     session.replace(projectDocument('stamp')); await workflow.save(); await tick();
     expect(backend.getAll).toHaveBeenCalledTimes(1);
-    button('Actualiser les projets locaux').click();
+    button('Actualizar proyectos locales').click();
     await vi.waitFor(() => expect(document.querySelectorAll('li')).toHaveLength(2));
     expect(backend.getAll).toHaveBeenCalledTimes(2);
   });
