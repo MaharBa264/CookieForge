@@ -76,10 +76,10 @@ it.each(['circle', 'heart'] as const)('%s selects a session-owned mode with one 
     depth.value = value; depth.dispatchEvent(new Event('input', { bubbles: true })); await tick(); await ready(session);
   }
   const saved = session.getDocument()!, savedBytes = bytes(), savedJson = encodeProject(saved);
-  await click('Projets locaux'); await click('Enregistrer le projet'); await vi.waitFor(() => expect(records.get(saved.id)).toEqual(saved));
+  await click('Proyectos locales'); await click('Guardar proyecto'); await vi.waitFor(() => expect(records.get(saved.id)).toEqual(saved));
   await unmount(app!); app = undefined; document.body.innerHTML = '';
-  session = setup(null, records); await click('Projets locaux'); await vi.waitFor(() => expect(document.querySelector('[aria-label="Ouvrir Tampon local"]')).not.toBeNull());
-  await click('Ouvrir Tampon local'); await ready(session);
+  session = setup(null, records); await click('Proyectos locales'); await vi.waitFor(() => expect(document.querySelector('[aria-label="Abrir Tampon local"]')).not.toBeNull());
+  await click('Abrir Tampon local'); await ready(session);
   expect(encodeProject(session.getDocument())).toBe(savedJson); expect(bytes()).toEqual(savedBytes);
   await click('Réglages'); expect(button('Hueco').getAttribute('aria-pressed')).toBe('true');
   const action = await exportPanel(); expect(action.disabled).toBe(false); action.click();
@@ -104,7 +104,7 @@ it('blocks a retained raised mesh synchronously even if generation is cancelled 
   boundary.owner!.cancel(); expect(get(generationState).phase).toBe('ready'); expect(get(model)!.mesh).toBe(mesh);
   action.dispatchEvent(new MouseEvent('click', { bubbles: true })); expect(boundary.stl).not.toHaveBeenCalled();
   await tick(); expect(action.disabled).toBe(true);
-  await click('Projets locaux'); expect(button('Exporter le projet').disabled).toBe(false);
+  await click('Proyectos locales'); expect(button('Exportar proyecto').disabled).toBe(false);
   session.updateParameters('stamp', { stampDepth: 1.5 }); await ready(session);
   const fresh = await exportPanel(); expect(fresh.disabled).toBe(false); fresh.click();
   expect(boundary.stl.mock.calls[0][0]).toBe(get(model)!.mesh); expect(get(model)!.mesh).not.toBe(mesh);
