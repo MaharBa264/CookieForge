@@ -41,29 +41,29 @@
   }
 </script>
 
-<section class="project-manager" aria-label="Projet">
-  <h3>Projet</h3>
-  <label for="project-name">Nom du projet</label>
+<section class="project-manager" aria-label="Proyecto">
+  <h3>Proyecto</h3>
+  <label for="project-name">Nombre del proyecto</label>
   <input id="project-name" type="text" value={nameDraft} on:input={rename}
     disabled={!$session || $workflow.disposed}
     aria-invalid={nameError !== null} aria-describedby={nameError ? 'project-name-error' : undefined} />
   {#if nameError}<p id="project-name-error" role="alert">{nameError}</p>{/if}
-  <p role="status">{#if $workflow.saving}Enregistrement du projet…{:else if !$session}Aucun projet actif{:else if $workflow.dirty}Modifications non enregistrées{:else}Enregistré localement{/if}</p>
+  <p role="status">{#if $workflow.saving}Guardando el proyecto…{:else if !$session}No hay ningún proyecto activo{:else if $workflow.dirty}Cambios sin guardar{:else}Guardado localmente{/if}</p>
   {#if unavailableReason !== null}<p role="status">{unavailableReason}</p>{/if}
   <div class="actions">
-    <button type="button" disabled={saveBlocked} on:click={save}>Enregistrer le projet</button>
+    <button type="button" disabled={saveBlocked} on:click={save}>Guardar proyecto</button>
     <button type="button" disabled={documentUnavailable || ($workflow.pending !== null && $workflow.pending !== 'save')}
-      on:click={() => workflow.export()}>Exporter le projet</button>
-    <button type="button" disabled={transitionBusy} on:click={() => fileInput.click()}>Importer un fichier projet</button>
-    <input bind:this={fileInput} type="file" accept=".ccd.json,.json" aria-label="Fichier projet"
+      on:click={() => workflow.export()}>Exportar proyecto</button>
+    <button type="button" disabled={transitionBusy} on:click={() => fileInput.click()}>Importar archivo de proyecto</button>
+    <input bind:this={fileInput} type="file" accept=".ccd.json,.json" aria-label="Archivo de proyecto"
       disabled={transitionBusy} on:change={importFile} hidden />
   </div>
-  {#if $workflow.saveError}<p role="alert">Impossible d’enregistrer le projet : {$workflow.saveError.message} Réessayez ou exportez une sauvegarde du fichier.</p>{/if}
+  {#if $workflow.saveError}<p role="alert">No se pudo guardar el proyecto: {$workflow.saveError.message} Volvé a intentarlo o exportá una copia del archivo.</p>{/if}
   {#if $workflow.error && $workflow.error !== $workflow.saveError}<p role="alert">{$workflow.error.message}</p>{/if}
   {#if $workflow.warnings.length}
-    <div role="status"><p>Avertissements lors de l’import</p><ul>{#each $workflow.warnings as warning}<li>{warning}</li>{/each}</ul></div>
+    <div role="status"><p>Advertencias de importación</p><ul>{#each $workflow.warnings as warning}<li>{warning}</li>{/each}</ul></div>
   {/if}
-  <p class="hint">Les projets locaux restent dans ce navigateur et sur ce site. Exportez un fichier .ccd.json pour disposer d’une sauvegarde transférable ou changer de navigateur.</p>
+  <p class="hint">Los proyectos locales permanecen en este navegador y en este sitio. Exportá un archivo .ccd.json para tener una copia transferible o cambiar de navegador.</p>
 </section>
 
 <style>
