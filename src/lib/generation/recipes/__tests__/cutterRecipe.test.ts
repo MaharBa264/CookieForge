@@ -542,6 +542,37 @@ describe('cutterRecipe', () => {
     }
   });
 
+  it('V5 genera y exporta seis relieves de alturas diferentes en una envolvente', async () => {
+    const centers = [27, 72, 117];
+    const paths = ['<path d="M0 0 L160 0 L160 160 L0 160 Z"/>'];
+    const bridges: Array<{ id: string; from: { x: number; y: number }; to: { x: number; y: number }; widthMm: number }> = [];
+    const operations: Array<{ pathIndex: number; operation: 'cut' | 'emboss'; depthMm?: number }> =
+      [{ pathIndex: 0, operation: 'cut' }];
+    for (let i = 0; i < 6; i++) {
+      const right = i >= 3, y = centers[i % 3], x0 = right ? 120 : 25, x1 = right ? 135 : 40;
+      paths.push(`<path d="M${x0} ${y-7} L${x1} ${y-7} L${x1} ${y+7} L${x0} ${y+7} Z"/>`);
+      bridges.push({ id: `link-${i}`, from: { x: right ? 160 : 0, y }, to: { x: right ? 135 : 25, y }, widthMm: 2 });
+      operations.push({ pathIndex: i+1, operation: 'emboss', depthMm: 0.5 + i*0.4 });
+    }
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160">${paths.join('')}</svg>`;
+    const params = { ...createDefaultCutterParameters(), taperAngle: 0, enableHandle: false, handleStyle: 'none' as const };
+    const document = { ...createCutterDocument(params, svg), schemaVersion: 5 as const,
+      bridges, contourOperations: operations };
+    const artifacts = await cutterRecipe.generate(document, generationContext(new AbortController().signal));
+    try {
+      expect(artifacts).toHaveLength(1);
+      expect(artifacts[0].validation.valid, artifacts[0].validation.errors.join('\n')).toBe(true);
+      expect(artifacts[0].validation.shells).toBe(1);
+      const stl = serializeSTL(artifacts[0].object, true);
+      expect(stl).toBeInstanceOf(DataView);
+      if (!(stl instanceof DataView)) throw Error('Se esperaba STL binario');
+      expect(stl.byteLength).toBe(84 + artifacts[0].validation.triangles * 50);
+      expect(serialize3MF(artifacts[0].object, params).byteLength).toBeGreaterThan(100);
+    } finally {
+      for (const artifact of artifacts) disposeObject3D(artifact.object);
+    }
+  });
+
   it('V5 falla cerrado si Relieve carece de puente o conserva un mango', async () => {
     const svg = '<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0 L100 0 L100 100 L0 100 Z"/><path d="M30 30 L70 30 L70 70 L30 70 Z"/></svg>';
     const bridge = { id: 'join', from: { x: 0, y: 50 }, to: { x: 30, y: 50 }, widthMm: 2 };
