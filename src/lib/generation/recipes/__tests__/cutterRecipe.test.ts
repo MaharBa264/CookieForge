@@ -30,6 +30,7 @@ import {
   logicalTriangleHash
 } from '../../../utils/__tests__/legacyGeometryFixtureSupport';
 import { installSvgLoaderDomParserAdapter } from '../../../utils/__tests__/svgDomTestSupport';
+import { encodeProject, decodeProject } from '../../../projects/projectCodec';
 import { cutterRecipe } from '../cutterRecipe';
 
 vi.mock('../../../utils/cookieCutterGenerator', async (importOriginal) => {
@@ -589,7 +590,13 @@ describe('cutterRecipe', () => {
         { pathIndex: 1, operation: 'emboss' as const, depthMm: 0.9 },
         { pathIndex: 2, operation: 'emboss' as const, depthMm: 2.2 }
       ] };
-    const artifacts = await cutterRecipe.generate(document, generationContext(new AbortController().signal));
+    // Flujo completo de entrega: guardar .ccd.json, reabrir, regenerar y exportar.
+    const serializedProject = encodeProject(document);
+    const reopened = decodeProject(serializedProject);
+    expect(reopened.warnings).toEqual([]);
+    expect(reopened.document).toEqual(document);
+    expect(reopened.document.schemaVersion).toBe(5);
+    const artifacts = await cutterRecipe.generate(reopened.document, generationContext(new AbortController().signal));
     try {
       expect(artifacts).toHaveLength(1);
       expect(artifacts[0].validation.valid, artifacts[0].validation.errors.join('\n')).toBe(true);
