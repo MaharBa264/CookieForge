@@ -4,7 +4,7 @@
 
 CookieForge es una adaptación de [Cookie Cutter Designer](https://github.com/razorglyon/cookie-cutter-designer). Permite importar imágenes **SVG, PNG y JPG**, convertirlas en contornos, configurar dimensiones en milímetros, previsualizar modelos tridimensionales y exportar archivos **STL, OBJ y 3MF**.
 
-> **Estado del proyecto:** versión base importada y validada. Estamos desarrollando un editor avanzado para asignar operaciones y dimensiones a cada trazado. Esta función todavía **no** está integrada al motor 3D ni al formato de guardado.
+> **Estado del proyecto:** versión 1.0 **en preparación**, no publicada. En la rama `feature/advanced-contour-editor` ya hay operaciones persistentes V5 por contorno y geometría exportable para hasta seis relieves interiores **cerrados**, conectados por una red de puentes sin ciclos, con restricciones de topología. Las líneas abiertas y Grabado no generan geometría V5. Aún falta validar una carta piloto real y hacer un ensayo de impresión con masa. Consultá el [contrato de cierre 1.0](docs/CIERRE_COOKIEFORGE_1_0.md).
 
 ## Funciones disponibles
 
@@ -41,13 +41,11 @@ pnpm run test:smoke
 
 La integración continua ejecuta estas comprobaciones en GitHub Actions. Consultá [la guía de inicio](QUICKSTART.md) y [las instrucciones para colaborar](CONTRIBUTING.md).
 
-## Desarrollo previsto
+## Camino a la versión 1.0
 
-1. Traducir la documentación y la interfaz al español.
-2. Seleccionar trazados y asignarles funciones individuales: corte, relieve, hueco o ignorar.
-3. Guardar estas propiedades en una nueva versión de documento, manteniendo la compatibilidad con V1–V4.
-4. Integrar las propiedades con la generación y validación de modelos 3D.
-5. Preparar una distribución sin conexión para Windows y evaluar una versión para Android.
+La prioridad ya no es ampliar indefinidamente las funciones: es completar una **carta piloto del tarot celestial**, guardar y reabrir el proyecto, exportar un cortante y un sello cuando corresponda, comprobarlos en un laminador y probar físicamente su impresión y marcado sobre masa. La [lista de aceptación y funciones aplazadas](docs/CIERRE_COOKIEFORGE_1_0.md) fija el alcance antes de publicar la versión.
+
+La aplicación de escritorio sin conexión, Android y las herramientas CAD más avanzadas quedan para versiones posteriores.
 
 Los avances experimentales se desarrollan en la rama `feature/advanced-contour-editor`; `main` conserva la base estable.
 
