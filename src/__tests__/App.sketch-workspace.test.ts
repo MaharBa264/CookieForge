@@ -23,7 +23,7 @@ it('integrates current sketch, one-step history, fresh generation, save and relo
  const storage = createProjectStorage({ put: async document => { records.set(document.id, document); }, get: async id => records.get(id), getAll: async () => [...records.values()], delete: async id => { records.delete(id); } });
  app = mount(App, { target: document.body.appendChild(document.createElement('div')), props: { projectSession: session, projectStorage: storage } });
  await vi.waitFor(() => expect(get(generationState).phase).toBe('ready'), { timeout: 10000 });
- click('Création avancée'); await vi.waitFor(() => expect(document.querySelector('.sketch-workspace')).not.toBeNull(), { timeout: 10000 });
+ click('Creación avanzada'); await vi.waitFor(() => expect(document.querySelector('.sketch-workspace')).not.toBeNull(), { timeout: 10000 });
  expect(session.getDocument()).toBe(baseline); const length = historyStore.getLength();
  const point = document.querySelector('.sketch-workspace circle')!;
  point.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true })); await tick();
