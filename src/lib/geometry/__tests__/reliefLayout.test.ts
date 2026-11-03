@@ -113,7 +113,7 @@ describe('diagnóstico topológico de primer relieve', () => {
     }));
     expect(ready.topologyReady, ready.reason).toBe(true);
     expect(ready.detailProfiles).toHaveLength(6);
-    expect(ready.detailProfiles?.map(p => p.clearanceMm)).toEqual([0.5,0.9,1.3,1.7,2.1,2.5]);
+    expect(ready.detailProfiles?.map(p => Number(p.clearanceMm.toFixed(2)))).toEqual([0.5,0.9,1.3,1.7,2.1,2.5]);
     const invalid = assessFirstReliefLayout(fixture({
       sketch: { svg: svg6, revision: 1 }, bridges,
       contourOperations: [...operations, { pathIndex: 7, operation: 'emboss' }]
