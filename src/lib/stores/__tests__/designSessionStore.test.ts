@@ -116,6 +116,36 @@ describe('Cutter V5 contour assignment history', () => {
     expect(session.getDocument()).toMatchObject({ schemaVersion: 5, contourOperations: [] });
     expect(session.getDocument()?.source).toEqual(before.source);
   });
+  it('edita profundidades por contorno sin alterar SVG, mantiene historial y rechaza valores inválidos', () => {
+    const svg = '<svg viewBox="0 0 20 20"><path d="M0 0L20 0L20 20Z"/><path d="M5 5L10 5L10 10Z"/></svg>';
+    const base = projectDocument();
+    const session = createDesignSessionStore({ ...base, sketch: { svg, revision: 0 } }, { now: () => NEXT });
+    session.updateContourOperation(1, 'emboss');
+    const beforeDepth = session.getDocument()!;
+    session.updateContourDepth(1, 1.5);
+    const afterDepth = session.getDocument()!;
+    expect(afterDepth).toMatchObject({ schemaVersion: 5, contourOperations: [{ pathIndex: 1, operation: 'emboss', depthMm: 1.5 }] });
+    expect(afterDepth.sketch).toEqual(beforeDepth.sketch);
+    expect(Object.isFrozen(afterDepth)).toBe(true);
+    expect(Object.isFrozen((afterDepth as Extract<DesignDocument, { schemaVersion: 5 }>).contourOperations[0])).toBe(true);
+    session.restoreHistory(beforeDepth, session.getSessionEpoch());
+    expect(session.getDocument()).toEqual(beforeDepth);
+    session.restoreHistory(afterDepth, session.getSessionEpoch());
+    expect(session.getDocument()).toEqual(afterDepth);
+    session.updateContourOperation(1, 'engrave');
+    expect(session.getDocument()).toMatchObject({ contourOperations: [{ pathIndex: 1, operation: 'engrave', depthMm: 1.5 }] });
+    session.updateContourOperation(1, 'cut');
+    expect(session.getDocument()).toMatchObject({ contourOperations: [{ pathIndex: 1, operation: 'cut' }] });
+    const current = session.getDocument();
+    expect(() => session.updateContourDepth(1, 1)).toThrow();
+    expect(session.getDocument()).toBe(current);
+    session.updateContourOperation(1, 'emboss');
+    for (const invalid of [0, 0.2, 3.1, Number.NaN, Infinity]) {
+      const snapshot = session.getDocument();
+      expect(() => session.updateContourDepth(1, invalid)).toThrow();
+      expect(session.getDocument()).toBe(snapshot);
+    }
+  });
   it('rejects operation assignment on a stamp and preserves the active snapshot', () => {
     const session = createDesignSessionStore(projectDocument('stamp'));
     const before = session.getDocument();
