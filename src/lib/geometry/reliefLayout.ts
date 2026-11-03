@@ -105,51 +105,74 @@ export function assessFirstReliefLayout(document: CutterDocumentV5): ReliefLayou
   if (!Number.isFinite(dimension) || dimension <= 0) return failed('Dimensiones del SVG inválidas.');
   const scale = document.parameters.targetSize / dimension;
   if (document.bridges.length !== details.length) {
-    return failed('Cada detalle requiere un puente explícito hacia el contorno exterior.');
+    return failed('La red requiere exactamente un puente por detalle interior.');
   }
   try {
     validateConnectorLayout(contours, document.bridges, scale, document.parameters.wallThickness);
   } catch { return failed('Los puentes deben conectar contornos distintos, sin cruzarse ni ser demasiado cortos.'); }
 
-  // La asociación se verifica por extremos; no basta con contar puentes.
+  // Identificamos cada extremo sin adivinar: los trazados de la red forman un
+  // árbol conectado y sin ciclos con raíz en el filo exterior. Los puentes
+  // pueden ir de un detalle a otro, no sólo hacia el contorno de corte.
   const tolerance = Math.max(0.001, Math.min(document.parameters.wallThickness, 1) / scale);
+  const bridgeEdges: Array<{ bridgeId: string; a: number; b: number }> = [];
+  for (const bridge of document.bridges) {
+    const endpoint = (point: Readonly<{ x: number; y: number }>): number | null => {
+      const matches = contours.map((contour, index) => nearContour(point, contour, tolerance) ? index : -1)
+        .filter(index => index !== -1);
+      return matches.length === 1 ? matches[0] : null;
+    };
+    const a = endpoint(bridge.from), b = endpoint(bridge.to);
+    if (a === null || b === null || a === b) {
+      return failed('Cada extremo de puente debe tocar exactamente un contorno distinto.');
+    }
+    // No atravesar ninguna isla ajena a los dos extremos del puente.
+    for (let index = 0; index < contours.length; index++) {
+      if (index === a || index === b) continue;
+      if (isInside(bridge.from, contours[index]) || isInside(bridge.to, contours[index]) ||
+          segmentCrossesPolygon(bridge.from, bridge.to, contours[index])) {
+        return failed('Un puente atraviesa otro detalle interior; cambiá su recorrido.');
+      }
+    }
+    bridgeEdges.push({ bridgeId: bridge.id, a, b });
+  }
+
+  const visited = new Set<number>([outerPathIndex]);
+  const parents = new Map<number, string>();
+  let frontier = [outerPathIndex];
+  while (frontier.length) {
+    const next: number[] = [];
+    for (const current of frontier) {
+      for (const edge of bridgeEdges) {
+        const other = edge.a === current ? edge.b : edge.b === current ? edge.a : -1;
+        if (other < 0 || visited.has(other)) continue;
+        visited.add(other);
+        parents.set(other, edge.bridgeId);
+        next.push(other);
+      }
+    }
+    frontier = next;
+  }
+  if (visited.size !== contours.length || parents.size !== details.length) {
+    return failed('Todos los detalles deben estar conectados al borde exterior mediante una red continua.');
+  }
+  // El número de puentes coincide con el número de detalles: red conexa
+  // implica árbol; nunca una unión circular con alturas contradictorias.
   const detailProfiles: Array<{ pathIndex: number; clearanceMm: number; bridgeId: string }> = [];
   for (const detail of details) {
-    const matching = document.bridges.filter(bridge =>
-      (nearContour(bridge.from, outer, tolerance) && nearContour(bridge.to, contours[detail.pathIndex], tolerance)) ||
-      (nearContour(bridge.to, outer, tolerance) && nearContour(bridge.from, contours[detail.pathIndex], tolerance))
-    );
-    if (matching.length !== 1) {
-      return failed('Cada puente debe unir directamente el exterior con un único relieve.');
-    }
+    const bridgeId = parents.get(detail.pathIndex);
+    if (!bridgeId) return failed('Un detalle no tiene conexión al exterior.');
     const clearanceMm = detail.depthMm ?? 1.2;
     if (!Number.isFinite(clearanceMm) || clearanceMm <= 0 ||
         clearanceMm >= document.parameters.cuttingHeight) {
       return failed('La altura interior debe ser menor que la altura del cuerpo cortante.');
     }
-    detailProfiles.push({ pathIndex: detail.pathIndex, clearanceMm, bridgeId: matching[0].id });
-  }
-  // Un puente no debe atravesar otro detalle: una unión topológica aparentemente
-  // correcta podría elevar la cara de un relieve ajeno y deformar el marcador.
-  for (const profile of detailProfiles) {
-    const bridge = document.bridges.find(b => b.id === profile.bridgeId);
-    if (!bridge) return failed('Falta un puente requerido.');
-    for (const other of detailProfiles) {
-      if (other.pathIndex === profile.pathIndex) continue;
-      const polygon = contours[other.pathIndex];
-      if (isInside(bridge.from, polygon) || isInside(bridge.to, polygon) ||
-          segmentCrossesPolygon(bridge.from, bridge.to, polygon)) {
-        return failed('Un puente atraviesa otro detalle interior; cambiá su recorrido.');
-      }
-    }
-  }
-  if (new Set(detailProfiles.map(p => p.bridgeId)).size !== details.length) {
-    return failed('Cada relieve debe utilizar su propio puente.');
+    detailProfiles.push({ pathIndex: detail.pathIndex, clearanceMm, bridgeId });
   }
   const first = detailProfiles[0];
   return Object.freeze({
     topologyReady: true,
-    reason: `Exterior unido a ${details.length} detalle(s) mediante puentes independientes.`,
+    reason: `Red conectada de ${details.length} detalle(s) interiores, sin ciclos.`,
     outerPathIndex,
     detailPathIndex: first.pathIndex,
     markingClearanceMm: first.clearanceMm,
