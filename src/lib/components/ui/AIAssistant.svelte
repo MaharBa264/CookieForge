@@ -183,7 +183,7 @@
     aria-expanded={showPanel}
     aria-controls="ai-assistant-panel"
   >
-    🤖 Assistant IA {#if !apiKey}<span class="badge">Sin conexión</span>{/if}
+    🤖 Asistente de IA {#if !apiKey}<span class="badge">Sin conexión</span>{/if}
   </button>
 
   {#if showPanel}
@@ -277,7 +277,7 @@
                 onclick={optimizeSVG}
                 disabled={isProcessing || !svgContent}
               >
-                {isProcessing ? 'Analizando…' : 'Analizar le SVG'}
+                {isProcessing ? 'Analizando…' : 'Analizar SVG'}
               </button>
               <p class="hint">Revisá la consola del navegador (F12) para ver las recomendaciones detalladas.</p>
             </div>
