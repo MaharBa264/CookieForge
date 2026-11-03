@@ -60,7 +60,7 @@ it('separates sketch, bridges and batch in the mobile creation flow without chan
   await vi.waitFor(() => expect(get(generationState).phase).toBe('ready'), { timeout: 10000 });
   const initial = session.getDocument();
   mobileButton('Crear').click(); await tick();
-  click('Atelier 2D et ponts');
+  click('Editor 2D y puentes');
   await vi.waitFor(() => expect(document.querySelector('.sketch-workspace')).not.toBeNull(), { timeout: 10000 });
   expect(document.querySelector('.app-layout')?.classList.contains('mobile-workshop-sketch')).toBe(true);
   click('Ponts'); await tick();
@@ -78,7 +78,7 @@ it('separates sketch, bridges and batch in the mobile creation flow without chan
 it('returns to the sketch instead of leaving an empty bridge tab after changing to Stamp', async () => {
   const session = setup(true);
   await vi.waitFor(() => expect(get(generationState).phase).toBe('ready'), { timeout: 10000 });
-  mobileButton('Crear').click(); await tick(); click('Atelier 2D et ponts'); await tick();
+  mobileButton('Crear').click(); await tick(); click('Editor 2D y puentes'); await tick();
   click('Ponts'); await tick();
   expect(document.querySelector('.app-layout')?.classList.contains('mobile-workshop-bridges')).toBe(true);
   session.changeKind('stamp'); await tick();
