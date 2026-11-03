@@ -180,9 +180,9 @@ it('rejects forged viewer deletion without changing document, ownership or expor
   await ready(); const mesh = get(model)!.mesh as THREE.Group;
   expect(mesh.children).toHaveLength(2);
   const intersect = vi.spyOn(THREE.Raycaster.prototype, 'intersectObject').mockReturnValue([{ object: mesh.children[0], distance: 1, point: new THREE.Vector3() }]);
-  button('Activer le mode sélection').click(); await tick();
+  button('Activar modo selección').click(); await tick();
   document.querySelector('canvas')!.dispatchEvent(new MouseEvent('click', { bubbles: true })); await tick();
-  expect(button('Supprimer l’élément sélectionné').disabled).toBe(true); intersect.mockRestore();
+  expect(button('Eliminar elemento seleccionado').disabled).toBe(true); intersect.mockRestore();
   const original = session.getDocument(), epoch = session.getSessionEpoch(), state = get(generationState);
   const geometry = (mesh.children[0] as THREE.Mesh).geometry, disposed = vi.spyOn(geometry, 'dispose');
   for (const dispatch of viewerEvents.dispatchers) dispatch('deleteObject', mesh.children[0]);
@@ -208,9 +208,9 @@ it.each(['heterogeneous', 'legacy-unknown'])('omits global geometry claims for %
   const batch = get(model)!.mesh;
   const part = batch.children[0] instanceof THREE.Mesh ? batch.children[0] : batch.children[0].children[0];
   const intersect = vi.spyOn(THREE.Raycaster.prototype, 'intersectObject').mockReturnValue([{ object: part, distance: 1, point: new THREE.Vector3() }]);
-  button('Activer le mode sélection').click(); await tick();
+  button('Activar modo selección').click(); await tick();
   document.querySelector('canvas')!.dispatchEvent(new MouseEvent('click', { bubbles: true })); await tick();
-  expect(button('Supprimer l’élément sélectionné').disabled).toBe(true); intersect.mockRestore();
+  expect(button('Eliminar elemento seleccionado').disabled).toBe(true); intersect.mockRestore();
   const action = await exportPanel('3mf');
   expect(action.disabled).toBe(false); action.click();
   expect(downloads.mf).toHaveBeenCalledTimes(1); expect(downloads.mf.mock.calls[0][0]).toBe(batch);
