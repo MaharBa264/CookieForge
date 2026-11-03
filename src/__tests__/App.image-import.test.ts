@@ -239,7 +239,7 @@ it('blocked photo and edited controls cannot apply an unreviewed contour', async
   expect(apply.disabled).toBe(true); apply.click(); expect(session.getDocument()).toBe(original);
   click('Recalcular vista previa'); await vi.waitFor(() => expect(photo.calls).toHaveLength(2));
   photo.calls[1].resolve(photoResult(svg)); await settled(); expect(apply.disabled).toBe(false);
-  const noise = document.querySelector<HTMLInputElement>('[aria-label="Surface du bruit sur la photo"]')!;
+  const noise = document.querySelector<HTMLInputElement>('[aria-label="Tamaño del ruido en la foto"]')!;
   noise.value = '4'; noise.dispatchEvent(new Event('input', { bubbles: true })); await tick();
   expect(apply.disabled).toBe(true); expect(session.getDocument()).toBe(original);
 });
@@ -264,7 +264,7 @@ it('photo setting changes cancel in-flight computation and ignore its reply', as
   await upload(new File(['photo'], 'camera.jpg', { type: 'image/jpeg' }));
   await vi.waitFor(() => expect(photo.calls).toHaveLength(1), { timeout: 10000 });
   const pending = photo.calls[0];
-  const noise = document.querySelector<HTMLInputElement>('[aria-label="Surface du bruit sur la photo"]')!;
+  const noise = document.querySelector<HTMLInputElement>('[aria-label="Tamaño del ruido en la foto"]')!;
   noise.value = '4'; noise.dispatchEvent(new Event('input', { bubbles: true })); await tick();
   expect(pending.signal?.aborted).toBe(true);
   pending.resolve(photoResult(svg)); await settled();
