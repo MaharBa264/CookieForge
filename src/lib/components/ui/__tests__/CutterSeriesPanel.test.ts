@@ -16,7 +16,7 @@ function start(document = initial) {
 it('opening the existing batch entry does not promote or change a project', async () => {
   const { update } = start(); await tick();
   expect(update).not.toHaveBeenCalled();
-  expect(document.body.textContent).toContain('Série enregistrable');
+  expect(document.body.textContent).toContain('Serie que se puede guardar');
   expect(document.querySelector('#series-copies')).not.toBeNull();
 });
 it('applies one explicit, bounded layout without creating runtime meshes', async () => {
