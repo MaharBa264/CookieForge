@@ -132,7 +132,7 @@ export function createDesignDocumentStore(
     },
     updateContourOperation(pathIndex: number, operation: ContourOperation | 'unassigned'): void {
       const current = get(internal);
-      if (current.kind !== 'cutter' || current.schemaVersion === 3 || current.schemaVersion === 4) {
+      if (current.kind !== 'cutter') {
         throw new Error('Las operaciones por contorno solo están disponibles en cortantes individuales.');
       }
       if (!Number.isSafeInteger(pathIndex) || pathIndex < 0 || pathIndex > 1023) throw new RangeError('Índice de contorno inválido.');
