@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import * as THREE from 'three';
 import {
   afterAll,
@@ -166,8 +167,8 @@ async function captureFailure(
 describe('stampRecipe', () => {
 
   it('piloto La Estrella XVII: guarda, abre y exporta cortante 75x125 y sello interior', async () => {
-    const cutterSvg = readFileSync(new URL('../../../../../examples/tarot-estrella-xvii/cortante.svg', import.meta.url), 'utf8');
-    const stampSvg = readFileSync(new URL('../../../../../examples/tarot-estrella-xvii/sello-piloto.svg', import.meta.url), 'utf8');
+    const cutterSvg = readFileSync(resolve(process.cwd(), 'examples/tarot-estrella-xvii/cortante.svg'), 'utf8');
+    const stampSvg = readFileSync(resolve(process.cwd(), 'examples/tarot-estrella-xvii/sello-piloto.svg'), 'utf8');
     const cutterParams = {
       ...createDefaultCutterParameters(), targetSize: 125, sizeMode: 'height' as const,
       taperAngle: 0, enableHandle: false, handleStyle: 'none' as const
