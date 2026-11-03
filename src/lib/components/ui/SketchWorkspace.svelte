@@ -16,6 +16,14 @@
   $: model = svg ? inspectSketch(svg) : null;
   $: path = model?.paths[pathIndex];
   $: selected = path?.points[pointIndex];
+  $: if (model && pathIndex >= model.paths.length) { pathIndex = 0; pointIndex = 0; cancel(); }
+  function chooseContour(index: number): void {
+    if (index === pathIndex) return;
+    cancel(); pathIndex = index; pointIndex = 0; message = '';
+  }
+  function contourKey(event: KeyboardEvent, index: number): void {
+    if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); chooseContour(index); }
+  }
   $: if (selected) { x = selected.x; y = selected.y; }
   $: box = model?.viewBox.split(' ').map(Number) ?? [0, 0, 100, 100];
   $: radius = Math.max(box[2], box[3]) / 45;
@@ -61,29 +69,40 @@
   <h2>Editor de dibujo 2D</h2>
   <p>Modificá el dibujo sin alterar el archivo original. Arrastrá un punto, usá las flechas o ingresá sus coordenadas. Escape cancela el desplazamiento.</p>
   {#if model && document}
-    <label>Contour
-      <select bind:value={pathIndex} on:change={() => { cancel(); pointIndex = 0; }}>
+    <label>Contorno
+      <select value={pathIndex} on:change={event => chooseContour(Number(event.currentTarget.value))}>
         {#each model.paths as candidate, index}<option value={index}>Trazado {index + 1}{candidate.reason ? ' — conservado (solo lectura)' : ''}</option>{/each}
       </select>
     </label>
     <svg bind:this={canvas} class="canvas" viewBox={model.viewBox} role="group" aria-label="Dibujo actual y puntos editables"
       on:pointermove={move} on:pointerup={finish} on:pointercancel={cancel} on:lostpointercapture={cancel}>
       <image href={'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg)} x={box[0]} y={box[1]} width={box[2]} height={box[3]} />
+      {#each model.paths as candidate, index}
+        {#if !candidate.reason && candidate.segments.length}
+          <path d={candidate.segments.map(segment => segment.command + segment.values.join(' ')).join(' ')}
+            class="contour-target" class:active={pathIndex === index}
+            fill="none" vector-effect="non-scaling-stroke"
+            role="button" tabindex="0" aria-label={`Seleccionar contorno ${index + 1}`}
+            aria-pressed={pathIndex === index}
+            on:click={() => chooseContour(index)} on:keydown={event => contourKey(event, index)} />
+        {/if}
+      {/each}
       {#if path && !path.reason}
         {#each path.points as point, index}
           <circle cx={point.x} cy={point.y} r={hitRadius} class="point-hit"
-            role="button" tabindex="0" aria-label={`${point.control ? 'Contrôle' : 'Ancrage'} ${index + 1}`}
+            role="button" tabindex="0" aria-label={`${point.control ? 'Control' : 'Anclaje'} ${index + 1}`}
             on:focus={() => pointIndex = index} on:keydown={event => key(event, index)} on:pointerdown={event => begin(event, index)} />
           <circle cx={point.x} cy={point.y} r={radius} class:control={point.control} class:selected={pointIndex === index}
             aria-hidden="true" pointer-events="none" />
         {/each}
       {/if}
     </svg>
+    <p class="notice">Seleccioná un contorno haciendo clic en su línea o desde la lista. El contorno activo se destaca en azul. La selección no modifica el diseño.</p>
     {#if path?.reason}<p role="status">{path.reason}</p>{/if}
     {#if !model.paths.length}<p role="status">No hay trazados editables. Las formas SVG originales se conservan sin convertir.</p>{/if}
     {#each model.notices as notice}<p class="notice">{notice}</p>{/each}
     {#if selected && path && !path.reason}
-      <label>Point <select bind:value={pointIndex} on:change={cancel}>{#each path.points as point, index}<option value={index}>{point.control ? 'Contrôle' : 'Ancrage'} {index + 1}</option>{/each}</select></label>
+      <label>Punto <select bind:value={pointIndex} on:change={cancel}>{#each path.points as point, index}<option value={index}>{point.control ? 'Control' : 'Anclaje'} {index + 1}</option>{/each}</select></label>
       <div class="coordinates">
         <label>X <input type="number" step="any" bind:value={x} /></label>
         <label>Y <input type="number" step="any" bind:value={y} /></label>
@@ -109,6 +128,9 @@
   select, input, button { font: inherit; min-height: 44px; max-width: 100%; border: 1px solid var(--border-color, #cbd5e1); border-radius: 6px; padding: .5rem; }
   button { cursor: pointer; } button:disabled { opacity: .5; cursor: not-allowed; }
   .canvas { width: 100%; aspect-ratio: 1; background: #fff; border: 1px solid #64748b; touch-action: none; }
+  .contour-target { fill: none; stroke: transparent; stroke-width: 12px; pointer-events: stroke; cursor: pointer; }
+  .contour-target.active { stroke: #2563eb; stroke-opacity: .4; }
+  .contour-target:focus-visible { stroke: #2563eb; stroke-opacity: .65; outline: 2px solid #2563eb; }
   circle { fill: #fff; stroke: #2563eb; stroke-width: 1; cursor: grab; }
   circle.point-hit { fill: transparent; stroke: transparent; }
   circle.control { fill: #fef3c7; } circle.selected { fill: #60a5fa; }
