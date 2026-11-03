@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { DesignSessionStore } from '../../stores/designSessionStore';
-  import type { DesignDocument, ContourOperation } from '../../domain/designDocument';
+  import { CONTOUR_DETAIL_DEPTH, type DesignDocument, type ContourOperation } from '../../domain/designDocument';
   import { inspectSketch, editSketch, commitSketch, type SketchCommand } from '../../sketch/sketchCommands';
   export let session: DesignSessionStore;
   let pathIndex = 0;
@@ -20,6 +20,10 @@
   $: operations = document?.schemaVersion === 5
     ? Object.fromEntries(document.contourOperations.map(item => [item.pathIndex, item.operation])) as Record<number, ContourOperation>
     : {};
+  $: selectedAssignment = document?.schemaVersion === 5
+    ? document.contourOperations.find(item => item.pathIndex === pathIndex)
+    : undefined;
+  $: detailMode = selectedAssignment?.operation === 'emboss' || selectedAssignment?.operation === 'engrave';
   $: if (document && gesture && (document !== gesture.baseline || session.getSessionEpoch() !== gesture.epoch)) cancel();
   $: svg = draft ?? document?.sketch.svg ?? '';
   $: model = svg ? inspectSketch(svg) : null;
@@ -31,6 +35,11 @@
     message = '';
     try { session.updateContourOperation(pathIndex, value); }
     catch (cause) { message = cause instanceof Error ? cause.message : 'No se pudo guardar la operación.'; }
+  }
+  function setDepth(value: number): void {
+    message = '';
+    try { session.updateContourDepth(pathIndex, value); }
+    catch (cause) { message = cause instanceof Error ? cause.message : 'No se pudo modificar la profundidad.'; }
   }
   function chooseContour(index: number): void {
     if (index === pathIndex) return;
@@ -124,6 +133,18 @@
           </select>
         </label>
         <p role="status">Operación asignada: {operationLabels[operations[pathIndex] ?? 'unassigned']}.</p>
+        {#if detailMode}
+          <label>Profundidad de marcado (mm)
+            <input type="number" aria-label="Profundidad de marcado (mm)"
+              min={CONTOUR_DETAIL_DEPTH.minMm}
+              max={Math.min(CONTOUR_DETAIL_DEPTH.maxMm, document.parameters.cuttingHeight)}
+              step="0.1"
+              value={selectedAssignment?.depthMm ?? CONTOUR_DETAIL_DEPTH.defaultMm}
+              on:change={event => setDepth(Number(event.currentTarget.value))} />
+          </label>
+          <p class="notice">La profundidad es independiente por contorno y se guarda en el proyecto. Rango: 0,4 a 3 mm, sin superar la altura de corte. Todavía no se fabrica en 3D.</p>
+        {/if}
+
         <p class="notice">La operación forma parte del documento y participa de Deshacer/Rehacer. Usá Guardar proyecto o Exportar proyecto para conservarla después de cerrar. Corte conserva el contorno e Ignorar lo excluye del STL solamente en SVG simples con trazados independientes. Relieve y Grabado aún no generan geometría: bloquean la exportación hasta que se implementen. Si editás el SVG, se limpian las asignaciones para evitar índices incorrectos.</p>
       </div>
     {/if}
