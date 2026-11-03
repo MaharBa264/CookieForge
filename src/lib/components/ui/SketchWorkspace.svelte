@@ -2,6 +2,7 @@
   import type { DesignSessionStore } from '../../stores/designSessionStore';
   import { CONTOUR_DETAIL_DEPTH, type DesignDocument, type ContourOperation } from '../../domain/designDocument';
   import { inspectSketch, editSketch, commitSketch, type SketchCommand } from '../../sketch/sketchCommands';
+  import { assessFirstReliefLayout } from '../../geometry/reliefLayout';
   export let session: DesignSessionStore;
   let pathIndex = 0;
   let pointIndex = 0;
@@ -24,6 +25,8 @@
     ? document.contourOperations.find(item => item.pathIndex === pathIndex)
     : undefined;
   $: detailMode = selectedAssignment?.operation === 'emboss' || selectedAssignment?.operation === 'engrave';
+  $: reliefLayout = document?.schemaVersion === 5 && document.contourOperations.some(item => item.operation === 'emboss')
+    ? assessFirstReliefLayout(document) : null;
   $: if (document && gesture && (document !== gesture.baseline || session.getSessionEpoch() !== gesture.epoch)) cancel();
   $: svg = draft ?? document?.sketch.svg ?? '';
   $: model = svg ? inspectSketch(svg) : null;
@@ -134,6 +137,16 @@
         <span><i class="legend-ignored" aria-hidden="true"></i>Ignorar</span>
       </div>
       <p class="notice">Vista 2D de las asignaciones; los colores no garantizan que los relieves sean imprimibles.</p>
+      {#if reliefLayout}
+        <div class="layout-status" role="status">
+          <strong>Comprobación topológica del relieve: {reliefLayout.topologyReady ? 'configuración compatible' : 'pendiente'}</strong>
+          <p>{reliefLayout.reason}</p>
+          {#if reliefLayout.topologyReady}
+            <p>Altura de separación de la punta de corte: {reliefLayout.markingClearanceMm} mm.
+            Este análisis no habilita la exportación; todavía falta construir y validar la malla 3D.</p>
+          {/if}
+        </div>
+      {/if}
     {/if}
     {#if path && !path.reason && document.kind === 'cutter'}
       <div class="operation-draft" aria-label="Operación del contorno">
@@ -210,6 +223,7 @@
   circle.point-hit { fill: transparent; stroke: transparent; }
   circle.control { fill: #fef3c7; } circle.selected { fill: #60a5fa; }
   circle:focus { outline: none; stroke: #111827; stroke-width: 2; }
+  .layout-status { display: grid; gap: .375rem; padding: .65rem; border: 1px solid var(--border-color, #cbd5e1); border-radius: 6px; }
   .operation-draft { display: grid; gap: .375rem; padding: .75rem; border: 1px dashed var(--border-color, #cbd5e1); border-radius: 6px; }
   .coordinates, .tools { display: flex; flex-wrap: wrap; gap: .5rem; }
   .coordinates label { flex: 1; width: 80px; } .coordinates input { width: 100%; box-sizing: border-box; }
