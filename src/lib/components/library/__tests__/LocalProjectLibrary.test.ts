@@ -63,9 +63,9 @@ describe('LocalProjectLibrary', () => {
     const { backend, records } = setup();
     vi.mocked(backend.getAll).mockRejectedValueOnce(new Error('library unavailable'));
     await vi.waitFor(() => expect(document.querySelector('[role=alert]')?.textContent).toContain('library unavailable'));
-    expect(document.body.textContent).not.toContain('Aucun projet local');
+    expect(document.body.textContent).not.toContain('Todavía no hay proyectos locales');
     records.clear(); button('Actualizar proyectos locales').click();
-    await vi.waitFor(() => expect(document.body.textContent).toContain('Aucun projet local'));
+    await vi.waitFor(() => expect(document.body.textContent).toContain('Todavía no hay proyectos locales'));
     expect(document.querySelector('[role=alert]')).toBeNull();
   });
   it('defaults deletion to cancellation without native dialogs', async () => {
@@ -82,7 +82,7 @@ describe('LocalProjectLibrary', () => {
     confirm(false); await vi.waitFor(() => expect(button(`Eliminar ${doc.name}`).disabled).toBe(false));
     expect(backend.delete).not.toHaveBeenCalled();
     button(`Eliminar ${doc.name}`).click(); await tick(); confirm(true);
-    await vi.waitFor(() => expect(document.body.textContent).toContain('Aucun projet local'));
+    await vi.waitFor(() => expect(document.body.textContent).toContain('Todavía no hay proyectos locales'));
     expect(backend.delete).toHaveBeenCalledWith(doc.id);
     expect(document.activeElement).toBe(button('Actualizar proyectos locales'));
   });
@@ -167,7 +167,7 @@ describe('LocalProjectLibrary', () => {
   }
   it('disables row actions during workflow pending operations and shows initial loading', async () => {
     const { workflow, doc } = setup();
-    expect(document.body.textContent).not.toContain('Aucun projet local'); await loaded();
+    expect(document.body.textContent).not.toContain('Todavía no hay proyectos locales'); await loaded();
     let release!: () => void;
     const gate = new Promise<void>(resolve => { release = resolve; });
     const importing = workflow.import({ size: 1, text: async () => { await gate; return 'invalid'; } }); await tick();
