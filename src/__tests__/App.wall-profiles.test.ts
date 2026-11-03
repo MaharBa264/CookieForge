@@ -109,7 +109,7 @@ it.each([1, 2] as const)('V%s profiles use one history step and the same documen
   const savedStl = stl();
   await click('Proyectos locales');
   await click('Guardar proyecto');
-  await vi.waitFor(() => expect(document.querySelector('.project-manager [role="status"]')?.textContent).toBe('Enregistré localement'));
+  await vi.waitFor(() => expect(document.querySelector('.project-manager [role="status"]')?.textContent).toBe('Guardado localmente'));
   expect(records.get(saved.id)).toEqual(saved);
   await unmount(app!);
   app = undefined;
