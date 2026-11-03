@@ -42,7 +42,7 @@
     cleanSVG,
     terminateImageProcessor
   } from './lib/utils/imageProcessor';
-  import { exportToSTL, estimateSTLSize, formatFileSize } from './lib/utils/stlExportacióner';
+  import { exportToSTL, estimateSTLSize, formatFileSize } from './lib/utils/stlExporter';
   import { applyMaterialToMesh, type MaterialPreset } from './lib/utils/materialManager';
   import type { SavedDesign } from './lib/utils/cloudGallery';
   import { disposeObject3D } from './lib/utils/disposeThree';
@@ -123,20 +123,20 @@
   let publishedGenerationResult: GenerationResult | null = null;
   let scheduledProjectEpoch = -1;
   const generatedMeshEpochs = new WeakMap<THREE.Object3D, number>();
-  let externalExportación: { mesh: ModelObject; params: Readonly<CookieCutterParams> | undefined; current: () => boolean } | null = null;
+  let externalExport: { mesh: ModelObject; params: Readonly<CookieCutterParams> | undefined; current: () => boolean } | null = null;
 
   function geometryKey(document: DesignDocument): string {
     // Match the integration's semantic generation key, not name/timestamps/view.
     return JSON.stringify([document.kind, document.sketch, document.parameters, document.schemaVersion !== 1 ? document.bridges : [], document.schemaVersion === 3 ? document.layout : null, document.schemaVersion === 4 ? document.imprintMode : null]);
   }
 
-  function captureGeometryExportación(): { mesh: ModelObject; params: Readonly<CookieCutterParams> | undefined; filename: string } | null {
+  function captureGeometryExport(): { mesh: ModelObject; params: Readonly<CookieCutterParams> | undefined; filename: string } | null {
     if (!alive || !currentMesh) return null;
     if (unavailableReason !== null) {
       // External batches own a separate publication/context proof; never fall
       // back to the retained single-design preview or mutable legacy parameters.
-      if (!externalExportación || externalExportación.mesh !== currentMesh || !externalExportación.current()) return null;
-      return { mesh: currentMesh, params: externalExportación.params, filename: fileName };
+      if (!externalExport || externalExport.mesh !== currentMesh || !externalExport.current()) return null;
+      return { mesh: currentMesh, params: externalExport.params, filename: fileName };
     }
     const document = session.getDocument();
     const state = generationOrchestrator.getState();
@@ -149,16 +149,16 @@
     } catch { return null; }
   }
 
-  let geometryExportaciónAvailable = false;
+  let geometryExportAvailable = false;
   // DOM state is advisory: every handler also queries the synchronous owner.
   $: {
     // Explicit dependencies: the live query intentionally reads owner state,
     // not potentially stale child props or an earlier derived snapshot.
     void $session; void $generationState; void currentMesh;
-    void unavailableReason; void externalExportación; void sourceRevision;
-    geometryExportaciónAvailable = captureGeometryExportación() !== null;
+    void unavailableReason; void externalExport; void sourceRevision;
+    geometryExportAvailable = captureGeometryExport() !== null;
   }
-  $: geometryExportaciónReason = geometryExportaciónAvailable ? null : 'Generá el modelo actual antes de exportar su geometría.';
+  $: geometryExportReason = geometryExportAvailable ? null : 'Generá el modelo actual antes de exportar su geometría.';
   const pendingExternalDisposals = new Set<ModelObject>();
   const pendingBatchObjects = new Set<ModelObject>();
   const disposedExternalObjects = new WeakSet<THREE.Object3D>();
@@ -345,7 +345,7 @@
     },
     confirmCollision: async incoming => {
       const choice = await ask('Ya existe un proyecto', `¿Importar ${incoming.name} como copia o reemplazar el proyecto existente?`, [
-        { id: 'cancel', label: 'Cancelar' }, { id: 'copy', label: '¿Importar une copie' },
+        { id: 'cancel', label: 'Cancelar' }, { id: 'copy', label: 'Importar una copia' },
         { id: 'replace', label: 'Remplacer le projet', destructive: true }
       ]);
       return choice === 'copy' ? 'copy' : choice === 'replace' ? 'replace' : 'cancel';
@@ -369,7 +369,7 @@
       cancelImageImport();
       importError = null;
       unavailableReason = null;
-      externalExportación = null;
+      externalExport = null;
       $uploadedFile = null;
       sessionRaster = null;
       if (session.getDocument() === null) {
@@ -553,7 +553,7 @@
       return alive && accepted;
     } catch (cause) {
       if (alive && revision === sourceRevision && epoch === session.getSessionEpoch()) {
-        $error = cause instanceof Error ? cause.message : 'No se pudo cargar el dessin';
+        $error = cause instanceof Error ? cause.message : 'No se pudo cargar el diseño';
         $isProcessing = false;
       }
       return false;
@@ -721,8 +721,8 @@
     }
   }
 
-  function handleExportación() {
-    const snapshot = captureGeometryExportación();
+  function handleExport() {
+    const snapshot = captureGeometryExport();
     if (!snapshot) return;
 
     try {
@@ -801,7 +801,7 @@
       console.error('Error loading design:', galleryError);
       $error = galleryError instanceof Error
         ? galleryError.message
-        : 'No se pudo cargar el dessin';
+        : 'No se pudo cargar el diseño';
       $isProcessing = false;
     }
   }
@@ -843,7 +843,7 @@
       if (!current()) return;
       await replaceCurrentMesh(batch, displayParams);
       if (!current()) return;
-      externalExportación = { mesh: batch, params: batchParams, current };
+      externalExport = { mesh: batch, params: batchParams, current };
       fileName = 'batch-production.stl';
       unavailableReason = 'La vista previa de una serie no se puede guardar ni exportar como proyecto V1. Creá o abrí un proyecto compatible.';
       observeRecovery();
@@ -1029,7 +1029,7 @@
           class:active={activeCategory === 'upload'}
           on:click={() => activeCategory = 'upload'}
           title="Importer"
-          aria-label="¿Importar un dessin"
+          aria-label="Importar un diseño"
           aria-current={activeCategory === 'upload' ? 'page' : undefined}
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1168,7 +1168,7 @@
             class:active={activeCategory === 'export'}
             on:click={() => activeCategory = 'export'}
             title="Exportación"
-            aria-label="Exportaciónar diseño"
+            aria-label="Exportar diseño"
             aria-current={activeCategory === 'export' ? 'page' : undefined}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1202,7 +1202,7 @@
         <section class="mobile-create-menu" aria-label="Herramientas de creación">
           <h2>Crear un cortante</h2>
           <p>Elegí una etapa. Podés volver a los ajustes o al visor 3D en cualquier momento.</p>
-          <button type="button" on:click={() => selectMobileCategory('upload')}>¿Importar une image</button>
+          <button type="button" on:click={() => selectMobileCategory('upload')}>Importar una imagen</button>
           <button type="button" on:click={() => selectMobileCategory('shapes')}>Elegir una figura</button>
           <button type="button" on:click={() => selectMobileCategory('advanced')}>Atelier 2D et ponts</button>
           {#if batchAvailable}<button type="button" on:click={() => selectMobileCategory('batch')}>Serie de cortantes</button>{/if}
@@ -1298,17 +1298,17 @@
           </nav>
           <div class="advanced-ai">
           {#await import('./lib/components/ui/AIImageProcessor.svelte')}
-            <div class="panel-loading" role="status">Cargando traitement d’image…</div>
+            <div class="panel-loading" role="status">Cargando procesamiento de imágenes…</div>
           {:then component}
             <component.default captureOperationValidity={captureAIOperationValidity} onProcessedImage={handleContextualAIImage} />
           {:catch}
-            <div class="panel-load-error" role="alert">No se pudo cargar el traitement d’image.</div>
+            <div class="panel-load-error" role="alert">No se pudo cargar el procesamiento de imágenes.</div>
           {/await}
           </div>
           <HistoryPanel on:undo={handleUndo} on:redo={handleRedo} />
           <div class="advanced-sketch">
           {#await import('./lib/components/ui/SketchWorkspace.svelte')}
-            <div class="panel-loading" role="status">Cargando l’atelier 2D…</div>
+            <div class="panel-loading" role="status">Cargando editor 2D…</div>
           {:then component}
             {#if unavailableReason === null}
               {#key $session?.id}
@@ -1318,30 +1318,30 @@
               <p role="status">Ouvrez un projet pour modifier son dessin.</p>
             {/if}
           {:catch}
-            <div class="panel-load-error" role="alert">No se pudo cargar atelier 2D.</div>
+            <div class="panel-load-error" role="alert">No se pudo cargar el editor 2D.</div>
           {/await}
           </div>
           <div class="advanced-bridges">
           {#if unavailableReason === null && ($session?.kind === 'cutter' || $session?.kind === 'multi-cutter')}
             {#await import('./lib/components/ui/BridgeWorkspace.svelte')}
-              <div class="panel-loading" role="status">Cargando l’éditeur de ponts…</div>
+              <div class="panel-loading" role="status">Cargando editor de puentes…</div>
             {:then component}
               {#key $session?.id}<component.default {session} />{/key}
             {:catch}
-              <div class="panel-load-error" role="alert">No se pudo cargar éditeur de ponts.</div>
+              <div class="panel-load-error" role="alert">No se pudo cargar el editor de puentes.</div>
             {/await}
           {/if}
           </div>
           <div class="advanced-extra">
           {#await import('./lib/components/ui/PatternGenerator.svelte')}
-            <div class="panel-loading" role="status">Cargando générateur de motifs…</div>
+            <div class="panel-loading" role="status">Cargando generador de patrones…</div>
           {:then component}
             <component.default on:patternCreated={(e) => handleShapeSelect(e.detail)} />
           {:catch}
-            <div class="panel-load-error" role="alert">No se pudo cargar el générateur de motifs.</div>
+            <div class="panel-load-error" role="alert">No se pudo cargar el generador de patrones.</div>
           {/await}
           {#await import('./lib/components/ui/BooleanOperations.svelte')}
-            <div class="panel-loading" role="status">Cargando opérations booléennes…</div>
+            <div class="panel-loading" role="status">Cargando operaciones booleanas…</div>
           {:then component}
             <component.default on:shapeCreated={(e) => handleShapeSelect(e.detail)} />
           {:catch}
@@ -1355,14 +1355,14 @@
             <p>Connectez Gemini pour obtenir de l’aide sur le dessin actuel.</p>
           </header>
           {#await import('./lib/components/ui/GeminiAPIConfig.svelte')}
-            <div class="panel-loading" role="status">Cargando la configuration Gemini…</div>
+            <div class="panel-loading" role="status">Cargando configuración de Gemini…</div>
           {:then component}
             <component.default />
           {:catch}
-            <div class="panel-load-error" role="alert">No se pudo cargar la configuration Gemini.</div>
+            <div class="panel-load-error" role="alert">No se pudo cargar la configuración de Gemini.</div>
           {/await}
           {#await import('./lib/components/ui/AIAssistant.svelte')}
-            <div class="panel-loading" role="status">Cargando l’assistant IA…</div>
+            <div class="panel-loading" role="status">Cargando asistente de IA…</div>
           {:then component}
             <component.default
               params={$params}
@@ -1371,12 +1371,12 @@
               onOptimizedSVG={handleContextualAISVG}
             />
           {:catch}
-            <div class="panel-load-error" role="alert">No se pudo cargar assistant IA.</div>
+            <div class="panel-load-error" role="alert">No se pudo cargar el asistente de IA.</div>
           {/await}
 
         {:else if activeCategory === 'gallery'}
           {#await import('./lib/components/ui/CloudGallery.svelte')}
-            <div class="panel-loading" role="status">Cargando la galerie locale…</div>
+            <div class="panel-loading" role="status">Cargando galería local…</div>
           {:then component}
             <component.default
               currentSvg={svgCache}
@@ -1384,42 +1384,42 @@
               on:loadDesign={handleLoadFromGallery}
             />
           {:catch}
-            <div class="panel-load-error" role="alert">No se pudo cargar la galerie locale.</div>
+            <div class="panel-load-error" role="alert">No se pudo cargar la galería local.</div>
           {/await}
 
         {:else if activeCategory === 'materials' && $model}
           {#await import('./lib/components/ui/MaterialManager.svelte')}
-            <div class="panel-loading" role="status">Cargando matériaux…</div>
+            <div class="panel-loading" role="status">Cargando materiales…</div>
           {:then component}
             <component.default on:materialChanged={handleMaterialChange} />
           {:catch}
             <div class="panel-load-error" role="alert">No se pudieron cargar las matériaux.</div>
           {/await}
           {#await import('./lib/components/ui/OptimizationPanel.svelte')}
-            <div class="panel-loading" role="status">Cargando outils d’optimisation…</div>
+            <div class="panel-loading" role="status">Cargando herramientas de optimización…</div>
           {:then component}
             <component.default on:applyFix={(e) => updateParams(e.detail)} />
           {:catch}
             <div class="panel-load-error" role="alert">No se pudieron cargar las outils d’optimisation.</div>
           {/await}
           {#await import('./lib/components/ui/CollisionDetector.svelte')}
-            <div class="panel-loading" role="status">Cargando détecteur de collisions…</div>
+            <div class="panel-loading" role="status">Cargando detector de colisiones…</div>
           {:then component}
             <component.default mesh={currentMesh} buildPlateSize={$params.buildPlateSize} allowPositionFix={false} />
           {:catch}
-            <div class="panel-load-error" role="alert">No se pudo cargar el détecteur de collisions.</div>
+            <div class="panel-load-error" role="alert">No se pudo cargar el detector de colisiones.</div>
           {/await}
 
         {:else if activeCategory === 'preview' && $model}
           {#await import('./lib/components/ui/SlicePreview.svelte')}
-            <div class="panel-loading" role="status">Cargando l’aperçu des couches…</div>
+            <div class="panel-loading" role="status">Cargando vista de capas…</div>
           {:then component}
             <component.default mesh={currentMesh} layerHeight={0.2} />
           {:catch}
-            <div class="panel-load-error" role="alert">No se pudo cargar aperçu des couches.</div>
+            <div class="panel-load-error" role="alert">No se pudo cargar la vista de capas.</div>
           {/await}
           {#await import('./lib/components/ui/PrintabilityInfo.svelte')}
-            <div class="panel-loading" role="status">Cargando informations d’impression…</div>
+            <div class="panel-loading" role="status">Cargando información de impresión…</div>
           {:then component}
             <component.default />
           {:catch}
@@ -1428,7 +1428,7 @@
 
         {:else if activeCategory === 'batch' && batchAvailable}
           {#await import('./lib/components/ui/BatchMode.svelte')}
-            <div class="panel-loading" role="status">Cargando mode série…</div>
+            <div class="panel-loading" role="status">Cargando modo de series…</div>
           {:then component}
             <component.default
               currentSvg={svgCache}
@@ -1442,20 +1442,20 @@
               on:batchCreated={handleBatchCreated}
             />
           {:catch}
-            <div class="panel-load-error" role="alert">No se pudo cargar el mode série.</div>
+            <div class="panel-load-error" role="alert">No se pudo cargar el modo de series.</div>
           {/await}
 
         {:else if activeCategory === 'export' && $model}
-          {#await import('./lib/components/ui/AdvancedExportación.svelte')}
-            <div class="panel-loading" role="status">Cargando outils d’export…</div>
+          {#await import('./lib/components/ui/AdvancedExport.svelte')}
+            <div class="panel-loading" role="status">Cargando herramientas de exportación…</div>
           {:then component}
             <component.default mesh={currentMesh} filename={fileName} params={$params}
-              captureExportación={captureGeometryExportación} unavailableReason={geometryExportaciónReason} />
+              captureExport={captureGeometryExport} unavailableReason={geometryExportReason} />
           {:catch}
             <div class="panel-load-error" role="alert">No se pudieron cargar las outils d’export.</div>
           {/await}
         {:else if activeCategory === 'export'}
-          <div class="feature-header"><h2>Exportación</h2><p>Importez ou ouvrez un projet pour exporter son fichier. Si une série ne peut pas être générée, corrigez sa disposition dans Créer → Serie de cortantes.</p></div>
+          <div class="feature-header"><h2>Exportación</h2><p>Importá o abrí un proyecto para exportar su archivo. Si no se puede generar una serie, corregí su disposición en Crear → Serie de cortantes.</p></div>
         {/if}
         {#if recoveryPanelVisible}
           <div class="recovery-area" class:mobile-recovery-away={activeCategory !== 'projects'}>
