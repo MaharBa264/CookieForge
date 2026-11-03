@@ -60,11 +60,11 @@ it('lists recovery on startup without auto-restoring or writing', async () => {
   const { session, put, expected } = setup(); await listed();
   expect(document.body.textContent).toContain(expected.document.name);
   expect(session.getDocument()).toBeNull(); expect(put).not.toHaveBeenCalled();
-  expect(document.querySelectorAll('[aria-label="Brouillons de récupération"]')).toHaveLength(1);
+  expect(document.querySelectorAll('[aria-label="Borradores de recuperación"]')).toHaveLength(1);
 });
 it('keeps empty startup unobstructed and exposes the empty recovery list from Local projects', async () => {
   const { session, put } = setup(null, { empty: true }); await tick(); await tick();
-  expect(document.querySelector('[aria-label="Brouillons de récupération"]')).toBeNull(); expect(session.getDocument()).toBeNull(); expect(put).not.toHaveBeenCalled();
+  expect(document.querySelector('[aria-label="Borradores de recuperación"]')).toBeNull(); expect(session.getDocument()).toBeNull(); expect(put).not.toHaveBeenCalled();
   click('Proyectos locales'); await vi.waitFor(() => expect(document.body.textContent).toContain('No hay borradores de recuperación en este navegador'));
   expect(button('Actualizar borradores de recuperación').disabled).toBe(false);
 });
@@ -143,7 +143,7 @@ it('explicit save retains recovery drafts and independent saved-local status', a
   const { expected, drafts } = setup(); await listed(); resume().click(); await ready();
   window.dispatchEvent(new Event('pagehide')); await vi.waitFor(() => expect(drafts.size).toBe(2));
   click('Proyectos locales'); await tick(); click('Guardar proyecto'); await vi.waitFor(() => expect(document.body.textContent).toContain('Guardado localmente'));
-  expect(drafts.get(expected.draftId)).toEqual(expected); expect(drafts.size).toBe(2); expect(document.body.textContent).toContain('Récupération enregistrée');
+  expect(drafts.get(expected.draftId)).toEqual(expected); expect(drafts.size).toBe(2); expect(document.body.textContent).toContain('Recuperación guardada');
 });
 it('recovery storage failure keeps project export backup available and retry works', async () => {
   let fail = true; const { drafts } = setup(fixture('Current'), { put: async () => { if (fail) throw new Error('recovery disk full'); } }); await listed();
