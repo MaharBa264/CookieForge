@@ -21,7 +21,7 @@
   }
 
   function removeLayer(id: string) {
-    if (confirm('Supprimer ce calque ?')) {
+    if (confirm('¿Eliminar esta capa?')) {
       dispatch('removeLayer', id);
     }
   }
@@ -90,15 +90,15 @@
 
 <div class="layer-manager">
   <div class="header">
-    <h3>Calques</h3>
+    <h3>Capas</h3>
     <div class="add-buttons">
-      <button class="add-btn cutter" on:click={() => addNewLayer('cutter')} title="Ajouter un calque de découpe">
+      <button class="add-btn cutter" on:click={() => addNewLayer('cutter')} title="Agregar capa de corte">
         ✂️
       </button>
-      <button class="add-btn stamp" on:click={() => addNewLayer('stamp')} title="Ajouter un calque de tampon">
+      <button class="add-btn stamp" on:click={() => addNewLayer('stamp')} title="Agregar capa de sello">
         🔖
       </button>
-      <button class="add-btn emboss" on:click={() => addNewLayer('emboss')} title="Ajouter un calque de gravure">
+      <button class="add-btn emboss" on:click={() => addNewLayer('emboss')} title="Agregar capa de grabado">
         ⚡
       </button>
     </div>
@@ -107,8 +107,8 @@
   <div class="layers-list">
     {#if layers.length === 0}
       <div class="empty-state">
-        <p>Aucun calque pour le moment</p>
-        <span>Ajoutez un calque pour commencer</span>
+        <p>Todavía no hay capas</p>
+        <span>Agregá una capa para comenzar</span>
       </div>
     {:else}
       {#each layers as layer (layer.id)}
@@ -129,7 +129,7 @@
             class="visibility-btn"
             class:visible={layer.visible}
             on:click|stopPropagation={() => toggleLayerVisibility(layer.id)}
-            title={layer.visible ? 'Masquer le calque' : 'Afficher le calque'}
+            title={layer.visible ? 'Ocultar capa' : 'Mostrar capa'}
           >
             {layer.visible ? '👁️' : '👁️‍🗨️'}
           </button>
@@ -143,9 +143,9 @@
               value={layer.name}
               on:click|stopPropagation
               on:input={(e) => handleLayerUpdate({ ...layer, name: e.currentTarget.value })}
-              placeholder="Nom du calque"
+              placeholder="Nombre de capa"
             />
-            <span class="layer-type">{layer.type === 'cutter' ? 'Découpe' : layer.type === 'stamp' ? 'Tampon' : 'Gravure'}</span>
+            <span class="layer-type">{layer.type === 'cutter' ? 'Corte' : layer.type === 'stamp' ? 'Sello' : 'Grabado'}</span>
           </div>
 
           {#if layer.type !== 'cutter'}
@@ -165,7 +165,7 @@
           <button
             class="delete-btn"
             on:click|stopPropagation={() => removeLayer(layer.id)}
-            title="Supprimer le calque"
+            title="Eliminar capa"
           >
             🗑️
           </button>
@@ -176,10 +176,10 @@
 
   <div class="layer-info-panel">
     <p class="hint">
-      💡 Glissez les calques pour les réorganiser<br/>
-      ✂️ Découpe : forme principale<br/>
-      🔖 Tampon : motif en relief<br/>
-      ⚡ Gravure : motif en creux
+      💡 Arrastrá las capas para cambiar su orden<br/>
+      ✂️ Corte: forma principal<br/>
+      🔖 Sello: dibujo en relieve<br/>
+      ⚡ Grabado: dibujo hundido
     </p>
   </div>
 </div>
