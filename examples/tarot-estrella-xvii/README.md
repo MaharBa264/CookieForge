@@ -25,7 +25,7 @@ No son SVG que se deban combinar en una única receta. Son **dos piezas independ
 | Base del sello | No aplica | Activada |
 | Superficie mínima recomendada | 200 × 200 mm | 200 × 200 mm |
 
-El sello es deliberadamente menor para entrar dentro del cortante. La prueba automatizada comprueba **las dimensiones finales reales** y no solo los valores SVG.
+El sello es deliberadamente menor para entrar dentro del cortante. La prueba automatizada comprueba **las dimensiones finales reales** y no solo los valores SVG. Al generar paredes de 1 mm, el cortante puede medir aproximadamente **75,4 × 125,4 mm** exteriormente; la tolerancia de aceptación del piloto es ±0,6 mm. Antes de imprimir, revisá las dimensiones exteriores exactas en el visor y el laminador.
 
 ## Procedimiento de validación
 
