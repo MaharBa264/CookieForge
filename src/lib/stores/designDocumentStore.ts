@@ -162,7 +162,12 @@ export function createDesignDocumentStore(
     updateSeries(layout: CutterSeriesLayout): void {
       const current = get(internal);
       if (current.kind !== 'cutter' && current.kind !== 'multi-cutter') throw new Error('Une série nécessite un Cutter.');
-      if (current.schemaVersion === 5) throw new Error('Las operaciones por contorno deben eliminarse antes de crear una serie.');
+      if (current.schemaVersion === 5) {
+        if (current.contourOperations.length) throw new Error('Quitá las operaciones de los contornos antes de crear una serie.');
+        const { contourOperations: _operations, ...base } = current;
+        publishMutation(current, { ...base, schemaVersion: 3, kind: 'multi-cutter', layout });
+        return;
+      }
       if (current.schemaVersion === 3 && JSON.stringify(current.layout) === JSON.stringify(layout)) return;
       publishMutation(current, { ...current, schemaVersion: 3, kind: 'multi-cutter',
         bridges: current.schemaVersion === 1 ? [] : current.bridges, layout });
@@ -201,7 +206,12 @@ export function createDesignDocumentStore(
     changeKind(kind: ImplementedDesignKind): void {
       const current = get(internal);
       if (current.kind === kind) return;
-      if (current.schemaVersion === 5) throw new Error('Las operaciones por contorno deben eliminarse antes de cambiar de tipo de diseño.');
+      if (current.schemaVersion === 5) {
+        if (current.contourOperations.length || current.bridges.length) throw new Error('Quitá las operaciones y los puentes antes de cambiar de tipo de diseño.');
+        const { contourOperations: _operations, bridges: _bridges, ...base } = current;
+        publishMutation(current, { ...base, schemaVersion: 1, kind, parameters: createDefaultParameters(kind) });
+        return;
+      }
       if (kind === 'multi-cutter') {
         if (current.kind !== 'cutter') throw new Error('Une série nécessite un Cutter.');
         publishMutation(current, { ...current, kind, schemaVersion: 3,
