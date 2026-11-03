@@ -97,12 +97,12 @@ it('cancelling new preserves dirty document and existing preview; destroy cancel
   const { session, close } = setup(fixture('A'));
   await vi.waitFor(() => expect(get(generationState).phase).toBe('ready'), { timeout: 10000 });
   const snapshot = session.getDocument(); const preview = get(model)?.mesh;
-  click('Nouveau dessin');
+  click('Diseño nuevo');
   await vi.waitFor(() => expect(document.querySelector('dialog[open]')).not.toBeNull());
   expect(document.activeElement?.getAttribute('data-choice')).toBe('cancel');
-  click('Annuler'); await tick();
+  click('Cancelar'); await tick();
   expect(session.getDocument()).toBe(snapshot); expect(get(model)?.mesh).toBe(preview);
-  click('Nouveau dessin'); await tick();
+  click('Diseño nuevo'); await tick();
   await unmount(app!); app = undefined;
   await vi.waitFor(() => expect(close).toHaveBeenCalledTimes(1));
   expect(session.getDocument()).toBe(snapshot);
@@ -134,7 +134,7 @@ it.each(['open', 'import'])('dirty %s cancellation preserves exact A, preview an
   const snapshot = session.getDocument(), mesh = get(model)?.mesh, epoch = session.getSessionEpoch();
   if (transition === 'open') click('Abrir B');
   else upload(document.querySelector<HTMLInputElement>('input[aria-label="Fichier projet"]')!, new File([encodeProject(fixture('C'))], 'C.ccd.json', { type: 'application/json' }));
-  await prompt(); click('Annuler'); await tick(); await tick();
+  await prompt(); click('Cancelar'); await tick(); await tick();
   expect(session.getDocument()).toBe(snapshot); expect(get(model)?.mesh).toBe(mesh);
   expect(session.getSessionEpoch()).toBe(epoch); expect(put).not.toHaveBeenCalled();
   await vi.waitFor(() => expect(button('Guardar proyecto').disabled).toBe(false));
@@ -143,7 +143,7 @@ it.each(['open', 'import'])('dirty %s cancellation preserves exact A, preview an
 it('failed save-and-continue blocks opening B and preserves A with visible storage error', async () => {
   const { session, put } = setup(fixture('A'), async () => { throw new Error('disk full'); }); await ready(); await library();
   const snapshot = session.getDocument(), mesh = get(model)?.mesh, epoch = session.getSessionEpoch();
-  click('Abrir B'); await prompt(); click('Enregistrer et continuer');
+  click('Abrir B'); await prompt(); click('Guardar y continuar');
   await vi.waitFor(() => expect(document.body.textContent).toContain('disk full'));
   expect(put).toHaveBeenCalledTimes(1); expect(session.getDocument()).toBe(snapshot);
   expect(get(model)?.mesh).toBe(mesh); expect(session.getSessionEpoch()).toBe(epoch);
@@ -163,7 +163,7 @@ it.each(['resolve', 'reject'] as const)('accepted save drains before close after
   const pending = deferred();
   const { session, close, put, records } = setup(fixture('A'), () => pending.promise); await ready(); await library();
   const snapshot = session.getDocument(), epoch = session.getSessionEpoch();
-  click('Abrir B'); await prompt(); const lateDiscard = button('Ignorer les modifications'); click('Enregistrer et continuer');
+  click('Abrir B'); await prompt(); const lateDiscard = button('Ignorer les modifications'); click('Guardar y continuar');
   await vi.waitFor(() => expect(put).toHaveBeenCalledTimes(1));
   await unmount(app!); app = undefined; lateDiscard.click(); await tick();
   expect(close).not.toHaveBeenCalled(); expect(session.getDocument()).toBe(snapshot);
@@ -186,9 +186,9 @@ it.each(['open', 'new'])('real BatchMode blocks project save/export and paramete
   const snapshot = session.getDocument(), scheduled = schedules.documents.length, index = get(historyStore.currentIndex);
   setParams({ ...get(model)!.params, totalHeight: 31 } as typeof DEFAULT_PARAMS); await tick();
   expect(session.getDocument()).toBe(snapshot); expect(schedules.documents).toHaveLength(scheduled);
-  click('Réglages'); await tick(); document.querySelector<HTMLButtonElement>('button[title*="Annuler"]')!.click(); await tick();
+  click('Ajustes'); await tick(); document.querySelector<HTMLButtonElement>('button[title*="Deshacer"]')!.click(); await tick();
   expect(get(historyStore.currentIndex)).toBe(index); expect(get(model)?.mesh).toBe(batch.mesh);
-  await library(); if (transition === 'open') click('Abrir B'); else click('Nouveau dessin');
+  await library(); if (transition === 'open') click('Abrir B'); else click('Diseño nuevo');
   await prompt(); click('Ignorer les modifications');
   if (transition === 'new') {
     await vi.waitFor(() => expect(session.getDocument()).toBeNull());
@@ -339,7 +339,7 @@ it.each(['source', 'open', 'import'] as const)('pending raster B supersedes %s A
     if (transition === 'open') click('Abrir B');
     else upload(document.querySelector<HTMLInputElement>('input[aria-label="Fichier projet"]')!, new File([encodeProject(fixture('C'))], 'C.ccd.json', { type: 'application/json' }));
   }
-  await prompt(); click('Enregistrer et continuer');
+  await prompt(); click('Guardar y continuar');
   await vi.waitFor(() => expect(put).toHaveBeenCalledTimes(1));
   click('Importer un dessin'); await tick(); raster.resolve = undefined;
   const nextInput = document.querySelector<HTMLInputElement>('input[type="file"]')!;
