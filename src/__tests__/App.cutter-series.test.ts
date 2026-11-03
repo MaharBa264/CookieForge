@@ -50,8 +50,8 @@ it.each([1, 2] as const)('V%s creates one history step, keeps editable profiles/
   await ready(session); expect(get(generationState).result?.artifacts[0].validation.shells).toBe(4);
   const seriesCodec = encodeProject(series), seriesStl = stl();
   await click('Ajustes');
-  await click('Annuler'); expect(encodeProject(session.getDocument())).toBe(originalCodec); await ready(session); expect(stl()).toEqual(originalStl);
-  await click('Rétablir'); expect(encodeProject(session.getDocument())).toBe(seriesCodec); await ready(session); expect(stl()).toEqual(seriesStl);
+  await click('Deshacer'); expect(encodeProject(session.getDocument())).toBe(originalCodec); await ready(session); expect(stl()).toEqual(originalStl);
+  await click('Rehacer'); expect(encodeProject(session.getDocument())).toBe(seriesCodec); await ready(session); expect(stl()).toEqual(seriesStl);
   await click('Ajustes');
   document.querySelector<HTMLButtonElement>('[data-wall-profile="robust"]')!.click(); await tick(); await ready(session);
   expect(session.getDocument()).toMatchObject({ kind: 'multi-cutter', layout: { copies: 4, columns: 2, spacingMm: 5 }, parameters: { wallThickness: 1.5, taperAngle: 10 } });
