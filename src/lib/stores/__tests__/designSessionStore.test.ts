@@ -93,6 +93,35 @@ describe('createDesignSessionStore history restoration', () => {
   });
 });
 
+describe('Cutter V5 contour assignment history', () => {
+  it('promotes V1 once, restores exact assignments through history, and clears them on SVG change', () => {
+    const session = createDesignSessionStore(projectDocument(), { now: () => NEXT });
+    const before = session.getDocument()!;
+    const epoch = session.getSessionEpoch();
+    session.updateContourOperation(0, 'cut');
+    const first = session.getDocument()!;
+    expect(first).toMatchObject({ schemaVersion: 5, contourOperations: [{ pathIndex: 0, operation: 'cut' }] });
+    expect(first.sketch.svg).toBe(before.sketch.svg);
+    session.updateContourOperation(1, 'engrave');
+    const second = session.getDocument()!;
+    expect(second).toMatchObject({ contourOperations: [{ pathIndex: 0, operation: 'cut' }, { pathIndex: 1, operation: 'engrave' }] });
+    session.restoreHistory(first, epoch);
+    expect(session.getDocument()).toEqual(first);
+    session.restoreHistory(second, epoch);
+    expect(session.getDocument()).toEqual(second);
+    expect(session.getSessionEpoch()).toBe(epoch);
+    session.updateSketch(INITIAL_SVG);
+    expect(session.getDocument()).toMatchObject({ schemaVersion: 5, contourOperations: [] });
+    expect(session.getDocument()?.source).toEqual(before.source);
+  });
+  it('rejects operation assignment on a stamp and preserves the active snapshot', () => {
+    const session = createDesignSessionStore(projectDocument('stamp'));
+    const before = session.getDocument();
+    expect(() => session.updateContourOperation(0, 'cut')).toThrow();
+    expect(session.getDocument()).toBe(before);
+  });
+});
+
 describe('createDesignSessionStore', () => {
   it('démarre vide sans faux SVG et expose un readable nullable', () => {
     const session = createDesignSessionStore();
