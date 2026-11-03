@@ -3,7 +3,7 @@ import { extractClosedContours, signedArea, type NormalizedContour } from '../ut
 import { validateConnectorLayout } from './connectors';
 
 export interface ReliefLayoutAssessment {
-  /** Apto para diseñar una unión 3D, NO significa que exista un STL imprimible. */
+  /** Apto para solicitar la primera malla V5; la validación del STL se hace después. */
   readonly topologyReady: boolean;
   readonly reason: string;
   readonly outerPathIndex?: number;
@@ -42,7 +42,7 @@ function isConvex(polygon: NormalizedContour): boolean {
 /**
  * Primera calificación topológica de detalle unido: un corte exterior convexo,
  * un relieve interior y un puente explícito entre ambos.
- * No crea ni habilita geometría; el STL sigue bloqueado por cutterRecipe.
+ * Califica la topología. El generador aplica además restricciones físicas y validación de malla.
  */
 export function assessFirstReliefLayout(document: CutterDocumentV5): ReliefLayoutAssessment {
   const detailAssignments = document.contourOperations.filter(a => a.operation === 'emboss');
@@ -104,7 +104,7 @@ export function assessFirstReliefLayout(document: CutterDocumentV5): ReliefLayou
   const markingClearanceMm = detailAssignments[0].depthMm ?? 1.2;
   return Object.freeze({
     topologyReady: true,
-    reason: 'Contornos contenidos y puente válido. Falta construir y verificar la unión 3D.',
+    reason: 'Contornos contenidos y puente válido para el primer relieve conectado.',
     outerPathIndex, detailPathIndex, markingClearanceMm, bridgeId: bridge.id
   });
 }
