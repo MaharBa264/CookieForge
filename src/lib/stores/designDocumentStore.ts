@@ -5,6 +5,7 @@ import type {
   CutterSeriesLayout,
   StampImprintMode,
   ContourOperation,
+  ContourAssignment,
   ViewportPreferences
 } from '../domain/designDocument';
 import type { ImplementedDesignKind } from '../domain/designKind';
@@ -29,6 +30,8 @@ export interface DesignDocumentStore extends Readable<DesignDocument> {
   updateSketch(svg: string): void;
   /** Primera asignación promueve Cutter V1/V2 a V5. 'unassigned' elimina la asignación. */
   updateContourOperation(pathIndex: number, operation: ContourOperation | 'unassigned'): void;
+  /** Ajusta la profundidad de un detalle existente, con una mutación histórica. */
+  updateContourDepth(pathIndex: number, depthMm: number): void;
   /** Promote V1 only on the first bridge edit; the input is validated and detached. */
   updateBridges(bridges: readonly Bridge[]): void;
   /** Atomic promotion/update; same identity and epoch, no generated objects. */
@@ -137,10 +140,15 @@ export function createDesignDocumentStore(
       }
       if (!Number.isSafeInteger(pathIndex) || pathIndex < 0 || pathIndex > 1023) throw new RangeError('Índice de contorno inválido.');
       const previous = current.schemaVersion === 5 ? current.contourOperations : [];
-      const existing = previous.find(item => item.pathIndex === pathIndex)?.operation ?? 'unassigned';
-      if (existing === operation) return;
-      const contourOperations = previous.filter(item => item.pathIndex !== pathIndex);
-      if (operation !== 'unassigned') contourOperations.push({ pathIndex, operation });
+      const oldAssignment = previous.find(item => item.pathIndex === pathIndex);
+      if ((oldAssignment?.operation ?? 'unassigned') === operation) return;
+      const contourOperations: ContourAssignment[] = previous.filter(item => item.pathIndex !== pathIndex);
+      if (operation !== 'unassigned') {
+        const detail = operation === 'emboss' || operation === 'engrave';
+        contourOperations.push(detail && oldAssignment?.depthMm !== undefined
+          ? { pathIndex, operation, depthMm: oldAssignment.depthMm }
+          : { pathIndex, operation });
+      }
       contourOperations.sort((a, b) => a.pathIndex - b.pathIndex);
       const { schemaVersion: _version, ...other } = current;
       publishMutation(current, {
@@ -149,6 +157,21 @@ export function createDesignDocumentStore(
         bridges: current.schemaVersion === 1 ? [] : current.bridges,
         contourOperations
       });
+    },
+
+
+    updateContourDepth(pathIndex: number, depthMm: number): void {
+      const current = get(internal);
+      if (current.schemaVersion !== 5) throw new Error('Primero asigná Relieve o Grabado al contorno.');
+      const original = current.contourOperations.find(item => item.pathIndex === pathIndex);
+      if (!original || (original.operation !== 'emboss' && original.operation !== 'engrave')) {
+        throw new Error('La profundidad solo corresponde a Relieve y Grabado.');
+      }
+      if (original.depthMm === depthMm) return;
+      const contourOperations = current.contourOperations.map(item =>
+        item.pathIndex === pathIndex ? { ...item, depthMm } : item
+      );
+      publishMutation(current, { ...current, contourOperations });
     },
 
     updateBridges(bridges: readonly Bridge[]): void {
