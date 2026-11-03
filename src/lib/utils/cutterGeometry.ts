@@ -945,7 +945,7 @@ export async function createMultiReliefBridgedWallGeometry(
   }>
 ): Promise<THREE.BufferGeometry> {
   const { scale, wallThickness, height, outerIndex, details } = options;
-  if (contours.length < 2 || contours.length > 4 || details.length !== contours.length - 1 ||
+  if (contours.length < 2 || contours.length > 7 || details.length !== contours.length - 1 ||
       !Number.isSafeInteger(outerIndex) || outerIndex < 0 || outerIndex >= contours.length ||
       bridges.length !== details.length ||
       new Set(details.map(p => p.index)).size !== details.length ||
