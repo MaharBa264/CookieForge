@@ -285,7 +285,7 @@
             <div class="tab-pane">
               <p>Generá variantes creativas de un diseño a partir de una descripción.</p>
               <button class="btn-primary" onclick={getVariations} disabled={isProcessing}>
-                {isProcessing ? 'Generando…' : 'Generar des variantes'}
+                {isProcessing ? 'Generando…' : 'Generar variantes'}
               </button>
 
               {#if variations.length > 0}
