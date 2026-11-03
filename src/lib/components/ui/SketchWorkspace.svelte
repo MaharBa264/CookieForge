@@ -168,7 +168,7 @@
               value={selectedAssignment?.depthMm ?? CONTOUR_DETAIL_DEPTH.defaultMm}
               on:change={event => setDepth(Number(event.currentTarget.value))} />
           </label>
-          <p class="notice">La profundidad es independiente por contorno y se guarda en el proyecto. Rango: 0,4 a 3 mm, sin superar la altura de corte. Todavía no se fabrica en 3D.</p>
+          <p class="notice">El valor representa cuánto se eleva la punta interior respecto del filo exterior (0,4 a 3 mm). Cada contorno conserva su ajuste. El primer Relieve conectado puede generarse en 3D; Grabado sigue pendiente. Según la inclinación del puente, la impresión puede necesitar soportes.</p>
         {/if}
 
         <p class="notice">La operación forma parte del documento y participa de Deshacer/Rehacer. Usá Guardar proyecto o Exportar proyecto para conservarla después de cerrar. Corte conserva el contorno e Ignorar lo excluye del STL solamente en SVG simples con trazados independientes. Relieve ya genera geometría 3D para un borde exterior convexo, un detalle interior y un puente válido, sin mango y con paredes rectas. Grabado aún bloquea la exportación. Si editás el SVG, se limpian las asignaciones para evitar índices incorrectos.</p>
