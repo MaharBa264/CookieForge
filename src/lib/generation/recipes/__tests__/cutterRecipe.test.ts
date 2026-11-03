@@ -16,6 +16,8 @@ import {
 } from '../../../domain/designParameters';
 import type { GenerationContext } from '../../generationRecipe';
 import { disposeObject3D } from '../../../utils/disposeThree';
+import { serializeSTL } from '../../../utils/stlExporter';
+import { serialize3MF } from '../../../utils/advancedExporter';
 import {
   CutterGenerationError
 } from '../../../utils/generationValidation';
@@ -436,6 +438,12 @@ describe('cutterRecipe', () => {
       expect(artifacts[0].validation.valid, artifacts[0].validation.errors.join('\n')).toBe(true);
       expect(artifacts[0].validation.shells).toBe(1);
       const object = artifacts[0].object;
+      const stl = serializeSTL(object, true);
+      expect(stl).toBeInstanceOf(DataView);
+      if (!(stl instanceof DataView)) throw new Error('STL binario esperado.');
+      expect(stl.byteLength).toBe(84 + artifacts[0].validation.triangles * 50);
+      const threeMf = serialize3MF(object, params);
+      expect(threeMf.byteLength).toBeGreaterThan(100);
       const meshes = object.children.filter(child => child instanceof THREE.Mesh);
       expect(meshes).toHaveLength(1);
       const geometry = (meshes[0] as THREE.Mesh).geometry;
