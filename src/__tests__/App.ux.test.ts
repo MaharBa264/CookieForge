@@ -29,7 +29,7 @@ describe('App UX states', () => {
       expect(document.documentElement.classList.contains('dark-mode')).toBe(true);
     });
 
-    const themeButton = document.querySelector<HTMLButtonElement>('button[aria-label="Activer le thème clair"]');
+    const themeButton = document.querySelector<HTMLButtonElement>('button[aria-label="Activar tema claro"]');
     expect(themeButton?.getAttribute('aria-pressed')).toBe('true');
     themeButton?.click();
 
