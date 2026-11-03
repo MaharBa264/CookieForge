@@ -105,8 +105,12 @@
         {#if !candidate.reason && candidate.segments.length}
           <path d={candidate.segments.map(segment => segment.command + segment.values.join(' ')).join(' ')}
             class="contour-target" class:active={pathIndex === index}
+            class:cut={operations[index] === 'cut'}
+            class:emboss={operations[index] === 'emboss'}
+            class:engrave={operations[index] === 'engrave'}
+            class:ignored={operations[index] === 'ignore'}
             fill="none" vector-effect="non-scaling-stroke"
-            role="button" tabindex="0" aria-label={`Seleccionar contorno ${index + 1}`}
+            role="button" tabindex="0" aria-label={`Seleccionar contorno ${index + 1}: ${operationLabels[operations[index] ?? 'unassigned']}`}
             aria-pressed={pathIndex === index}
             on:click={() => chooseContour(index)} on:keydown={event => contourKey(event, index)} />
         {/if}
@@ -121,7 +125,16 @@
         {/each}
       {/if}
     </svg>
-    <p class="notice">Seleccioná un contorno haciendo clic en su línea o desde la lista. El contorno activo se destaca en azul. La selección no modifica el diseño.</p>
+    <p class="notice">Seleccioná un contorno haciendo clic en su línea o desde la lista. La selección no modifica el diseño.</p>
+    {#if document.kind === 'cutter'}
+      <div class="contour-legend" aria-label="Vista de operaciones por contorno">
+        <span><i class="legend-cut" aria-hidden="true"></i>Corte</span>
+        <span><i class="legend-emboss" aria-hidden="true"></i>Relieve</span>
+        <span><i class="legend-engrave" aria-hidden="true"></i>Grabado</span>
+        <span><i class="legend-ignored" aria-hidden="true"></i>Ignorar</span>
+      </div>
+      <p class="notice">Vista 2D de las asignaciones; los colores no garantizan que los relieves sean imprimibles.</p>
+    {/if}
     {#if path && !path.reason && document.kind === 'cutter'}
       <div class="operation-draft" aria-label="Operación del contorno">
         <label>Operación del contorno {pathIndex + 1}
@@ -180,6 +193,18 @@
   .canvas { width: 100%; aspect-ratio: 1; background: #fff; border: 1px solid #64748b; touch-action: none; }
   .contour-target { fill: none; stroke: transparent; stroke-width: 12px; pointer-events: stroke; cursor: pointer; }
   .contour-target.active { stroke: #2563eb; stroke-opacity: .4; }
+  .contour-target.cut { stroke: #147d51; stroke-opacity: .66; }
+  .contour-target.emboss { stroke: #bf6b17; stroke-opacity: .75; }
+  .contour-target.engrave { stroke: #7a42b6; stroke-opacity: .7; }
+  .contour-target.ignored { stroke: #9ca3af; stroke-opacity: .6; stroke-dasharray: 6 5; }
+  .contour-target.active { stroke-width: 15px; }
+  .contour-legend { display: flex; flex-wrap: wrap; gap: .75rem; font-size: .8rem; }
+  .contour-legend span { display: inline-flex; gap: .3rem; align-items: center; }
+  .contour-legend i { width: 14px; height: 5px; display: inline-block; border-radius: 3px; }
+  .legend-cut { background: #147d51; }
+  .legend-emboss { background: #bf6b17; }
+  .legend-engrave { background: #7a42b6; }
+  .legend-ignored { background: repeating-linear-gradient(90deg, #9ca3af 0 4px, transparent 4px 7px); }
   .contour-target:focus-visible { stroke: #2563eb; stroke-opacity: .65; outline: 2px solid #2563eb; }
   circle { fill: #fff; stroke: #2563eb; stroke-width: 1; cursor: grab; }
   circle.point-hit { fill: transparent; stroke: transparent; }
