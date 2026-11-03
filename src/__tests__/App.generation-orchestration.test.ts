@@ -55,7 +55,7 @@ async function mountGeneratedCutter(): Promise<void> {
 
 async function publishBatchFixture(): Promise<void> {
   const category = document.querySelector<HTMLButtonElement>(
-    'button[aria-label="Production en série"]'
+    'button[aria-label="Producción en serie"]'
   );
   expect(category).not.toBeNull();
   category?.click();
