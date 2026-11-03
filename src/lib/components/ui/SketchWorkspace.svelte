@@ -8,15 +8,27 @@
   let draft: string | null = null;
   let gesture: { baseline: DesignDocument; epoch: number; pointer: number } | null = null;
   let message = '';
+  type ContourOperation = 'unassigned' | 'cut' | 'emboss' | 'engrave' | 'ignore';
+  const operationLabels: Record<ContourOperation, string> = {
+    unassigned: 'Sin asignar', cut: 'Corte', emboss: 'Relieve', engrave: 'Grabado', ignore: 'Ignorar'
+  };
+  let operations: Record<number, ContourOperation> = {};
+  let operationOwner: DesignDocument | null = null;
   let canvas: SVGSVGElement;
   let x = 0, y = 0;
   $: document = $session;
+  // El borrador pertenece a un snapshot exacto: editar, deshacer o cambiar de proyecto lo invalida.
+  $: if (document !== operationOwner) { operations = {}; operationOwner = document; }
   $: if (document && gesture && (document !== gesture.baseline || session.getSessionEpoch() !== gesture.epoch)) cancel();
   $: svg = draft ?? document?.sketch.svg ?? '';
   $: model = svg ? inspectSketch(svg) : null;
   $: path = model?.paths[pathIndex];
   $: selected = path?.points[pointIndex];
   $: if (model && pathIndex >= model.paths.length) { pathIndex = 0; pointIndex = 0; cancel(); }
+  function setOperation(value: ContourOperation): void {
+    if (!document || !path || path.reason) return;
+    operations = { ...operations, [pathIndex]: value };
+  }
   function chooseContour(index: number): void {
     if (index === pathIndex) return;
     cancel(); pathIndex = index; pointIndex = 0; message = '';
@@ -98,6 +110,20 @@
       {/if}
     </svg>
     <p class="notice">Seleccioná un contorno haciendo clic en su línea o desde la lista. El contorno activo se destaca en azul. La selección no modifica el diseño.</p>
+    {#if path && !path.reason}
+      <div class="operation-draft" aria-label="Operación provisional del contorno">
+        <label>Operación del contorno {pathIndex + 1}
+          <select aria-label="Operación del contorno" value={operations[pathIndex] ?? 'unassigned'}
+            on:change={event => setOperation(event.currentTarget.value as ContourOperation)}>
+            {#each Object.entries(operationLabels) as [value, label]}
+              <option {value}>{label}</option>
+            {/each}
+          </select>
+        </label>
+        <p role="status">Operación provisional: {operationLabels[operations[pathIndex] ?? 'unassigned']}.</p>
+        <p class="notice">Prototipo de fase 5: esta selección no se guarda en el proyecto ni modifica la geometría o el STL. Se descarta al editar el dibujo o cambiar de proyecto.</p>
+      </div>
+    {/if}
     {#if path?.reason}<p role="status">{path.reason}</p>{/if}
     {#if !model.paths.length}<p role="status">No hay trazados editables. Las formas SVG originales se conservan sin convertir.</p>{/if}
     {#each model.notices as notice}<p class="notice">{notice}</p>{/each}
@@ -135,6 +161,7 @@
   circle.point-hit { fill: transparent; stroke: transparent; }
   circle.control { fill: #fef3c7; } circle.selected { fill: #60a5fa; }
   circle:focus { outline: none; stroke: #111827; stroke-width: 2; }
+  .operation-draft { display: grid; gap: .375rem; padding: .75rem; border: 1px dashed var(--border-color, #cbd5e1); border-radius: 6px; }
   .coordinates, .tools { display: flex; flex-wrap: wrap; gap: .5rem; }
   .coordinates label { flex: 1; width: 80px; } .coordinates input { width: 100%; box-sizing: border-box; }
   .notice { font-size: .8rem; } :focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; }
