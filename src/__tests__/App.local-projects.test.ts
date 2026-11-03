@@ -76,7 +76,7 @@ it('restores the exact session document into the real orchestrator, not source o
   expect(session.getDocument()?.parameters.totalHeight).toBe(29);
   expect(session.getDocument()?.sketch.revision).toBe(7);
   expect(session.getDocument()?.source).toEqual(fixture().source);
-  expect(document.body.textContent).toContain('Enregistré localement');
+  expect(document.body.textContent).toContain('Guardado localmente');
 });
 it('ignores slow raster A after opening B without publishing upload state early', async () => {
   const { session } = setup();
@@ -115,7 +115,7 @@ it('invalid generated SVG through the real shape library reports async validatio
   const original = shape.svg;
   try {
     shape.svg = '<svg xmlns="http://www.w3.org/2000/svg"><script>bad()</script></svg>';
-    click('Bibliothèque de formes'); await tick(); click('Utiliser la forme Circle');
+    click('Biblioteca de formas'); await tick(); click('Usar la forma Círculo');
     await vi.waitFor(() => expect(document.querySelector('.alert-error')?.textContent).toContain('source.svg'));
     expect(session.getDocument()).toBe(snapshot); expect(session.getSessionEpoch()).toBe(epoch);
     expect(get(model)?.mesh).toBe(mesh); expect(document.querySelector('dialog[open]')).toBeNull();
@@ -329,7 +329,7 @@ it.each(['source', 'open', 'import'] as const)('pending raster B supersedes %s A
   const pending = deferred();
   const { session, put, records } = setup(fixture('original'), () => pending.promise); await ready();
   const snapshot = session.getDocument(), epoch = session.getSessionEpoch(), mesh = get(model)?.mesh;
-  click('Importer un dessin'); await tick();
+  click('Importar un diseño'); await tick();
   const input = document.querySelector<HTMLInputElement>('input[type="file"]')!;
   if (transition === 'source') {
     upload(input, new File(['a'], 'A.png', { type: 'image/png' }));
@@ -341,7 +341,7 @@ it.each(['source', 'open', 'import'] as const)('pending raster B supersedes %s A
   }
   await prompt(); click('Guardar y continuar');
   await vi.waitFor(() => expect(put).toHaveBeenCalledTimes(1));
-  click('Importer un dessin'); await tick(); raster.resolve = undefined;
+  click('Importar un diseño'); await tick(); raster.resolve = undefined;
   const nextInput = document.querySelector<HTMLInputElement>('input[type="file"]')!;
   upload(nextInput, new File(['b'], 'latest.png', { type: 'image/png' }));
   await vi.waitFor(() => expect(raster.resolve).toBeDefined());
