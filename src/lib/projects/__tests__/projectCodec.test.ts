@@ -122,7 +122,7 @@ describe('codec projet portable V1', () => {
 
   it('round-trip V5 conserva operaciones, fuente y parámetros y rechaza asignaciones inválidas', () => {
     const v1 = cutterDocument();
-    const v5 = { ...v1, schemaVersion: 5, bridges: [], contourOperations: [
+    const v5 = { ...v1, sketch: { ...v1.sketch, svg: '<svg viewBox="0 0 10 10"><path d="M0 0L4 0L4 4Z"/><path d="M6 6L10 6L10 10Z"/></svg>' }, schemaVersion: 5, bridges: [], contourOperations: [
       { pathIndex: 0, operation: 'cut' }, { pathIndex: 1, operation: 'engrave' }
     ] };
     const encoded = encodeProject(v5);
