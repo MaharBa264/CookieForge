@@ -186,7 +186,7 @@ it.each(['new-image', 'shape', 'open', 'unmount'])('a late raster is invalidated
     click('Biblioteca de formas'); await tick(); click('Usar la forma Círculo');
     await vi.waitFor(() => expect(session.getDocument()?.source.fileName).toBe('circulo.svg'));
   } else if (transition === 'open') {
-    click('Projets locaux'); await vi.waitFor(() => expect(document.querySelector('button[aria-label="Abrir Other"]')).not.toBeNull());
+    click('Proyectos locales'); await vi.waitFor(() => expect(document.querySelector('button[aria-label="Abrir Other"]')).not.toBeNull());
     click('Abrir Other'); await vi.waitFor(() => expect(session.getDocument()?.name).toBe('Other'));
   } else { await unmount(app!); app = undefined; }
   const accepted = session.getDocument(); slow.resolve(svg); await settled();
@@ -196,7 +196,7 @@ it('opening a project invalidates conversion immediately, even while the dirty d
   const session = setup(fixture()); await ready();
   await upload(new File(['r'], 'slow.png', { type: 'image/png' }));
   await vi.waitFor(() => expect(raster.calls).toHaveLength(1)); const slow = raster.calls[0];
-  click('Projets locaux'); await vi.waitFor(() => expect(document.querySelector('button[aria-label="Abrir Other"]')).not.toBeNull());
+  click('Proyectos locales'); await vi.waitFor(() => expect(document.querySelector('button[aria-label="Abrir Other"]')).not.toBeNull());
   click('Abrir Other'); await vi.waitFor(() => expect(document.querySelector('dialog[open]')).not.toBeNull());
   expect(slow.signal?.aborted).toBe(true);
   slow.resolve(svg); await settled(); click('Descartar cambios');
