@@ -108,11 +108,11 @@
 
 <div class="ai-processor">
   <div class="panel-header">
-    <h3>🤖 Traitement d’images par IA</h3>
+    <h3>🤖 Procesamiento de imágenes con IA</h3>
     <button
       class="toggle-btn"
       on:click={() => showPanel = !showPanel}
-      aria-label={showPanel ? 'Replier le traitement d’images par IA' : 'Déplier le traitement d’images par IA'}
+      aria-label={showPanel ? 'Contraer procesamiento de imágenes con IA' : 'Expandir procesamiento de imágenes con IA'}
       aria-expanded={showPanel}
       aria-controls="ai-image-processor-content"
     >
@@ -123,8 +123,8 @@
   {#if showPanel}
     <div class="panel-content" id="ai-image-processor-content">
       <p class="description">
-        Améliorez vos images avec l’IA avant de les convertir en emporte-pièces.
-        Idéal pour les photos et les illustrations complexes.
+        Mejorá tus imágenes con IA antes de convertirlas en cortantes.
+        Útil para fotografías e ilustraciones complejas.
       </p>
 
       <div class="upload-section">
@@ -136,7 +136,7 @@
             style="display: none;"
           />
           <div class="upload-button">
-            📁 {selectedFile ? selectedFile.name : 'Choisir une image'}
+            📁 {selectedFile ? selectedFile.name : 'Elegir imagen'}
           </div>
         </label>
       </div>
@@ -144,52 +144,52 @@
       {#if selectedFile}
         <div class="preset-selector">
           <label>
-            <span>Préréglage de traitement :</span>
+            <span>Perfil de procesamiento:</span>
             <select bind:value={selectedPreset}>
-              <option value="simple">Simple (idéal pour les logos)</option>
-              <option value="detailed">Détaillé (idéal pour les photos)</option>
-              <option value="outline">Contours (détection des bords)</option>
-              <option value="clean">Épuré (noir et blanc)</option>
+              <option value="simple">Simple (para logotipos)</option>
+              <option value="detailed">Detallado (para fotos)</option>
+              <option value="outline">Contornos (detección de bordes)</option>
+              <option value="clean">Limpio (blanco y negro)</option>
             </select>
           </label>
         </div>
 
         <div class="advanced-options">
-          <h4>Options avancées :</h4>
+          <h4>Opciones avanzadas:</h4>
 
           <label class="checkbox-label">
             <input type="checkbox" bind:checked={options.enhanceContrast} />
-            <span>Améliorer le contraste</span>
+            <span>Mejorar contraste</span>
           </label>
 
           <label class="checkbox-label">
             <input type="checkbox" bind:checked={options.removeBackground} />
-            <span>Supprimer l’arrière-plan</span>
+            <span>Eliminar fondo</span>
           </label>
 
           <label class="checkbox-label">
             <input type="checkbox" bind:checked={options.edgeDetection} />
-            <span>Détection des bords</span>
+            <span>Detección de bordes</span>
           </label>
 
           <label class="checkbox-label">
             <input type="checkbox" bind:checked={options.denoise} />
-            <span>Réduire le bruit</span>
+            <span>Reducir ruido</span>
           </label>
 
           <label class="checkbox-label">
             <input type="checkbox" bind:checked={options.autoThreshold} />
-            <span>Seuil automatique</span>
+            <span>Umbral automático</span>
           </label>
 
           <label class="checkbox-label">
             <input type="checkbox" bind:checked={options.simplifyColors} />
-            <span>Simplifier les couleurs</span>
+            <span>Simplificar colores</span>
           </label>
 
           {#if options.simplifyColors}
             <label>
-              <span>Nombre maximal de couleurs : {options.maxColors || 8}</span>
+              <span>Cantidad máxima de colores: {options.maxColors || 8}</span>
               <input
                 type="range"
                 bind:value={options.maxColors}
@@ -206,17 +206,17 @@
           on:click={processImage}
           disabled={processing}
         >
-          {processing ? '⏳ Traitement…' : '🚀 Traiter l’image'}
+          {processing ? '⏳ Procesando…' : '🚀 Procesar imagen'}
         </button>
       {/if}
 
       {#if result}
         <div class="results">
-          <h4>Résultats du traitement :</h4>
+          <h4>Resultados del procesamiento:</h4>
 
           <div class="preview">
             <div class="preview-item">
-              <strong>Image traitée :</strong>
+              <strong>Imagen procesada:</strong>
               <canvas
                 use:renderPreview={result}
                 style="max-width: 100%; border: 1px solid #e2e8f0; border-radius: 4px;"
@@ -225,10 +225,10 @@
           </div>
 
           <div class="stats">
-            <h4>Statistiques :</h4>
+            <h4>Estadísticas:</h4>
             <div class="stat-grid">
               <div class="stat-item">
-                <span>Luminosité :</span>
+                <span>Luminosidad:</span>
                 <strong>{(result.stats.brightness * 100).toFixed(1)}%</strong>
               </div>
               <div class="stat-item">
@@ -236,11 +236,11 @@
                 <strong>{(result.stats.contrast * 100).toFixed(1)}%</strong>
               </div>
               <div class="stat-item">
-                <span>Couleurs :</span>
+                <span>Colores:</span>
                 <strong>{result.stats.colorCount}</strong>
               </div>
               <div class="stat-item">
-                <span>Intensité des bords :</span>
+                <span>Intensidad de bordes:</span>
                 <strong>{(result.stats.edgeStrength * 100).toFixed(1)}%</strong>
               </div>
             </div>
@@ -248,10 +248,10 @@
 
           <div class="actions">
             <button class="use-btn" on:click={useProcessedImage}>
-              ✅ Utiliser cette image
+              ✅ Usar esta imagen
             </button>
             <button class="reset-btn" on:click={resetProcessor}>
-              🔄 Recommencer
+              🔄 Empezar de nuevo
             </button>
           </div>
         </div>
