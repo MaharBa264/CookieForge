@@ -68,11 +68,11 @@
 
 <div class="pattern-generator">
   <div class="panel-header">
-    <h3>🔄 Générateur de motifs</h3>
+    <h3>🔄 Generador de patrones</h3>
     <button
       class="toggle-btn"
       on:click={() => showPanel = !showPanel}
-      aria-label={showPanel ? 'Réduire le générateur de motifs' : 'Développer le générateur de motifs'}
+      aria-label={showPanel ? 'Contraer generador de patrones' : 'Expandir generador de patrones'}
       aria-expanded={showPanel}
       aria-controls="pattern-generator-content"
     >
@@ -84,7 +84,7 @@
     <div class="panel-content" id="pattern-generator-content">
       <!-- Pattern type selection -->
       <div class="preset-section">
-        <h4>Type de motif</h4>
+        <h4>Tipo de patrón</h4>
         <div class="preset-grid">
           {#each presets as preset}
             <button
@@ -101,30 +101,30 @@
 
       <!-- Base shape selection -->
       <div class="shape-section">
-        <h4>Forme de base</h4>
+        <h4>Figura básica</h4>
         <div class="shape-buttons">
           <button class="shape-btn" on:click={() => changeBaseShape('circle')}>
-            ⚪ Cercle
+            ⚪ Círculo
           </button>
           <button class="shape-btn" on:click={() => changeBaseShape('square')}>
-            ⬜ Carré
+            ⬜ Cuadrado
           </button>
           <button class="shape-btn" on:click={() => changeBaseShape('star')}>
-            ⭐ Étoile
+            ⭐ Estrella
           </button>
           <button class="shape-btn" on:click={() => changeBaseShape('heart')}>
-            ❤️ Cœur
+            ❤️ Corazón
           </button>
         </div>
       </div>
 
       <!-- Pattern Controls -->
       <div class="controls-section">
-        <h4>Réglages du motif</h4>
+        <h4>Ajustes del patrón</h4>
 
         <div class="control-group">
           <label for="count">
-            Nombre : {config.count}
+            Cantidad: {config.count}
           </label>
           <input
             id="count"
@@ -138,7 +138,7 @@
 
         <div class="control-group">
           <label for="spacing">
-            Espacement : {config.spacing.toFixed(1)}
+            Separación: {config.spacing.toFixed(1)}
           </label>
           <input
             id="spacing"
@@ -152,7 +152,7 @@
 
         <div class="control-group">
           <label for="scale">
-            Échelle : {config.scale.toFixed(2)}
+            Escala: {config.scale.toFixed(2)}
           </label>
           <input
             id="scale"
@@ -183,7 +183,7 @@
 
       <!-- Preview -->
       <div class="preview-section">
-        <h4>Aperçu</h4>
+        <h4>Vista previa</h4>
         <div class="preview-container">
           {@html previewSVG}
         </div>
@@ -192,7 +192,7 @@
       <!-- Apply Button -->
       <div class="action-section">
         <button class="apply-btn" on:click={applyPattern}>
-          Appliquer le motif
+          Aplicar patrón
         </button>
       </div>
     </div>
