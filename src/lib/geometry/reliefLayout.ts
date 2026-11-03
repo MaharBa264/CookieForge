@@ -129,6 +129,20 @@ export function assessFirstReliefLayout(document: CutterDocumentV5): ReliefLayou
     }
     detailProfiles.push({ pathIndex: detail.pathIndex, clearanceMm, bridgeId: matching[0].id });
   }
+  // Un puente no debe atravesar otro detalle: una unión topológica aparentemente
+  // correcta podría elevar la cara de un relieve ajeno y deformar el marcador.
+  for (const profile of detailProfiles) {
+    const bridge = document.bridges.find(b => b.id === profile.bridgeId);
+    if (!bridge) return failed('Falta un puente requerido.');
+    for (const other of detailProfiles) {
+      if (other.pathIndex === profile.pathIndex) continue;
+      const polygon = contours[other.pathIndex];
+      if (isInside(bridge.from, polygon) || isInside(bridge.to, polygon) ||
+          segmentCrossesPolygon(bridge.from, bridge.to, polygon)) {
+        return failed('Un puente atraviesa otro detalle interior; cambiá su recorrido.');
+      }
+    }
+  }
   if (new Set(detailProfiles.map(p => p.bridgeId)).size !== details.length) {
     return failed('Cada relieve debe utilizar su propio puente.');
   }
@@ -159,6 +173,22 @@ function polygonsCross(a: NormalizedContour, b: NormalizedContour): boolean {
   for (let i=0;i<a.length;i++) for (let j=0;j<b.length;j++) {
     const p=a[i], q=a[(i+1)%a.length], r=b[j], t=b[(j+1)%b.length];
     if (cross(p,q,r)*cross(p,q,t)<0 && cross(r,t,p)*cross(r,t,q)<0) return true;
+  }
+  return false;
+}
+
+function segmentCrossesPolygon(
+  start: Readonly<{ x: number; y: number }>,
+  end: Readonly<{ x: number; y: number }>,
+  polygon: NormalizedContour
+): boolean {
+  const cross = (a: Readonly<{ x: number; y: number }>,
+    b: Readonly<{ x: number; y: number }>, c: Readonly<{ x: number; y: number }>) =>
+    (b.x-a.x)*(c.y-a.y) - (b.y-a.y)*(c.x-a.x);
+  for (let i=0; i<polygon.length; i++) {
+    const a=polygon[i], b=polygon[(i+1)%polygon.length];
+    if (cross(start,end,a)*cross(start,end,b)<0 &&
+        cross(a,b,start)*cross(a,b,end)<0) return true;
   }
   return false;
 }
