@@ -36,7 +36,7 @@ async function parameters() {
 }
 async function dirty(expected: boolean) {
   await click('Proyectos locales');
-  expect(document.querySelector('.project-manager [role="status"]')?.textContent).toBe(expected ? 'Modifications non enregistrées' : 'Guardado localmente');
+  expect(document.querySelector('.project-manager [role="status"]')?.textContent).toBe(expected ? 'Cambios sin guardar' : 'Guardado localmente');
 }
 async function editSize(value: number) {
   await parameters();
