@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="75mm" height="125mm" viewBox="0 0 75 125">
+  <!-- PILOTO técnico simplificado basado en La Estrella XVII, NO trazado fiel de la ilustración. -->
+  <!-- La receta Stamp crea una base sólida común y une estos contornos cerrados. -->
+  <path aria-label="Marco superior" d="M7 5 L68 5 L68 6.6 L7 6.6 Z" fill="black"/>
+  <path aria-label="Marco inferior" d="M7 118.4 L68 118.4 L68 120 L7 120 Z" fill="black"/>
+  <path aria-label="Marco izquierdo" d="M7 5 L8.6 5 L8.6 120 L7 120 Z" fill="black"/>
+  <path aria-label="Marco derecho" d="M66.4 5 L68 5 L68 120 L66.4 120 Z" fill="black"/>
+  <path aria-label="Estrella principal de ocho puntas" d="M37.50 14.00 L39.68 21.73 L46.69 17.81 L42.77 24.82 L50.50 27.00 L42.77 29.18 L46.69 36.19 L39.68 32.27 L37.50 40.00 L35.32 32.27 L28.31 36.19 L32.23 29.18 L24.50 27.00 L32.23 24.82 L28.31 17.81 L35.32 21.73 Z" fill="black"/>
+  <path aria-label="Estrella secundaria 1" d="M19.00 17.60 L19.73 20.24 L22.11 18.89 L20.76 21.27 L23.40 22.00 L20.76 22.73 L22.11 25.11 L19.73 23.76 L19.00 26.40 L18.27 23.76 L15.89 25.11 L17.24 22.73 L14.60 22.00 L17.24 21.27 L15.89 18.89 L18.27 20.24 Z" fill="black"/>
+  <path aria-label="Estrella secundaria 2" d="M56.00 17.60 L56.73 20.24 L59.11 18.89 L57.76 21.27 L60.40 22.00 L57.76 22.73 L59.11 25.11 L56.73 23.76 L56.00 26.40 L55.27 23.76 L52.89 25.11 L54.24 22.73 L51.60 22.00 L54.24 21.27 L52.89 18.89 L55.27 20.24 Z" fill="black"/>
+  <path aria-label="Estrella secundaria 3" d="M16.00 38.60 L16.73 41.24 L19.11 39.89 L17.76 42.27 L20.40 43.00 L17.76 43.73 L19.11 46.11 L16.73 44.76 L16.00 47.40 L15.27 44.76 L12.89 46.11 L14.24 43.73 L11.60 43.00 L14.24 42.27 L12.89 39.89 L15.27 41.24 Z" fill="black"/>
+  <path aria-label="Estrella secundaria 4" d="M59.00 38.60 L59.73 41.24 L62.11 39.89 L60.76 42.27 L63.40 43.00 L60.76 43.73 L62.11 46.11 L59.73 44.76 L59.00 47.40 L58.27 44.76 L55.89 46.11 L57.24 43.73 L54.60 43.00 L57.24 42.27 L55.89 39.89 L58.27 41.24 Z" fill="black"/>
+  <path aria-label="Halo" d="M45.10 55.00 L44.73 57.09 L43.67 58.92 L42.05 60.28 L40.06 61.01 L37.94 61.01 L35.95 60.28 L34.33 58.92 L33.27 57.09 L32.90 55.00 L33.27 52.91 L34.33 51.08 L35.95 49.72 L37.94 48.99 L40.06 48.99 L42.05 49.72 L43.67 51.08 L44.73 52.91 Z" fill="black"/>
+  <path aria-label="Cabello" d="M34 57 L30 61 L31 65 L37 64 L40 60 L44 63 L46 60 L42 56 Z" fill="black"/>
+  <path aria-label="Cuerpo y túnica" d="M37 62 L44 64 L48 73 L45 83 L52 91 L51 95 L34 95 L28 90 L31 79 L34 71 Z" fill="black"/>
+  <path aria-label="Brazo izquierdo" d="M36 66 L32 65 L27 69 L19 73 L18 76 L20 77 L29 73 L36 70 Z" fill="black"/>
+  <path aria-label="Brazo derecho" d="M44 66 L48 66 L54 71 L58 74 L57 77 L53 75 L46 71 Z" fill="black"/>
+  <path aria-label="Jarra izquierda" d="M15 76 L14 72 L17 68 L22 69 L24 74 L21 79 L17 79 Z" fill="black"/>
+  <path aria-label="Jarra derecha" d="M53 74 L55 69 L61 69 L63 75 L60 79 L56 79 Z" fill="black"/>
+  <path aria-label="Agua izquierda" d="M16 79 L19 80 L18 89 L16 98 L13.5 105 L12 104 L13 94 Z" fill="black"/>
+  <path aria-label="Agua derecha" d="M57 79 L60 79 L61 88 L63 100 L60 103 L58 92 Z" fill="black"/>
+  <path aria-label="Ondas del estanque" d="M11 104 L22 102 L31 104 L29 106 L21 105 L14 107 L10 106 Z" fill="black"/>
+  <path aria-label="Colina" d="M47 100 L57 98 L64 102 L64 105 L55 102 L48 103 Z" fill="black"/>
+</svg>
