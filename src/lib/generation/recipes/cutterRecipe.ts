@@ -215,7 +215,7 @@ export const cutterRecipe = Object.freeze({
           : await generateCookieCutter(svgForCutter, validation.parameters);
       context.signal.throwIfAborted();
 
-      const report = validatePrintableObject(ownedObject);
+      const report = validatePrintableObject(ownedObject, assessed ? { requireSingleShell: true } : {});
       if (!report.valid || report.bounds === null) {
         throw new CutterGenerationError(
           'INVALID_GEOMETRY',
