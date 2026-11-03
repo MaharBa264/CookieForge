@@ -60,11 +60,11 @@ it('read-only preview retains selection, two contours and heatmap when deletion 
   const app = mount(Viewer, { target, props: { mesh, allowObjectDeletion: false, viewport: { showGrid: true, showAxes: false, showWallThickness: true } }, events: { deleteObject: deleted } });
   try {
     await vi.waitFor(() => expect(target.querySelector('canvas')).not.toBeNull());
-    target.querySelector<HTMLButtonElement>('[aria-label="Activer le mode sélection"]')!.click(); await tick();
+    target.querySelector<HTMLButtonElement>('[aria-label="Activar modo selección"]')!.click(); await tick();
     target.querySelector('canvas')!.dispatchEvent(new MouseEvent('click', { bubbles: true })); await tick();
     const button = target.querySelector<HTMLButtonElement>('[aria-label="Eliminar elemento seleccionado"]')!;
     expect(button).not.toBeNull(); expect(button.disabled).toBe(true);
-    expect(target.querySelector('#viewer-deletion-reason')?.textContent).toContain('lecture seule');
+    expect(target.querySelector('#viewer-deletion-reason')?.textContent).toContain('solo lectura');
     const display = (rendered.scene as THREE.Scene).children.find(child => child instanceof THREE.Group) as THREE.Group;
     const displayedFirst = display.children[0] as THREE.Mesh;
     expect(displayedFirst.geometry).not.toBe(geometry); expect(first.geometry).toBe(geometry);
