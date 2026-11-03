@@ -66,7 +66,7 @@ it('keeps empty startup unobstructed and exposes the empty recovery list from Lo
   const { session, put } = setup(null, { empty: true }); await tick(); await tick();
   expect(document.querySelector('[aria-label="Brouillons de récupération"]')).toBeNull(); expect(session.getDocument()).toBeNull(); expect(put).not.toHaveBeenCalled();
   click('Proyectos locales'); await vi.waitFor(() => expect(document.body.textContent).toContain('No hay borradores de recuperación en este navegador'));
-  expect(button('Actualiser les brouillons de récupération').disabled).toBe(false);
+  expect(button('Actualizar borradores de recuperación').disabled).toBe(false);
 });
 it('resumes the exact stored document through the real orchestrator as dirty, retaining library and source draft', async () => {
   const { session, expected, saved, drafts, projectPut } = setup(); const libraryBefore = JSON.stringify([...saved]); await listed(); resume().click();
@@ -78,7 +78,7 @@ it('resumes the exact stored document through the real orchestrator as dirty, re
 it('cancel resume retains document, epoch, history, generation and drafts', async () => {
   const { session, drafts, expected } = setup(fixture('Current')); await ready(); await listed();
   const doc = session.getDocument(), epoch = session.getSessionEpoch(), mesh = get(model)?.mesh, history = get(historyStore);
-  resume().click(); await prompt(); expect(document.activeElement?.getAttribute('data-choice')).toBe('cancel'); click('Annuler');
+  resume().click(); await prompt(); expect(document.activeElement?.getAttribute('data-choice')).toBe('cancel'); click('Cancelar');
   await vi.waitFor(() => expect(resume().disabled).toBe(false));
   expect(session.getDocument()).toBe(doc); expect(session.getSessionEpoch()).toBe(epoch); expect(get(historyStore)).toEqual(history); expect(get(model)?.mesh).toBe(mesh); expect(drafts.get(expected.draftId)).toEqual(expected);
 });
@@ -106,14 +106,14 @@ it('locks resume before the next Svelte tick', async () => {
   await vi.waitFor(() => expect(resume().disabled).toBe(false));
 });
 it('the synchronous handler rejects a stale enabled resume button once the workflow is busy', async () => {
-  const { read } = setup(fixture('Current')); await listed(); const stale = resume(); click('Créer un nouveau dessin'); stale.click();
-  expect(read).not.toHaveBeenCalled(); await prompt(); expect(resume().disabled).toBe(true); click('Annuler'); await vi.waitFor(() => expect(resume().disabled).toBe(false));
+  const { read } = setup(fixture('Current')); await listed(); const stale = resume(); click('Crear un diseño nuevo'); stale.click();
+  expect(read).not.toHaveBeenCalled(); await prompt(); expect(resume().disabled).toBe(true); click('Cancelar'); await vi.waitFor(() => expect(resume().disabled).toBe(false));
 });
 it('delete cancellation performs no mutation; confirmation deletes and focuses refresh', async () => {
-  const { drafts, deletion } = setup(); await listed(); remove().click(); await prompt(); click('Annuler');
+  const { drafts, deletion } = setup(); await listed(); remove().click(); await prompt(); click('Cancelar');
   await vi.waitFor(() => expect(remove().disabled).toBe(false)); expect(deletion).not.toHaveBeenCalled(); expect(drafts.size).toBe(1);
   remove().focus(); remove().click(); await prompt(); click('Eliminar borrador');
-  await vi.waitFor(() => expect(drafts.size).toBe(0)); await vi.waitFor(() => expect(document.activeElement).toBe(button('Actualiser les brouillons de récupération')));
+  await vi.waitFor(() => expect(drafts.size).toBe(0)); await vi.waitFor(() => expect(document.activeElement).toBe(button('Actualizar borradores de recuperación')));
 });
 it('delete binds the displayed version through the prompt and guards double click', async () => {
   const { expected, drafts, deletion } = setup(); await listed(); const control = remove(); control.click(); control.click(); await prompt();
@@ -164,13 +164,13 @@ it.each(['rename', 'raster'] as const)('rejects edits and source starts during t
 });
 it('failed save-and-resume keeps the workflow error visible on startup and never replaces the session', async () => {
   const { session, expected, drafts } = setup(fixture('Current'), { projectPut: async () => { throw new Error('project write blocked'); } }); await listed();
-  const latest = session.getDocument(), epoch = session.getSessionEpoch(); resume().click(); await prompt(); click('Enregistrer et continuer');
+  const latest = session.getDocument(), epoch = session.getSessionEpoch(); resume().click(); await prompt(); click('Guardar y continuar');
   await vi.waitFor(() => expect(resume().disabled).toBe(false)); expect(document.querySelector('[role="alert"]')?.textContent).toContain('project write blocked'); expect(session.getDocument()).toBe(latest); expect(session.getSessionEpoch()).toBe(epoch); expect(drafts.get(expected.draftId)).toEqual(expected);
 });
 it('read failure is local to the recovery action and refresh allows an explicit retry', async () => {
   let fail = true; const { session } = setup(null, { read: async () => { if (fail) throw new Error('recovery read blocked'); } }); await listed(); resume().click();
   await vi.waitFor(() => expect(document.querySelector('[role="alert"]')?.textContent).toContain('recovery read blocked')); expect(session.getDocument()).toBeNull(); expect(document.querySelector('.alert-error')).toBeNull();
-  fail = false; click('Actualiser les brouillons de récupération'); await vi.waitFor(() => expect(resume().disabled).toBe(false)); resume().click(); await vi.waitFor(() => expect(session.getDocument()?.name).toBe('Recovered A'));
+  fail = false; click('Actualizar borradores de recuperación'); await vi.waitFor(() => expect(resume().disabled).toBe(false)); resume().click(); await vi.waitFor(() => expect(session.getDocument()?.name).toBe('Recovered A'));
 });
 it('hidden/pagehide flush accepted writes best-effort and removes both listeners on unmount', async () => {
   const { session, put, close } = setup(); await listed();
