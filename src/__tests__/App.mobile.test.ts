@@ -66,8 +66,8 @@ it('separates sketch, bridges and batch in the mobile creation flow without chan
   click('Ponts'); await tick();
   expect(document.querySelector('.app-layout')?.classList.contains('mobile-workshop-bridges')).toBe(true);
   mobileButton('Crear').click(); await tick();
-  click('Série de Cutters'); await tick();
-  expect(document.querySelector('.panel-content')?.textContent).toMatch(/série|copies/i);
+  click('Serie de cortantes'); await tick();
+  expect(document.querySelector('.panel-content')?.textContent).toMatch(/serie|copias/i);
   expect(session.getDocument()).toBe(initial);
   mobileButton('Configurar').click(); await tick();
   expect(document.querySelector('.history-controls button[title^="Deshacer"]')).not.toBeNull();
