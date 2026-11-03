@@ -68,8 +68,8 @@ it.each(['circle', 'heart'] as const)('%s selects a session-owned mode with one 
   expect(get(generationState).result?.document).toMatchObject({ schemaVersion: 4, imprintMode: 'recessed' });
   const report = get(generationState).result!.artifacts[0].validation;
   expect(report.valid).toBe(true); expect(report.shells).toBe(1); expect(report.bounds!.max.y).toBe(4);
-  await click('Cancelar'); expect(encodeProject(session.getDocument())).toBe(originalJson); await ready(session); expect(bytes()).toEqual(raised);
-  await click('Rétablir'); expect(encodeProject(session.getDocument())).toBe(recessedJson); await ready(session); expect(bytes()).toEqual(recessed);
+  await click('Deshacer'); expect(encodeProject(session.getDocument())).toBe(originalJson); await ready(session); expect(bytes()).toEqual(raised);
+  await click('Rehacer'); expect(encodeProject(session.getDocument())).toBe(recessedJson); await ready(session); expect(bytes()).toEqual(recessed);
   const depth = document.querySelector<HTMLInputElement>('#stampDepth')!;
   // Exercise an actual depth change even when the Heart starts at the 3 mm boundary.
   for (const value of ['2.5', '3']) {
