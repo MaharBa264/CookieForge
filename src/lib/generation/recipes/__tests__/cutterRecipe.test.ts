@@ -507,6 +507,41 @@ describe('cutterRecipe', () => {
     }
   });
 
+  it('V5 admite tres detalles conectados de distintas alturas en un único STL', async () => {
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">' +
+      '<path d="M0 0 L100 0 L100 100 L0 100 Z"/>' +
+      '<path d="M25 20 L40 20 L40 40 L25 40 Z"/>' +
+      '<path d="M60 60 L75 60 L75 80 L60 80 Z"/>' +
+      '<path d="M45 35 L55 35 L55 45 L45 45 Z"/></svg>';
+    const bridges = [
+      { id: 'left', from: { x: 0, y: 30 }, to: { x: 25, y: 30 }, widthMm: 2 },
+      { id: 'right', from: { x: 100, y: 70 }, to: { x: 75, y: 70 }, widthMm: 2 },
+      { id: 'top', from: { x: 50, y: 0 }, to: { x: 50, y: 35 }, widthMm: 2 }
+    ];
+    const parameters = { ...createDefaultCutterParameters(), taperAngle: 0, enableHandle: false, handleStyle: 'none' as const };
+    const document = {
+      ...createCutterDocument(parameters, svg), schemaVersion: 5 as const, bridges,
+      contourOperations: [
+        { pathIndex: 0, operation: 'cut' as const },
+        { pathIndex: 1, operation: 'emboss' as const, depthMm: 0.8 },
+        { pathIndex: 2, operation: 'emboss' as const, depthMm: 2.4 },
+        { pathIndex: 3, operation: 'emboss' as const, depthMm: 1.5 }
+      ]
+    };
+    const artifacts = await cutterRecipe.generate(document, generationContext(new AbortController().signal));
+    try {
+      expect(artifacts).toHaveLength(1);
+      expect(artifacts[0].validation.valid, artifacts[0].validation.errors.join('\n')).toBe(true);
+      expect(artifacts[0].validation.shells).toBe(1);
+      const stl = serializeSTL(artifacts[0].object, true);
+      expect(stl).toBeInstanceOf(DataView);
+      if (!(stl instanceof DataView)) throw new Error('STL esperado');
+      expect(stl.byteLength).toBe(84 + artifacts[0].validation.triangles * 50);
+    } finally {
+      for (const artifact of artifacts) disposeObject3D(artifact.object);
+    }
+  });
+
   it('V5 falla cerrado si Relieve carece de puente o conserva un mango', async () => {
     const svg = '<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0 L100 0 L100 100 L0 100 Z"/><path d="M30 30 L70 30 L70 70 L30 70 Z"/></svg>';
     const bridge = { id: 'join', from: { x: 0, y: 50 }, to: { x: 30, y: 50 }, widthMm: 2 };
