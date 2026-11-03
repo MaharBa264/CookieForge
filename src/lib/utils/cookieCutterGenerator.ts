@@ -10,7 +10,7 @@ import type {
   SizeMode
 } from '../types/CookieCutter';
 import { extractClosedContours, type NormalizedContour } from './contourExtraction';
-import { createTaperedWallGeometry, createBridgedWallGeometry, createReliefBridgedWallGeometry } from './cutterGeometry';
+import { createTaperedWallGeometry, createBridgedWallGeometry, createMultiReliefBridgedWallGeometry } from './cutterGeometry';
 import {
   CutterGenerationError,
   validateCookieCutterParams
@@ -42,6 +42,8 @@ export interface FirstReliefProfile {
   readonly detailIndex: number;
   /** Separación desde la punta cortante (Y=0) hasta la punta interior. */
   readonly clearanceMm: number;
+  /** V5: detalles adicionales con alturas propias. */
+  readonly details?: readonly Readonly<{ index: number; clearanceMm: number }>[];
 }
 
 function createCutterMaterial(): THREE.MeshStandardMaterial {
@@ -258,13 +260,17 @@ async function createBridgedContourGeometry(
   relief?: Readonly<FirstReliefProfile>
 ): Promise<THREE.BufferGeometry> {
   if (relief) {
-    if (params.taperAngle !== 0 || hasActiveHandle(params) || contours.length !== 2 || bridges.length !== 1) {
-      throw new CutterGenerationError('INVALID_PARAMS', 'El primer relieve requiere paredes rectas, sin mango y exactamente un puente.', { field: 'contourOperations' });
+    const profiles = relief.details ?? [{ index: relief.detailIndex, clearanceMm: relief.clearanceMm }];
+    if (params.taperAngle !== 0 || hasActiveHandle(params) ||
+        contours.length !== profiles.length + 1 || bridges.length !== profiles.length) {
+      throw new CutterGenerationError('INVALID_PARAMS',
+        'Los relieves requieren paredes rectas, sin mango y un puente por detalle.',
+        { field: 'contourOperations' });
     }
-    const geometry = await createReliefBridgedWallGeometry(
-      contours[relief.outerIndex], contours[relief.detailIndex], bridges,
-      { scale, wallThickness: params.wallThickness, height: params.cuttingHeight, clearanceMm: relief.clearanceMm }
-    );
+    const geometry = await createMultiReliefBridgedWallGeometry(contours, bridges, {
+      scale, wallThickness: params.wallThickness, height: params.cuttingHeight,
+      outerIndex: relief.outerIndex, details: profiles
+    });
     try { assertWatertightGeometry(geometry); return geometry; }
     catch (error) { geometry.dispose(); throw error; }
   }
