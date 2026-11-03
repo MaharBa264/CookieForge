@@ -619,7 +619,7 @@ export function parseCutterDocumentV5(value: unknown): import('./designDocument'
   const contourOperations: import('./designDocument').ContourAssignment[] = rawOperations.map((item: unknown, i: number) => {
     const path = `contourOperations.${i}`;
     const entry = requireRecord(item, path);
-    requireExactKeys(entry, path, ['pathIndex', 'operation'], ['depthMm']);
+    requireExactKeys(entry, path, entry.depthMm === undefined ? ['pathIndex', 'operation'] : ['pathIndex', 'operation', 'depthMm']);
     const pathIndex = readFiniteNumber(entry, 'pathIndex', path);
     if (!Number.isSafeInteger(pathIndex) || pathIndex < 0 || pathIndex >= pathCount) invalid(`${path}.pathIndex`, 'índice fuera de rango.');
     if (indices.has(pathIndex)) invalid(`${path}.pathIndex`, 'contorno duplicado.');
