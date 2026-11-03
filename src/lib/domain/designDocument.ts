@@ -90,6 +90,20 @@ export type StampDocumentV4 = Omit<DesignDocumentV2<'stamp'>, 'schemaVersion' | 
   readonly imprintMode: StampImprintMode;
 };
 
+/** V5: operaciones por trazado persistidas, todavía sin efecto sobre la malla 3D. */
+export type ContourOperation = 'cut' | 'emboss' | 'engrave' | 'ignore';
+export interface ContourAssignment {
+  readonly pathIndex: number;
+  readonly operation: ContourOperation;
+}
+
+/** Solo Cutter, por ahora: V1-V4 se mantienen sin modificaciones. */
+export type CutterDocumentV5 = Omit<DesignDocumentV2<'cutter'>, 'schemaVersion'> & {
+  readonly schemaVersion: 5;
+  readonly contourOperations: readonly ContourAssignment[];
+};
+
 export type DesignDocument<K extends DesignKind = DesignKind> = DesignDocumentV1<K> | DesignDocumentV2<K>
   | ('multi-cutter' extends K ? MultiCutterDocument : never)
-  | ('stamp' extends K ? StampDocumentV4 : never);
+  | ('stamp' extends K ? StampDocumentV4 : never)
+  | ('cutter' extends K ? CutterDocumentV5 : never);
