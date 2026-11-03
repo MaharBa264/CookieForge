@@ -128,7 +128,7 @@ export function assessFirstReliefLayout(document: CutterDocumentV5): ReliefLayou
     }
     // No atravesar ninguna isla ajena a los dos extremos del puente.
     for (let index = 0; index < contours.length; index++) {
-      if (index === a || index === b) continue;
+      if (index === a || index === b || index === outerPathIndex) continue;
       if (isInside(bridge.from, contours[index]) || isInside(bridge.to, contours[index]) ||
           segmentCrossesPolygon(bridge.from, bridge.to, contours[index])) {
         return failed('Un puente atraviesa otro detalle interior; cambiá su recorrido.');
