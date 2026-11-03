@@ -739,7 +739,7 @@
     const svg = typeof shape === 'string' ? shape : shape.svg;
     const fileBaseName = typeof shape === 'string'
       ? 'generated-shape'
-      : shape.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      : shape.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
     cancelImageImport();
     importError = null;
