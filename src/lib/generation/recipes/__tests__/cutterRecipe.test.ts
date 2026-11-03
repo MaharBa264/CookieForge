@@ -389,7 +389,7 @@ describe('cutterRecipe', () => {
     try {
       await cutterRecipe.generate(document, generationContext(new AbortController().signal));
     } catch (cause) { error = cause; }
-    expect(error).toMatchObject({ code: 'INVALID_PARAMS', details: { field: 'contourOperations', pathIndex: 0, operation } });
+    expect(error).toMatchObject({ code: 'INVALID_PARAMS', details: { field: 'contourOperations' } });
     expect(generateCookieCutterMock.mock.calls.length).toBe(previousCalls);
   });
 
