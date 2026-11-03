@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { DesignSessionStore } from '../../stores/designSessionStore';
-  import type { DesignDocument } from '../../domain/designDocument';
+  import type { DesignDocument, ContourOperation } from '../../domain/designDocument';
   import { inspectSketch, editSketch, commitSketch, type SketchCommand } from '../../sketch/sketchCommands';
   export let session: DesignSessionStore;
   let pathIndex = 0;
@@ -8,26 +8,29 @@
   let draft: string | null = null;
   let gesture: { baseline: DesignDocument; epoch: number; pointer: number } | null = null;
   let message = '';
-  type ContourOperation = 'unassigned' | 'cut' | 'emboss' | 'engrave' | 'ignore';
-  const operationLabels: Record<ContourOperation, string> = {
+  type OperationChoice = ContourOperation | 'unassigned';
+  const operationLabels: Record<OperationChoice, string> = {
     unassigned: 'Sin asignar', cut: 'Corte', emboss: 'Relieve', engrave: 'Grabado', ignore: 'Ignorar'
   };
   let operations: Record<number, ContourOperation> = {};
-  let operationOwner: DesignDocument | null = null;
   let canvas: SVGSVGElement;
   let x = 0, y = 0;
   $: document = $session;
-  // El borrador pertenece a un snapshot exacto: editar, deshacer o cambiar de proyecto lo invalida.
-  $: if (document !== operationOwner) { operations = {}; operationOwner = document; }
+  // Se deriva del documento canónico: guardar, recargar y Deshacer/Rehacer mantienen las asignaciones.
+  $: operations = document?.schemaVersion === 5
+    ? Object.fromEntries(document.contourOperations.map(item => [item.pathIndex, item.operation])) as Record<number, ContourOperation>
+    : {};
   $: if (document && gesture && (document !== gesture.baseline || session.getSessionEpoch() !== gesture.epoch)) cancel();
   $: svg = draft ?? document?.sketch.svg ?? '';
   $: model = svg ? inspectSketch(svg) : null;
   $: path = model?.paths[pathIndex];
   $: selected = path?.points[pointIndex];
   $: if (model && pathIndex >= model.paths.length) { pathIndex = 0; pointIndex = 0; cancel(); }
-  function setOperation(value: ContourOperation): void {
-    if (!document || !path || path.reason) return;
-    operations = { ...operations, [pathIndex]: value };
+  function setOperation(value: OperationChoice): void {
+    if (!document || !path || path.reason || document.kind !== 'cutter') return;
+    message = '';
+    try { session.updateContourOperation(pathIndex, value); }
+    catch (cause) { message = cause instanceof Error ? cause.message : 'No se pudo guardar la operación.'; }
   }
   function chooseContour(index: number): void {
     if (index === pathIndex) return;
@@ -110,18 +113,18 @@
       {/if}
     </svg>
     <p class="notice">Seleccioná un contorno haciendo clic en su línea o desde la lista. El contorno activo se destaca en azul. La selección no modifica el diseño.</p>
-    {#if path && !path.reason}
-      <div class="operation-draft" aria-label="Operación provisional del contorno">
+    {#if path && !path.reason && document.kind === 'cutter' && document.schemaVersion !== 3}
+      <div class="operation-draft" aria-label="Operación del contorno">
         <label>Operación del contorno {pathIndex + 1}
           <select aria-label="Operación del contorno" value={operations[pathIndex] ?? 'unassigned'}
-            on:change={event => setOperation(event.currentTarget.value as ContourOperation)}>
+            on:change={event => setOperation(event.currentTarget.value as OperationChoice)}>
             {#each Object.entries(operationLabels) as [value, label]}
               <option {value}>{label}</option>
             {/each}
           </select>
         </label>
-        <p role="status">Operación provisional: {operationLabels[operations[pathIndex] ?? 'unassigned']}.</p>
-        <p class="notice">Prototipo de fase 5: esta selección no se guarda en el proyecto ni modifica la geometría o el STL. Se descarta al editar el dibujo o cambiar de proyecto.</p>
+        <p role="status">Operación guardada: {operationLabels[operations[pathIndex] ?? 'unassigned']}.</p>
+        <p class="notice">La operación se guarda en el proyecto y participa de Deshacer/Rehacer. Todavía no modifica la geometría ni el STL. Si editás el SVG, se limpian las asignaciones para evitar índices incorrectos.</p>
       </div>
     {/if}
     {#if path?.reason}<p role="status">{path.reason}</p>{/if}
