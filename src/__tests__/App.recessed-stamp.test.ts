@@ -49,7 +49,7 @@ async function ready(session: ReturnType<typeof setup>) {
 }
 function bytes() { const data = serializeSTL(get(model)!.mesh, true) as DataView; return new Uint8Array(data.buffer, data.byteOffset, data.byteLength).slice(); }
 async function exportPanel() {
-  await click('Exporter le dessin');
+  await click('Exportar diseño');
   await vi.waitFor(() => expect(document.querySelector('.advanced-export .toggle-btn')).not.toBeNull());
   document.querySelector<HTMLButtonElement>('.advanced-export .toggle-btn')!.click(); await tick();
   return document.querySelector<HTMLButtonElement>('.advanced-export .export-btn')!;
@@ -57,7 +57,7 @@ async function exportPanel() {
 it.each(['circle', 'heart'] as const)('%s selects a session-owned mode with one Undo step and reopens exact JSON, preview and STL', async shape => {
   const original = fixture(shape === 'heart' ? 3 : 2, shape), records = new Map<string, DesignDocument>();
   let session = setup(original, records); await ready(session); const raised = bytes(), originalJson = encodeProject(session.getDocument());
-  await click('Réglages'); const length = historyStore.getLength(), epoch = session.sessionEpoch;
+  await click('Ajustes'); const length = historyStore.getLength(), epoch = session.sessionEpoch;
   await click('Hueco');
   expect(session.getDocument()).toMatchObject({ schemaVersion: 4, imprintMode: 'recessed', id: original.id, source: original.source, sketch: original.sketch });
   expect(historyStore.getLength()).toBe(length + 1); expect(session.sessionEpoch).toBe(epoch);
@@ -81,12 +81,12 @@ it.each(['circle', 'heart'] as const)('%s selects a session-owned mode with one 
   session = setup(null, records); await click('Proyectos locales'); await vi.waitFor(() => expect(document.querySelector('[aria-label="Abrir Tampon local"]')).not.toBeNull());
   await click('Abrir Tampon local'); await ready(session);
   expect(encodeProject(session.getDocument())).toBe(savedJson); expect(bytes()).toEqual(savedBytes);
-  await click('Réglages'); expect(button('Hueco').getAttribute('aria-pressed')).toBe('true');
+  await click('Ajustes'); expect(button('Hueco').getAttribute('aria-pressed')).toBe('true');
   const action = await exportPanel(); expect(action.disabled).toBe(false); action.click();
   expect(boundary.stl).toHaveBeenCalledTimes(1); expect(boundary.stl.mock.calls[0][0]).toBe(get(model)!.mesh);
 }, 40000);
 it('refuses deep raised settings without loss and offers an explicit reduction action', async () => {
-  const session = setup(fixture(5)); await ready(session); await click('Réglages');
+  const session = setup(fixture(5)); await ready(session); await click('Ajustes');
   const before = session.getDocument(), length = historyStore.getLength();
   await click('Hueco'); expect(session.getDocument()).toBe(before); expect(historyStore.getLength()).toBe(length);
   expect(button('Relieve').getAttribute('aria-pressed')).toBe('true');
