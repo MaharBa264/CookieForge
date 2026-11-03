@@ -13,7 +13,7 @@ function deferred<T>() { let resolve!: (value: T) => void; const promise = new P
 function click(text: string) { const button = [...document.querySelectorAll<HTMLButtonElement>('button')].find(b => b.textContent?.trim().includes(text)); expect(button).toBeDefined(); button!.click(); }
 async function assistant(capture: () => (() => boolean) = () => () => true, handoff = vi.fn(), legacy = vi.fn()) {
  component = mount(AIAssistant, { target: document.body, props: { params: DEFAULT_PARAMS, svgContent: '<svg>A</svg>', captureOperationValidity: capture, onOptimizedSVG: handoff }, events: { optimizedSVG: legacy } });
- await tick(); click('Assistant IA'); await tick(); return { handoff, legacy };
+ await tick(); click('Asistente de IA'); await tick(); return { handoff, legacy };
 }
 beforeEach(() => { vi.clearAllMocks(); vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:test'); vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {}); });
 afterEach(async () => { if (component) await unmount(component); component = undefined; document.body.innerHTML = ''; vi.restoreAllMocks(); vi.unstubAllGlobals(); });
@@ -63,7 +63,7 @@ it('legacy optimization retains the string event payload', async () => {
  edges.optimize.mockResolvedValue('<svg>legacy</svg>'); const legacy = vi.fn();
  // Omit the contextual callback to exercise the existing event contract.
  component = mount(AIAssistant, { target: document.body, props: { params: DEFAULT_PARAMS, svgContent: '<svg>A</svg>' }, events: { optimizedSVG: legacy } });
- await tick(); click('Assistant IA'); await tick(); click('Analizar'); await tick(); click('Analizar SVG');
+ await tick(); click('Asistente de IA'); await tick(); click('Analizar'); await tick(); click('Analizar SVG');
  await vi.waitFor(() => expect(legacy).toHaveBeenCalledTimes(1)); expect(legacy.mock.calls[0][0].detail).toBe('<svg>legacy</svg>');
 });
 it('current nested generation accepts SVG and clear releases preview exactly once', async () => {
