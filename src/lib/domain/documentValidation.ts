@@ -619,7 +619,7 @@ export function parseCutterDocumentV5(value: unknown): import('./designDocument'
   const contourOperations: import('./designDocument').ContourAssignment[] = rawOperations.map((item: unknown, i: number) => {
     const path = `contourOperations.${i}`;
     const entry = requireRecord(item, path);
-    requireExactKeys(entry, path, ['pathIndex', 'operation']);
+    requireExactKeys(entry, path, ['pathIndex', 'operation'], ['depthMm']);
     const pathIndex = readFiniteNumber(entry, 'pathIndex', path);
     if (!Number.isSafeInteger(pathIndex) || pathIndex < 0 || pathIndex >= pathCount) invalid(`${path}.pathIndex`, 'índice fuera de rango.');
     if (indices.has(pathIndex)) invalid(`${path}.pathIndex`, 'contorno duplicado.');
@@ -627,6 +627,16 @@ export function parseCutterDocumentV5(value: unknown): import('./designDocument'
     const operation = entry.operation;
     if (operation !== 'cut' && operation !== 'emboss' && operation !== 'engrave' && operation !== 'ignore') {
       invalid(`${path}.operation`, 'operación desconocida.');
+    }
+    if (entry.depthMm !== undefined) {
+      if (operation !== 'emboss' && operation !== 'engrave') {
+        invalid(`${path}.depthMm`, 'solo Relieve y Grabado admiten profundidad.');
+      }
+      const depthMm = readFiniteNumber(entry, 'depthMm', path);
+      if (depthMm < 0.4 || depthMm > 3 || depthMm > base.parameters.cuttingHeight) {
+        invalid(`${path}.depthMm`, 'la profundidad debe ser de 0,4 a 3 mm y no superar la altura de corte.');
+      }
+      return { pathIndex, operation, depthMm };
     }
     return { pathIndex, operation };
   });
