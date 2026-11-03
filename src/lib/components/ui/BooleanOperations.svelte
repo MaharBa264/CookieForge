@@ -14,15 +14,15 @@
 </script>
 
 <div class="boolean-operations">
-  <h3>Opérations booléennes</h3>
-  <p class="description">Combinez des formes ou découpez des zones</p>
+  <h3>Operaciones booleanas</h3>
+  <p class="description">Combiná formas o quitá sectores</p>
 
   <div class="operations-grid">
     <button
       class="operation-btn"
       class:active={selectedOperation === 'union'}
       on:click={() => handleOperation('union')}
-      title="Fusionner les formes"
+      title="Unir formas"
     >
       <svg width="40" height="40" viewBox="0 0 40 40">
         <circle cx="15" cy="20" r="10" fill="currentColor" opacity="0.5" />
@@ -35,20 +35,20 @@
       class="operation-btn"
       class:active={selectedOperation === 'subtract'}
       on:click={() => handleOperation('subtract')}
-      title="Soustraire une forme d’une autre"
+      title="Restar una forma de otra"
     >
       <svg width="40" height="40" viewBox="0 0 40 40">
         <circle cx="15" cy="20" r="10" fill="currentColor" />
         <circle cx="25" cy="20" r="10" fill="white" stroke="currentColor" stroke-width="1" />
       </svg>
-      <span>Soustraction</span>
+      <span>Sustracción</span>
     </button>
 
     <button
       class="operation-btn"
       class:active={selectedOperation === 'intersect'}
       on:click={() => handleOperation('intersect')}
-      title="Conserver uniquement les zones communes"
+      title="Conservar solo las zonas comunes"
     >
       <svg width="40" height="40" viewBox="0 0 40 40">
         <defs>
@@ -63,7 +63,7 @@
   </div>
 
   <div class="upload-secondary">
-    <p>Importez une deuxième forme à combiner</p>
+    <p>Importá una segunda forma para combinar</p>
     <input
       type="file"
       accept=".svg,image/svg+xml"
