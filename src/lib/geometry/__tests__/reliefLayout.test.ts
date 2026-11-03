@@ -49,6 +49,52 @@ describe('diagnóstico topológico de primer relieve', () => {
     expect(assessFirstReliefLayout(fixture({ sketch: { svg: grouped, revision: 1 } })))
       .toMatchObject({ topologyReady: false });
   });
+  it('acepta dos detalles independientes de diferentes alturas, cada uno conectado al exterior', () => {
+    const multiSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">' +
+      '<path d="M0 0 L100 0 L100 100 L0 100 Z"/>' +
+      '<path d="M25 20 L40 20 L40 40 L25 40 Z"/>' +
+      '<path d="M60 60 L75 60 L75 80 L60 80 Z"/></svg>';
+    const bridges = [
+      { id: 'left', from: { x: 0, y: 30 }, to: { x: 25, y: 30 }, widthMm: 2 },
+      { id: 'right', from: { x: 100, y: 70 }, to: { x: 75, y: 70 }, widthMm: 2 }
+    ];
+    const document = fixture({
+      sketch: { svg: multiSvg, revision: 2 },
+      bridges,
+      contourOperations: [
+        { pathIndex: 0, operation: 'cut' },
+        { pathIndex: 1, operation: 'emboss', depthMm: 0.8 },
+        { pathIndex: 2, operation: 'emboss', depthMm: 2.4 }
+      ]
+    });
+    const assessed = assessFirstReliefLayout(document);
+    expect(assessed.topologyReady, assessed.reason).toBe(true);
+    expect(assessed.detailProfiles).toEqual([
+      { pathIndex: 1, clearanceMm: 0.8, bridgeId: 'left' },
+      { pathIndex: 2, clearanceMm: 2.4, bridgeId: 'right' }
+    ]);
+  });
+  it('rechaza detalles sin puente propio, anidados o superpuestos', () => {
+    const multiSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">' +
+      '<path d="M0 0 L100 0 L100 100 L0 100 Z"/>' +
+      '<path d="M25 20 L40 20 L40 40 L25 40 Z"/>' +
+      '<path d="M60 60 L75 60 L75 80 L60 80 Z"/></svg>';
+    const operations = [
+      { pathIndex: 0, operation: 'cut' as const },
+      { pathIndex: 1, operation: 'emboss' as const, depthMm: 0.8 },
+      { pathIndex: 2, operation: 'emboss' as const, depthMm: 2.4 }
+    ];
+    const oneBridge = { id: 'left', from: { x: 0, y: 30 }, to: { x: 25, y: 30 }, widthMm: 2 };
+    expect(assessFirstReliefLayout(fixture({
+      sketch: { svg: multiSvg, revision: 1 }, contourOperations: operations, bridges: [oneBridge]
+    })).topologyReady).toBe(false);
+    const nested = multiSvg.replace('M60 60 L75 60 L75 80 L60 80','M28 23 L35 23 L35 35 L28 35');
+    expect(assessFirstReliefLayout(fixture({
+      sketch: { svg: nested, revision: 1 }, contourOperations: operations, bridges: [
+        oneBridge, { id: 'right', from: { x: 100, y: 30 }, to: { x: 35, y: 30 }, widthMm: 2 }
+      ]
+    })).topologyReady).toBe(false);
+  });
   it('no confunde la calificación topológica con grabado o dos relieves', () => {
     expect(assessFirstReliefLayout(fixture({ contourOperations: [{ pathIndex: 1, operation: 'engrave', depthMm: 1 }] })))
       .toMatchObject({ topologyReady: false });
