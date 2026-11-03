@@ -136,6 +136,18 @@ describe('codec projet portable V1', () => {
     ] })).toThrow(DesignDocumentValidationError);
     expect(() => encodeProject({ ...v5, contourOperations: [{ pathIndex: 0, operation: 'unknown' }] })).toThrow(DesignDocumentValidationError);
     expect(() => encodeProject({ ...v5, kind: 'stamp', parameters: parameters('stamp') })).toThrow(DesignDocumentValidationError);
+    const withDepth = { ...v5, contourOperations: [
+      { pathIndex: 0, operation: 'cut' },
+      { pathIndex: 1, operation: 'engrave', depthMm: 1.5 }
+    ] };
+    expect(decodeProject(encodeProject(withDepth)).document).toEqual(withDepth);
+    for (const depthMm of [-1, 0, 0.39, 3.01, NaN, Infinity, '2']) {
+      expect(() => encodeProject({ ...v5, contourOperations: [{ pathIndex: 1, operation: 'engrave', depthMm }] })).toThrow(DesignDocumentValidationError);
+    }
+    expect(() => encodeProject({ ...v5, contourOperations: [{ pathIndex: 0, operation: 'cut', depthMm: 1 }] })).toThrow(DesignDocumentValidationError);
+    expect(() => encodeProject({ ...v5, contourOperations: [{ pathIndex: 0, operation: 'ignore', depthMm: 1 }] })).toThrow(DesignDocumentValidationError);
+    expect(decodeProject(encodeProject(v5)).document).toEqual(v5); // V5 previo sin profundidad sigue válido
+
   });
 
   it('fait un round-trip Stamp/raster sans inventer blob ni checksum', () => {
