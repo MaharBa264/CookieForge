@@ -143,7 +143,7 @@
           <p>{reliefLayout.reason}</p>
           {#if reliefLayout.topologyReady}
             <p>Altura de separación de la punta de corte: {reliefLayout.markingClearanceMm} mm.
-            Para generar de uno a seis relieves 3D, configurá ángulo de pared 0°, desactivá el mango y agregá un puente del exterior a cada detalle. La generación verifica que el STL sea una sola pieza estanca.</p>
+            Para generar de uno a seis relieves 3D, configurá ángulo de pared 0°, desactivá el mango y conectá cada detalle a la red de puentes (puede ser a otro relieve) hasta llegar al exterior. La generación verifica que el STL sea una sola pieza estanca.</p>
           {/if}
         </div>
       {/if}
@@ -171,7 +171,7 @@
           <p class="notice">El valor representa cuánto se eleva la punta interior respecto del filo exterior (0,4 a 3 mm). Cada contorno conserva su ajuste. Hasta seis relieves separados pueden generarse con alturas diferentes y puentes independientes; Grabado sigue pendiente. Según la inclinación del puente, la impresión puede necesitar soportes.</p>
         {/if}
 
-        <p class="notice">La operación forma parte del documento y participa de Deshacer/Rehacer. Usá Guardar proyecto o Exportar proyecto para conservarla después de cerrar. Corte conserva el contorno e Ignorar lo excluye del STL solamente en SVG simples con trazados independientes. Relieve genera geometría 3D para un borde exterior convexo y hasta seis detalles interiores separados, cada uno con su puente, sin mango y con paredes rectas. Grabado aún bloquea la exportación. Si editás el SVG, se limpian las asignaciones para evitar índices incorrectos.</p>
+        <p class="notice">La operación forma parte del documento y participa de Deshacer/Rehacer. Usá Guardar proyecto o Exportar proyecto para conservarla después de cerrar. Corte conserva el contorno e Ignorar lo excluye del STL solamente en SVG simples con trazados independientes. Relieve genera geometría 3D para un borde exterior convexo y hasta seis detalles interiores separados, con una red de puentes conectada al exterior, sin mango y con paredes rectas. Grabado aún bloquea la exportación. Si editás el SVG, se limpian las asignaciones para evitar índices incorrectos.</p>
       </div>
     {/if}
     {#if path?.reason}<p role="status">{path.reason}</p>{/if}
