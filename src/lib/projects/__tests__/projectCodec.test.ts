@@ -120,6 +120,24 @@ describe('codec projet portable V1', () => {
     expectCodecError(JSON.stringify({ format: PROJECT_FORMAT, version: 2, document: v1 }), 'document.schemaVersion');
   });
 
+  it('round-trip V5 conserva operaciones, fuente y parámetros y rechaza asignaciones inválidas', () => {
+    const v1 = cutterDocument();
+    const v5 = { ...v1, schemaVersion: 5, bridges: [], contourOperations: [
+      { pathIndex: 0, operation: 'cut' }, { pathIndex: 1, operation: 'engrave' }
+    ] };
+    const encoded = encodeProject(v5);
+    expect(JSON.parse(encoded).version).toBe(5);
+    expect(decodeProject(encoded).document).toEqual(v5);
+    expect(decodeProject(encodeProject(v1)).document).toEqual(v1);
+    expectCodecError(JSON.stringify({ format: PROJECT_FORMAT, version: 1, document: v5 }), 'document.schemaVersion');
+    expectCodecError(JSON.stringify({ format: PROJECT_FORMAT, version: 5, document: v1 }), 'document.schemaVersion');
+    expect(() => encodeProject({ ...v5, contourOperations: [
+      { pathIndex: 0, operation: 'cut' }, { pathIndex: 0, operation: 'ignore' }
+    ] })).toThrow(DesignDocumentValidationError);
+    expect(() => encodeProject({ ...v5, contourOperations: [{ pathIndex: 0, operation: 'unknown' }] })).toThrow(DesignDocumentValidationError);
+    expect(() => encodeProject({ ...v5, kind: 'stamp', parameters: parameters('stamp') })).toThrow(DesignDocumentValidationError);
+  });
+
   it('fait un round-trip Stamp/raster sans inventer blob ni checksum', () => {
     const decoded = decodeProject(encodeProject(rasterStampDocument()));
 
