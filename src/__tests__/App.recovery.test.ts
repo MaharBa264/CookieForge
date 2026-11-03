@@ -190,7 +190,7 @@ it('observes the latest canonical snapshot after a reentrant same-epoch edit, ne
 });
 it('a nonrepresentable batch suspends new captures without losing the last accepted canonical draft', async () => {
   const { session, put, close } = setup(fixture('Current')); await ready(); session.rename('Accepted before batch'); const expected = JSON.parse(JSON.stringify(session.getDocument())); batch.mesh = new Group(); click('Production en série');
-  await vi.waitFor(() => expect(document.querySelector('.batch-mode .toggle-btn')).not.toBeNull()); document.querySelector<HTMLButtonElement>('.batch-mode .toggle-btn')!.click(); await tick(); click('+ Ajouter le dessin actuel'); await tick(); click('Générer la série complète');
+  await vi.waitFor(() => expect(document.querySelector('.batch-mode .toggle-btn')).not.toBeNull()); document.querySelector<HTMLButtonElement>('.batch-mode .toggle-btn')!.click(); await tick(); click('+ Agregar el diseño actual'); await tick(); click('Generar serie completa');
   await vi.waitFor(() => expect(get(model)?.mesh).toBe(batch.mesh)); session.rename('Not representable now'); await tick();
   await unmount(app!); app = undefined; await vi.waitFor(() => expect(close).toHaveBeenCalledTimes(1)); expect(put.mock.calls.at(-1)?.[0].document).toEqual(expected);
 });
