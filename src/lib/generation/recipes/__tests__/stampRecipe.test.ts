@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import {
   afterAll,
@@ -11,6 +12,7 @@ import {
 import type { DesignDocumentV1 } from '../../../domain/designDocument';
 import type { GeneratedArtifact } from '../../../domain/generatedArtifact';
 import {
+  createDefaultCutterParameters,
   createDefaultStampParameters,
   type StampDesignParameters
 } from '../../../domain/designParameters';
@@ -32,6 +34,9 @@ import {
 } from '../../../utils/__tests__/legacyGeometryFixtureSupport';
 import { installSvgLoaderDomParserAdapter } from '../../../utils/__tests__/svgDomTestSupport';
 import { stampRecipe } from '../stampRecipe';
+import { cutterRecipe } from '../cutterRecipe';
+import { encodeProject, decodeProject } from '../../../projects/projectCodec';
+import { serialize3MF } from '../../../utils/advancedExporter';
 import { serializeSTL } from '../../../utils/stlExporter';
 
 vi.mock('../../../utils/stampGenerator', async (importOriginal) => {
@@ -159,6 +164,60 @@ async function captureFailure(
 }
 
 describe('stampRecipe', () => {
+
+  it('piloto La Estrella XVII: guarda, abre y exporta cortante 75x125 y sello interior', async () => {
+    const cutterSvg = readFileSync(new URL('../../../../../examples/tarot-estrella-xvii/cortante.svg', import.meta.url), 'utf8');
+    const stampSvg = readFileSync(new URL('../../../../../examples/tarot-estrella-xvii/sello-piloto.svg', import.meta.url), 'utf8');
+    const cutterParams = {
+      ...createDefaultCutterParameters(), targetSize: 125, sizeMode: 'height' as const,
+      taperAngle: 0, enableHandle: false, handleStyle: 'none' as const
+    };
+    const stampParams = {
+      ...createDefaultStampParameters(), targetSize: 106, sizeMode: 'height' as const,
+      stampDepth: 1.2, taperAngle: 0, enableHandle: false, handleStyle: 'none' as const,
+      stampBase: true
+    };
+    const cutter = {
+      ...createStampDocument(stampParams, stampSvg),
+      id: 'star-cutter-pilot', kind: 'cutter' as const, parameters: cutterParams,
+      source: { type: 'svg' as const, fileName: 'cortante.svg', svg: cutterSvg },
+      sketch: { svg: cutterSvg, revision: 0 }
+    };
+    const stamp = {
+      ...createStampDocument(stampParams, stampSvg),
+      id: 'star-stamp-pilot', name: 'La Estrella XVII - sello',
+      source: { type: 'svg' as const, fileName: 'sello-piloto.svg', svg: stampSvg },
+      sketch: { svg: stampSvg, revision: 0 }
+    };
+    const cutterRestored = decodeProject(encodeProject(cutter)).document;
+    const stampRestored = decodeProject(encodeProject(stamp)).document;
+    if (cutterRestored.kind !== 'cutter' || stampRestored.kind !== 'stamp') {
+      throw new Error('El proyecto piloto no pudo reabrirse con las recetas correctas.');
+    }
+    const cutting = await cutterRecipe.generate(cutterRestored, generationContext(new AbortController().signal));
+    let marking: readonly GeneratedArtifact<'stamp'>[] = [];
+    try {
+      marking = await stampRecipe.generate(stampRestored, generationContext(new AbortController().signal));
+      expect(cutting[0].validation.valid).toBe(true);
+      expect(marking[0].validation.valid, marking[0].validation.errors.join('\n')).toBe(true);
+      expect(cutting[0].validation.shells).toBe(1);
+      expect(marking[0].validation.shells).toBe(1);
+      expect(cutting[0].dimensionsMm.width).toBeCloseTo(75, 1);
+      expect(cutting[0].dimensionsMm.depth).toBeCloseTo(125, 1);
+      expect(marking[0].dimensionsMm.width).toBeLessThan(cutting[0].dimensionsMm.width - 8);
+      expect(marking[0].dimensionsMm.depth).toBeLessThan(cutting[0].dimensionsMm.depth - 8);
+      for (const artifact of [...cutting, ...marking]) {
+        const stl = serializeSTL(artifact.object, true);
+        expect(stl).toBeInstanceOf(DataView);
+        if (!(stl instanceof DataView)) throw new Error('Se esperaba STL binario.');
+        expect(stl.byteLength).toBe(84 + artifact.validation.triangles * 50);
+        expect(serialize3MF(artifact.object, artifact.role === 'stamp' ? stampParams : cutterParams).byteLength).toBeGreaterThan(100);
+      }
+    } finally {
+      for (const artifact of [...cutting, ...marking]) disposeObject3D(artifact.object);
+    }
+  });
+
   it.each(['raised', 'recessed'] as const)('reads V4 %s from the document, never from legacy params', async imprintMode => {
     const v1 = createStampDocument({ ...legacyStampFixture.success.parameters, stampDepth: 2 });
     const document = { ...v1, schemaVersion: 4 as const, bridges: [] as const, imprintMode };
