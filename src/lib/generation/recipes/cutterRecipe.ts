@@ -208,7 +208,12 @@ export const cutterRecipe = Object.freeze({
         ? await generateCookieCutter(svgForCutter, validation.parameters, bridges, {
             outerIndex: assessed.outerPathIndex,
             detailIndex: assessed.detailPathIndex,
-            clearanceMm: assessed.markingClearanceMm
+            clearanceMm: assessed.markingClearanceMm,
+            ...(assessed.detailProfiles && assessed.detailProfiles.length > 1 ? {
+              details: assessed.detailProfiles.map(profile => ({
+                index: profile.pathIndex, clearanceMm: profile.clearanceMm
+              }))
+            } : {})
           })
         : bridges.length > 0
           ? await generateCookieCutter(svgForCutter, validation.parameters, bridges)
