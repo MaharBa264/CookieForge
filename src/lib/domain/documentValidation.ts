@@ -603,6 +603,44 @@ export function parseStampDocumentV4(value: unknown): import('./designDocument')
   return { ...base, schemaVersion: 4, bridges: [], imprintMode };
 }
 
+/** V5 Cutter: índices únicos y acotados, y valores exactos. No se interpretan aún en la geometría. */
+export function parseCutterDocumentV5(value: unknown): import('./designDocument').CutterDocumentV5 {
+  const record = requireRecord(value, '
+export function parseDesignDocument(value: unknown): DesignDocument {
+  const record = requireRecord(value, '$');
+  if (record.schemaVersion === 1) return parseDesignDocumentV1(value);
+  if (record.schemaVersion === 2) return parseDesignDocumentV2(value);
+  if (record.schemaVersion === 3) return parseMultiCutterDocument(value);
+  if (record.schemaVersion === 4) return parseStampDocumentV4(value);
+  if (record.schemaVersion === 5) return parseCutterDocumentV5(value);
+  invalid('schemaVersion', 'version de document non prise en charge.');
+});
+  if (record.schemaVersion !== 5) invalid('schemaVersion', 'debe ser 5.');
+  if (record.kind !== 'cutter') invalid('kind', 'V5 solo admite cutter.');
+  requireExactKeys(record, '', [...V2_DOCUMENT_KEYS, 'contourOperations']);
+  const { contourOperations: rawOperations, ...fields } = record;
+  const base = parseDesignDocumentV2({ ...fields, schemaVersion: 2 });
+  if (base.kind !== 'cutter') invalid('kind', 'Cutter requerido.');
+  if (!Array.isArray(rawOperations)) invalid('contourOperations', 'debe ser una lista.');
+  if (rawOperations.length > 256) invalid('contourOperations', 'supera el límite de 256 contornos.');
+  const indices = new Set<number>();
+  const contourOperations: import('./designDocument').ContourAssignment[] = rawOperations.map((item: unknown, i: number) => {
+    const path = `contourOperations.${i}`;
+    const entry = requireRecord(item, path);
+    requireExactKeys(entry, path, ['pathIndex', 'operation']);
+    const pathIndex = readFiniteNumber(entry, 'pathIndex', path);
+    if (!Number.isSafeInteger(pathIndex) || pathIndex < 0 || pathIndex > 1023) invalid(`${path}.pathIndex`, 'índice fuera de rango.');
+    if (indices.has(pathIndex)) invalid(`${path}.pathIndex`, 'contorno duplicado.');
+    indices.add(pathIndex);
+    const operation = entry.operation;
+    if (operation !== 'cut' && operation !== 'emboss' && operation !== 'engrave' && operation !== 'ignore') {
+      invalid(`${path}.operation`, 'operación desconocida.');
+    }
+    return { pathIndex, operation };
+  });
+  return { ...base, schemaVersion: 5, contourOperations };
+}
+
 /** Route by header before checking version-specific fields. V1 remains unchanged. */
 export function parseDesignDocument(value: unknown): DesignDocument {
   const record = requireRecord(value, '$');
