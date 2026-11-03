@@ -596,6 +596,9 @@ describe('cutterRecipe', () => {
     expect(reopened.warnings).toEqual([]);
     expect(reopened.document).toEqual(document);
     expect(reopened.document.schemaVersion).toBe(5);
+    if (reopened.document.kind !== 'cutter' || reopened.document.schemaVersion !== 5) {
+      throw new Error('El archivo reabierto debe contener un cortante V5.');
+    }
     const artifacts = await cutterRecipe.generate(reopened.document, generationContext(new AbortController().signal));
     try {
       expect(artifacts).toHaveLength(1);
