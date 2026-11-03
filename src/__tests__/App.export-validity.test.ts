@@ -114,7 +114,7 @@ it.each(['stl', 'obj', '3mf'])('guards %s synchronously before a Svelte flush an
   expect(get(model)!.mesh).toBe(meshA); expect(get(generationState).phase).toBe('scheduled');
   await tick(); expect(action.disabled).toBe(true);
   expect(action.getAttribute('aria-describedby')).toBeTruthy();
-  expect(document.querySelector('[role="status"]')?.textContent).toContain('modèle actuel');
+  expect(document.querySelector('[role="status"]')?.textContent).toContain('modelo actual');
   await ready(); await tick(); expect(action.disabled).toBe(false); action.click();
   expect(download).toHaveBeenCalledTimes(1); expect(download.mock.calls[0][0]).toBe(get(model)!.mesh);
   expect(download.mock.calls[0][0]).not.toBe(meshA);
@@ -162,7 +162,7 @@ it('project JSON export stays enabled independently while geometry generation is
   expect(button('Exportar proyecto').disabled).toBe(false);
 });
 it('a current real batch remains exportable with captured metadata, not later legacy edits', async () => {
-  const session = setup(); await ready(); button('Production en série').click();
+  const session = setup(); await ready(); button('Producción en serie').click();
   await vi.waitFor(() => expect(document.querySelector('.batch-mode .toggle-btn')).not.toBeNull());
   document.querySelector<HTMLButtonElement>('.batch-mode .toggle-btn')!.click(); await tick();
   button('+ Agregar el diseño actual').click(); await tick(); setParams({ ...DEFAULT_PARAMS, wallThickness: 1.2 }); await tick(); button('Generar serie completa').click();
@@ -193,7 +193,7 @@ it('rejects forged viewer deletion without changing document, ownership or expor
 });
 
 it.each(['heterogeneous', 'legacy-unknown'])('omits global geometry claims for %s batches without blocking mesh export', async kind => {
-  setup(); await ready(); button('Production en série').click();
+  setup(); await ready(); button('Producción en serie').click();
   await vi.waitFor(() => expect(document.querySelector('.batch-mode .toggle-btn')).not.toBeNull());
   document.querySelector<HTMLButtonElement>('.batch-mode .toggle-btn')!.click(); await tick();
   if (kind === 'heterogeneous') {
