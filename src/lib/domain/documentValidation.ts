@@ -614,13 +614,14 @@ export function parseCutterDocumentV5(value: unknown): import('./designDocument'
   if (base.kind !== 'cutter') invalid('kind', 'Cutter requerido.');
   if (!Array.isArray(rawOperations)) invalid('contourOperations', 'debe ser una lista.');
   if (rawOperations.length > 256) invalid('contourOperations', 'supera el límite de 256 contornos.');
+  const pathCount = new DOMParser().parseFromString(base.sketch.svg, 'image/svg+xml').getElementsByTagName('path').length;
   const indices = new Set<number>();
   const contourOperations: import('./designDocument').ContourAssignment[] = rawOperations.map((item: unknown, i: number) => {
     const path = `contourOperations.${i}`;
     const entry = requireRecord(item, path);
     requireExactKeys(entry, path, ['pathIndex', 'operation']);
     const pathIndex = readFiniteNumber(entry, 'pathIndex', path);
-    if (!Number.isSafeInteger(pathIndex) || pathIndex < 0 || pathIndex > 1023) invalid(`${path}.pathIndex`, 'índice fuera de rango.');
+    if (!Number.isSafeInteger(pathIndex) || pathIndex < 0 || pathIndex >= pathCount) invalid(`${path}.pathIndex`, 'índice fuera de rango.');
     if (indices.has(pathIndex)) invalid(`${path}.pathIndex`, 'contorno duplicado.');
     indices.add(pathIndex);
     const operation = entry.operation;
