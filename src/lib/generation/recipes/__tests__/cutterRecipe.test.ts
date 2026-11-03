@@ -421,6 +421,49 @@ describe('cutterRecipe', () => {
     expect(generateCookieCutterMock.mock.calls.length).toBe(previousCalls);
   });
 
+  it('V5 genera el primer relieve interior unido en una única malla estanca', async () => {
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M0 0 L100 0 L100 100 L0 100 Z"/><path d="M30 30 L70 30 L70 70 L30 70 Z"/></svg>';
+    const bridge = { id: 'relief-bridge', from: { x: 0, y: 50 }, to: { x: 30, y: 50 }, widthMm: 2 };
+    const params = { ...createDefaultCutterParameters(), taperAngle: 0, enableHandle: false, handleStyle: 'none' as const };
+    const document = {
+      ...createCutterDocument(params, svg),
+      schemaVersion: 5 as const, bridges: [bridge],
+      contourOperations: [{ pathIndex: 0, operation: 'cut' as const }, { pathIndex: 1, operation: 'emboss' as const, depthMm: 1.5 }]
+    };
+    const artifacts = await cutterRecipe.generate(document, generationContext(new AbortController().signal));
+    try {
+      expect(artifacts).toHaveLength(1);
+      expect(artifacts[0].validation.valid, artifacts[0].validation.errors.join('\n')).toBe(true);
+      expect(artifacts[0].validation.shells).toBe(1);
+      const object = artifacts[0].object;
+      const meshes = object.children.filter(child => child instanceof THREE.Mesh);
+      expect(meshes).toHaveLength(1);
+      const geometry = (meshes[0] as THREE.Mesh).geometry;
+      const vertices = geometry.getAttribute('position');
+      const bottomHeights = Array.from({ length: vertices.count }, (_, i) => vertices.getY(i));
+      expect(Math.max(...bottomHeights)).toBeGreaterThan(1.5);
+      expect(generateCookieCutterMock).toHaveBeenCalledWith(
+        svg, params, [bridge], { outerIndex: 0, detailIndex: 1, clearanceMm: 1.5 }
+      );
+      expect(document.sketch.svg).toBe(svg);
+    } finally { for (const artifact of artifacts) disposeObject3D(artifact.object); }
+  });
+
+  it('V5 falla cerrado si Relieve carece de puente o conserva un mango', async () => {
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0 L100 0 L100 100 L0 100 Z"/><path d="M30 30 L70 30 L70 70 L30 70 Z"/></svg>';
+    const bridge = { id: 'join', from: { x: 0, y: 50 }, to: { x: 30, y: 50 }, widthMm: 2 };
+    const document = {
+      ...createCutterDocument(createDefaultCutterParameters(), svg), schemaVersion: 5 as const,
+      bridges: [bridge], contourOperations: [{ pathIndex: 1, operation: 'emboss' as const, depthMm: 1.2 }]
+    };
+    const calls = generateCookieCutterMock.mock.calls.length;
+    await expect(cutterRecipe.generate(document, generationContext(new AbortController().signal)))
+      .rejects.toMatchObject({ code: 'INVALID_PARAMS' });
+    await expect(cutterRecipe.generate({ ...document, bridges: [] }, generationContext(new AbortController().signal)))
+      .rejects.toMatchObject({ code: 'INVALID_PARAMS' });
+    expect(generateCookieCutterMock.mock.calls.length).toBe(calls);
+  });
+
   it('propage intact le code d’échec capturé par la fixture legacy', async () => {
     const document = createCutterDocument(
       { ...legacyCutterFixture.failure.parameters },
