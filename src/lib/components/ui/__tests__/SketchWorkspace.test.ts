@@ -64,6 +64,24 @@ it('persists contour operations independently and invalidates them on SVG edit',
  expect(session.getDocument()).toMatchObject({ schemaVersion: 5, contourOperations: [] });
  expect(session.getDocument()?.sketch.revision).toBe(baseline.sketch.revision + 1);
 });
+it('shows and persists an individual depth for an embossed contour without modifying SVG', async () => {
+ const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M10 10 L90 10 L90 90 Z"/></svg>';
+ const initial = createDesignDocument({ name: 'Detail', kind: 'cutter', source: { type: 'svg', svg, fileName: 'detail.svg' } });
+ const session = createDesignSessionStore(initial);
+ component = mount(SketchWorkspace, { target: document.body.appendChild(document.createElement('div')), props: { session } });
+ await tick();
+ const role = document.querySelector<HTMLSelectElement>('select[aria-label="Operación del contorno"]')!;
+ role.value = 'emboss'; role.dispatchEvent(new Event('change', { bubbles: true })); await tick();
+ const depth = document.querySelector<HTMLInputElement>('input[aria-label="Profundidad de marcado (mm)"]')!;
+ expect(depth).not.toBeNull();
+ expect(depth.value).toBe('1.2');
+ depth.value = '1.7'; depth.dispatchEvent(new Event('change', { bubbles: true })); await tick();
+ expect(session.getDocument()).toMatchObject({ schemaVersion: 5, contourOperations: [{ pathIndex: 0, operation: 'emboss', depthMm: 1.7 }] });
+ expect(session.getDocument()?.sketch.svg).toBe(svg);
+ role.value = 'cut'; role.dispatchEvent(new Event('change', { bubbles: true })); await tick();
+ expect(document.querySelector('input[aria-label="Profundidad de marcado (mm)"]')).toBeNull();
+ expect(session.getDocument()).toMatchObject({ contourOperations: [{ pathIndex: 0, operation: 'cut' }] });
+});
 it('opening does not mutate; drag preview commits once on release', async () => {
  const { session, canvas } = setup(); const baseline = session.getDocument(); await tick(); expect(session.getDocument()).toBe(baseline);
  pointer(document.querySelector('circle')!, 'pointerdown');
