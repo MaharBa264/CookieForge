@@ -29,7 +29,7 @@ describe('App lazy panels', () => {
     document.body.appendChild(target);
     mountedApp = mount(App, { target });
 
-    await openCategory('Création avancée', 'Traitement d’images par IA');
+    await openCategory('Creación avanzada', 'Traitement d’images par IA');
     await openCategory('Outils IA (Gemini)', 'Connexion à Gemini');
     await openCategory('Galerie locale', 'Galerie locale');
   });
