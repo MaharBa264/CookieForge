@@ -133,7 +133,7 @@ it.each(['open', 'import'])('dirty %s cancellation preserves exact A, preview an
   const { session, put } = setup(fixture('A')); await ready(); await library();
   const snapshot = session.getDocument(), mesh = get(model)?.mesh, epoch = session.getSessionEpoch();
   if (transition === 'open') click('Abrir B');
-  else upload(document.querySelector<HTMLInputElement>('input[aria-label="Fichier projet"]')!, new File([encodeProject(fixture('C'))], 'C.ccd.json', { type: 'application/json' }));
+  else upload(document.querySelector<HTMLInputElement>('input[aria-label="Archivo de proyecto"]')!, new File([encodeProject(fixture('C'))], 'C.ccd.json', { type: 'application/json' }));
   await prompt(); click('Cancelar'); await tick(); await tick();
   expect(session.getDocument()).toBe(snapshot); expect(get(model)?.mesh).toBe(mesh);
   expect(session.getSessionEpoch()).toBe(epoch); expect(put).not.toHaveBeenCalled();
@@ -153,7 +153,7 @@ it('failed save-and-continue blocks opening B and preserves A with visible stora
 it('discard opens B and erases every A history snapshot', async () => {
   const { session } = setup(fixture('A')); await ready();
   session.rename('Edited A'); expect(historyStore.getLength()).toBeGreaterThan(1); await library();
-  click('Abrir B'); await prompt(); click('Ignorer les modifications');
+  click('Abrir B'); await prompt(); click('Descartar cambios');
   await vi.waitFor(() => expect(session.getDocument()?.id).toBe('B')); await ready();
   expect(get(historyStore).map(s => s.document?.id)).toEqual(['B']);
   expect(get(generationState).result?.document).toEqual(session.getDocument());
@@ -163,7 +163,7 @@ it.each(['resolve', 'reject'] as const)('accepted save drains before close after
   const pending = deferred();
   const { session, close, put, records } = setup(fixture('A'), () => pending.promise); await ready(); await library();
   const snapshot = session.getDocument(), epoch = session.getSessionEpoch();
-  click('Abrir B'); await prompt(); const lateDiscard = button('Ignorer les modifications'); click('Guardar y continuar');
+  click('Abrir B'); await prompt(); const lateDiscard = button('Descartar cambios'); click('Guardar y continuar');
   await vi.waitFor(() => expect(put).toHaveBeenCalledTimes(1));
   await unmount(app!); app = undefined; lateDiscard.click(); await tick();
   expect(close).not.toHaveBeenCalled(); expect(session.getDocument()).toBe(snapshot);
@@ -180,7 +180,7 @@ it.each(['open', 'new'])('real BatchMode blocks project save/export and paramete
   document.querySelector<HTMLButtonElement>('.batch-mode .toggle-btn')!.click(); await tick();
   click('+ Ajouter le dessin actuel'); await tick(); click('Générer la série complète');
   await vi.waitFor(() => expect(get(model)?.mesh).toBe(batch.mesh)); await library();
-  expect(document.body.textContent).toContain('Un aperçu de série ne peut pas être enregistré');
+  expect(document.body.textContent).toContain('La vista previa de una serie no se puede guardar');
   expect(button('Guardar proyecto').disabled).toBe(true); expect(button('Exportar proyecto').disabled).toBe(true);
   button('Guardar proyecto').click(); button('Exportar proyecto').click(); expect(put).not.toHaveBeenCalled();
   const snapshot = session.getDocument(), scheduled = schedules.documents.length, index = get(historyStore.currentIndex);
@@ -189,16 +189,16 @@ it.each(['open', 'new'])('real BatchMode blocks project save/export and paramete
   click('Ajustes'); await tick(); document.querySelector<HTMLButtonElement>('button[title*="Deshacer"]')!.click(); await tick();
   expect(get(historyStore.currentIndex)).toBe(index); expect(get(model)?.mesh).toBe(batch.mesh);
   await library(); if (transition === 'open') click('Abrir B'); else click('Diseño nuevo');
-  await prompt(); click('Ignorer les modifications');
+  await prompt(); click('Descartar cambios');
   if (transition === 'new') {
     await vi.waitFor(() => expect(session.getDocument()).toBeNull());
     expect(get(model)).toBeNull(); await library();
-    expect(document.body.textContent).not.toContain('Un aperçu de série ne peut pas être enregistré');
+    expect(document.body.textContent).not.toContain('La vista previa de una serie no se puede guardar');
     expect(button('Guardar proyecto').disabled).toBe(true);
     click('Abrir B');
   }
   await vi.waitFor(() => expect(session.getDocument()?.id).toBe('B')); await ready();
-  expect(document.body.textContent).not.toContain('Un aperçu de série ne peut pas être enregistré');
+  expect(document.body.textContent).not.toContain('La vista previa de una serie no se puede guardar');
   expect(button('Guardar proyecto').disabled).toBe(false); expect(button('Exportar proyecto').disabled).toBe(false);
   expect(get(generationState).result?.document).toEqual(session.getDocument());
 });
@@ -214,7 +214,7 @@ it.each(['open', 'replace'])('real optimization A cannot replace clean B after %
   ai.optimize.mockReturnValue(new Promise<string>(yes => { resolve = yes; }));
   const { session } = setup(fixture('A')); await ready(); await startRealAI();
   expect(ai.optimize).toHaveBeenCalledTimes(1);
-  if (transition === 'open') { await library(); click('Abrir B'); await prompt(); click('Ignorer les modifications'); }
+  if (transition === 'open') { await library(); click('Abrir B'); await prompt(); click('Descartar cambios'); }
   else session.replace(fixture());
   await vi.waitFor(() => expect(session.getDocument()?.id).toBe('B')); await ready();
   const snapshot = session.getDocument(), mesh = get(model)?.mesh, epoch = session.getSessionEpoch();
@@ -224,7 +224,7 @@ it.each(['open', 'replace'])('real optimization A cannot replace clean B after %
 });
 it('current real AI handoff survives its own revision reservation and publishes through workflow', async () => {
   ai.optimize.mockResolvedValue(svg);
-  const { session } = setup(fixture('A')); await ready(); await startRealAI(); await prompt(); click('Ignorer les modifications');
+  const { session } = setup(fixture('A')); await ready(); await startRealAI(); await prompt(); click('Descartar cambios');
   await vi.waitFor(() => expect(session.getDocument()?.name).toBe('generated-shape')); await ready();
   expect(session.getDocument()?.sketch.svg).toBe(svg); expect(get(generationState).result?.document).toEqual(session.getDocument());
 });
@@ -245,7 +245,7 @@ it('late real batch A cannot clear or publish over opened B and is disposed once
   const pending = deferred(), owned = ownedBatch(); batch.gate = () => pending.promise;
   await startRealBatch();
   await vi.waitFor(() => expect(document.body.textContent).toContain('Annuler (0/1)'));
-  await library(); click('Abrir B'); await prompt(); click('Ignorer les modifications');
+  await library(); click('Abrir B'); await prompt(); click('Descartar cambios');
   await vi.waitFor(() => expect(session.getDocument()?.id).toBe('B')); await ready();
   const snapshot = session.getDocument(), epoch = session.getSessionEpoch(), preview = get(model)?.mesh;
   pending.resolve();
@@ -253,7 +253,7 @@ it('late real batch A cannot clear or publish over opened B and is disposed once
   expect(owned.material).toHaveBeenCalledTimes(1);
   expect(session.getDocument()).toBe(snapshot); expect(session.getSessionEpoch()).toBe(epoch);
   expect(get(model)?.mesh).toBe(preview); expect(get(generationState).phase).toBe('ready');
-  expect(document.body.textContent).not.toContain('Un aperçu de série ne peut pas être enregistré');
+  expect(document.body.textContent).not.toContain('La vista previa de una serie no se puede guardar');
   expect(button('Guardar proyecto').disabled).toBe(false);
 });
 
@@ -268,7 +268,7 @@ it('batch validity is bound to producer start even while BatchMode stays mounted
   expect(owned.material).toHaveBeenCalledTimes(1); expect(session.getDocument()).toBe(snapshot); expect(session.getSessionEpoch()).toBe(epoch);
   await ready(); expect(get(generationState).result?.document).toEqual(snapshot); expect(get(model)?.mesh).not.toBe(owned.mesh);
   await library(); expect(button('Guardar proyecto').disabled).toBe(false);
-  expect(document.body.textContent).not.toContain('Un aperçu de série ne peut pas être enregistré');
+  expect(document.body.textContent).not.toContain('La vista previa de una serie no se puede guardar');
 });
 it('session mutation during batch clear prevents publication and disposes the transferred result', async () => {
   const { session } = setup(fixture('A')); await ready();
@@ -290,7 +290,7 @@ it('new session during replacement tick retains filename and save eligibility wi
     await vi.waitFor(() => expect(owned.geometry).toHaveBeenCalledTimes(1));
     expect(owned.material).toHaveBeenCalledTimes(1); expect(get(model)?.mesh).not.toBe(owned.mesh);
     expect(document.querySelector('.current-file')?.textContent).toBe('B.svg'); await library();
-    expect(document.body.textContent).not.toContain('Un aperçu de série ne peut pas être enregistré'); expect(button('Guardar proyecto').disabled).toBe(false);
+    expect(document.body.textContent).not.toContain('La vista previa de una serie no se puede guardar'); expect(button('Guardar proyecto').disabled).toBe(false);
   } finally { unsubscribe(); }
 });
 
@@ -319,9 +319,9 @@ it('starting raster B while source A awaits confirmation cancels A without clobb
   await vi.waitFor(() => expect(raster.resolve).toBeDefined()); raster.resolve!(svg); await prompt();
   raster.resolve = undefined; upload(input, new File(['b'], 'B.png', { type: 'image/png' }));
   await vi.waitFor(() => expect(raster.resolve).toBeDefined());
-  click('Ignorer les modifications'); await tick(); await tick();
+  click('Descartar cambios'); await tick(); await tick();
   expect(session.getDocument()).toBe(snapshot); expect(session.getSessionEpoch()).toBe(epoch);
-  raster.resolve!(svg); await prompt(); click('Ignorer les modifications');
+  raster.resolve!(svg); await prompt(); click('Descartar cambios');
   await vi.waitFor(() => expect(session.getDocument()?.source.fileName).toBe('B.png')); await ready();
 });
 
@@ -337,7 +337,7 @@ it.each(['source', 'open', 'import'] as const)('pending raster B supersedes %s A
   } else {
     await library();
     if (transition === 'open') click('Abrir B');
-    else upload(document.querySelector<HTMLInputElement>('input[aria-label="Fichier projet"]')!, new File([encodeProject(fixture('C'))], 'C.ccd.json', { type: 'application/json' }));
+    else upload(document.querySelector<HTMLInputElement>('input[aria-label="Archivo de proyecto"]')!, new File([encodeProject(fixture('C'))], 'C.ccd.json', { type: 'application/json' }));
   }
   await prompt(); click('Guardar y continuar');
   await vi.waitFor(() => expect(put).toHaveBeenCalledTimes(1));
