@@ -63,8 +63,8 @@ export function assessFirstReliefLayout(document: CutterDocumentV5): ReliefLayou
   if (paths.length !== details.length + 1 || paths.some(element =>
     element.localName.toLowerCase() !== 'path' || element.hasAttribute('transform') ||
     (element.getAttribute('d')?.match(/[Mm]/g)?.length ?? 0) !== 1 ||
-    !/^[\\s\\d.,+\\-eE MmLlHhVvZz]+$/.test(element.getAttribute('d') ?? '') ||
-    !/[Zz]\\s*$/.test(element.getAttribute('d') ?? '')
+    !/^[\s\d.,+\-eE MmLlHhVvZz]+$/.test(element.getAttribute('d') ?? '') ||
+    !/[Zz]\s*$/.test(element.getAttribute('d') ?? '')
   )) {
     return failed('Se requiere un path lineal, simple y cerrado por cada contorno, sin grupos ni transformaciones.');
   }
