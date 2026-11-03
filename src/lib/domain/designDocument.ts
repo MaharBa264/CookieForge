@@ -92,6 +92,9 @@ export type StampDocumentV4 = Omit<DesignDocumentV2<'stamp'>, 'schemaVersion' | 
 
 /** V5: operaciones por trazado persistidas, todavía sin efecto sobre la malla 3D. */
 export type ContourOperation = 'cut' | 'emboss' | 'engrave' | 'ignore';
+/** Primer rango conservador para detalle interno; aún no se fabrica en 3D. */
+export const CONTOUR_DETAIL_DEPTH = Object.freeze({ minMm: 0.4, maxMm: 3, defaultMm: 1.2 });
+
 export interface ContourAssignment {
   readonly pathIndex: number;
   readonly operation: ContourOperation;
