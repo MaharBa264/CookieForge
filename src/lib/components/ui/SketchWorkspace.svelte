@@ -123,8 +123,8 @@
             {/each}
           </select>
         </label>
-        <p role="status">Operación guardada: {operationLabels[operations[pathIndex] ?? 'unassigned']}.</p>
-        <p class="notice">La operación se guarda en el proyecto y participa de Deshacer/Rehacer. Todavía no modifica la geometría ni el STL. Si editás el SVG, se limpian las asignaciones para evitar índices incorrectos.</p>
+        <p role="status">Operación asignada: {operationLabels[operations[pathIndex] ?? 'unassigned']}.</p>
+        <p class="notice">La operación forma parte del documento y participa de Deshacer/Rehacer. Usá Guardar proyecto o Exportar proyecto para conservarla después de cerrar. Todavía no modifica la geometría ni el STL. Si editás el SVG, se limpian las asignaciones para evitar índices incorrectos.</p>
       </div>
     {/if}
     {#if path?.reason}<p role="status">{path.reason}</p>{/if}
