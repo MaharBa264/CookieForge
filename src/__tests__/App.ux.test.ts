@@ -64,15 +64,15 @@ describe('App UX states', () => {
     document.querySelector<HTMLButtonElement>('button[title="Outils IA (Gemini)"]')?.click();
 
     await vi.waitFor(() => {
-      expect(document.querySelector('summary')?.textContent).toContain('Obtenir une clé API gratuite');
+      expect(document.querySelector('summary')?.textContent).toContain('Obtener una clave API gratuita');
     });
 
     const guide = document.querySelector<HTMLDetailsElement>('details.info-box');
     const connectButton = Array.from(document.querySelectorAll<HTMLButtonElement>('button'))
-      .find((button) => button.textContent?.trim() === 'Connecter Gemini');
+      .find((button) => button.textContent?.trim() === 'Conectar Gemini');
 
     expect(guide?.open).toBe(false);
-    expect(document.getElementById('gemini-key-privacy')?.textContent).toContain('données pertinentes');
+    expect(document.getElementById('gemini-key-privacy')?.textContent).toContain('datos necesarios');
     expect(connectButton?.disabled).toBe(true);
   });
 });
