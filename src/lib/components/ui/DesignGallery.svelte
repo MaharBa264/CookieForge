@@ -27,7 +27,7 @@
   function handleDeleteProject(project: ProjectData, event: Event) {
     event.stopPropagation();
 
-    if (confirm(`Supprimer le projet "${project.name}"?`)) {
+    if (confirm(`Eliminar proyecto "${project.name}"?`)) {
       deleteProjectFromStorage(project);
       loadProjects();
     }
@@ -47,13 +47,13 @@
       <rect x="14" y="14" width="7" height="7" />
       <rect x="3" y="14" width="7" height="7" />
     </svg>
-    Bibliothèque de dessins ({projects.length})
+    Biblioteca de diseños ({projects.length})
   </button>
 
   {#if showGallery}
     <div class="gallery-panel">
       <div class="gallery-header">
-        <h3>Dessins enregistrés</h3>
+        <h3>Diseños guardados</h3>
         <button class="close-btn" on:click={() => showGallery = false}>✕</button>
       </div>
 
@@ -64,8 +64,8 @@
             <polyline points="17 21 17 13 7 13 7 21" />
             <polyline points="7 3 7 8 15 8" />
           </svg>
-          <p>Aucun dessin enregistré</p>
-          <span>Créez un dessin et enregistrez-le dans votre bibliothèque</span>
+          <p>No hay diseños guardados</p>
+          <span>Creá un diseño y guardalo en tu biblioteca</span>
         </div>
       {:else}
         <div class="projects-grid">
@@ -101,7 +101,7 @@
               <button
                 class="delete-btn"
                 on:click={(e) => handleDeleteProject(project, e)}
-                title="Supprimer le projet"
+                title="Eliminar proyecto"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <polyline points="3 6 5 6 21 6" />
