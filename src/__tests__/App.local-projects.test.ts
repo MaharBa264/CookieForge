@@ -175,7 +175,7 @@ it.each(['resolve', 'reject'] as const)('accepted save drains before close after
 
 it.each(['open', 'new'])('real BatchMode blocks project save/export and parameter/history regeneration until %s', async transition => {
   const { session, put } = setup(fixture('A')); await ready(); session.rename('Edited A');
-  batch.mesh = new Group(); click('Production en série');
+  batch.mesh = new Group(); click('Producción en serie');
   await vi.waitFor(() => expect(document.querySelector('.batch-mode .toggle-btn')).not.toBeNull());
   document.querySelector<HTMLButtonElement>('.batch-mode .toggle-btn')!.click(); await tick();
   click('+ Agregar el diseño actual'); await tick(); click('Generar serie completa');
@@ -230,7 +230,7 @@ it('current real AI handoff survives its own revision reservation and publishes 
 });
 
 async function startRealBatch() {
-  click('Production en série');
+  click('Producción en serie');
   await vi.waitFor(() => expect(document.querySelector('.batch-mode .toggle-btn')).not.toBeNull());
   document.querySelector<HTMLButtonElement>('.batch-mode .toggle-btn')!.click(); await tick();
   click('+ Agregar el diseño actual'); await tick(); click('Generar serie completa');
