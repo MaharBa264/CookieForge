@@ -48,7 +48,7 @@ describe('App UX states', () => {
     });
 
     expect(navigationButton?.getAttribute('aria-current')).toBe('page');
-    expect(document.querySelector('button[aria-label^="Utiliser la forme "]')).not.toBeNull();
+    expect(document.querySelector('button[aria-label^="Usar la forma "]')).not.toBeNull();
 
     const seasonalFilter = Array.from(document.querySelectorAll<HTMLButtonElement>('.category-filter'))
       .find((button) => button.textContent?.trim() === 'Temporadas');
