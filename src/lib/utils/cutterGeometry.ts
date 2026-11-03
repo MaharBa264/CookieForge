@@ -920,11 +920,41 @@ export async function createReliefBridgedWallGeometry(
   bridges: readonly Bridge[],
   options: Readonly<{ scale: number; wallThickness: number; height: number; clearanceMm: number }>
 ): Promise<THREE.BufferGeometry> {
-  const { scale, wallThickness, height, clearanceMm } = options;
-  if (!Number.isFinite(clearanceMm) || clearanceMm < 0.4 || clearanceMm > 3 || clearanceMm >= height) {
-    throw generationError('INVALID_GEOMETRY', 'Invalid relief clearance.', { field: 'contourOperations', clearanceMm });
+  return createMultiReliefBridgedWallGeometry([outer, detail], bridges, {
+    scale: options.scale, wallThickness: options.wallThickness, height: options.height,
+    outerIndex: 0, details: [{ index: 1, clearanceMm: options.clearanceMm }]
+  });
+}
+
+export interface MultiReliefProfile {
+  readonly index: number;
+  readonly clearanceMm: number;
+}
+
+/**
+ * Construye UNA banda+puentes estanca y desplaza la punta inferior de cada
+ * detalle a una altura propia. Las paredes y los puentes comparten índices,
+ * por lo que no se exportan sólidos separados ni uniones por solapamiento.
+ */
+export async function createMultiReliefBridgedWallGeometry(
+  contours: readonly NormalizedContour[],
+  bridges: readonly Bridge[],
+  options: Readonly<{
+    scale: number; wallThickness: number; height: number;
+    outerIndex: number; details: readonly MultiReliefProfile[];
+  }>
+): Promise<THREE.BufferGeometry> {
+  const { scale, wallThickness, height, outerIndex, details } = options;
+  if (contours.length < 2 || contours.length > 4 || details.length !== contours.length - 1 ||
+      !Number.isSafeInteger(outerIndex) || outerIndex < 0 || outerIndex >= contours.length ||
+      bridges.length !== details.length ||
+      new Set(details.map(p => p.index)).size !== details.length ||
+      details.some(p => !Number.isSafeInteger(p.index) || p.index === outerIndex ||
+        p.index < 0 || p.index >= contours.length || !Number.isFinite(p.clearanceMm) ||
+        p.clearanceMm < 0.4 || p.clearanceMm > 3 || p.clearanceMm >= height)) {
+    throw generationError('INVALID_GEOMETRY', 'Invalid independent relief profiles.', { field: 'contourOperations' });
   }
-  const geometry = await createBridgedWallGeometry([outer, detail], bridges, {
+  const geometry = await createBridgedWallGeometry(contours, bridges, {
     scale, bottomWidthMm: wallThickness, topWidthMm: wallThickness,
     bottomBridgeGrowthMm: 0, topBridgeGrowthMm: 0,
     baseHeight: 0, height, capBottom: true, capTop: true
@@ -940,17 +970,21 @@ export async function createReliefBridgedWallGeometry(
       }
       return nearest;
     };
-    const scaledOuter = outer.map(p => ({ x: p.x * scale, y: p.y * scale }));
-    const scaledDetail = detail.map(p => ({ x: p.x * scale, y: p.y * scale }));
+    const scaled = contours.map(contour => contour.map(p => ({ x: p.x * scale, y: p.y * scale })));
     for (let i = 0; i < position.count; i++) {
-      if (Math.abs(position.getY(i)) > 1e-6) continue; // techo y cara del mango intactos
+      if (Math.abs(position.getY(i)) > 1e-6) continue;
       const x = position.getX(i), z = position.getZ(i);
-      const distOuter = minDistance(x, z, scaledOuter);
-      const distDetail = minDistance(x, z, scaledDetail);
-      const outerGap = Math.max(0, distOuter - wallThickness * 1.1);
-      const detailGap = Math.max(0, distDetail - wallThickness * 1.1);
+      const distanceOuter = minDistance(x, z, scaled[outerIndex]);
+      let nearestDetail = details[0];
+      let distanceDetail = Number.POSITIVE_INFINITY;
+      for (const profile of details) {
+        const distance = minDistance(x, z, scaled[profile.index]);
+        if (distance < distanceDetail) { distanceDetail = distance; nearestDetail = profile; }
+      }
+      const outerGap = Math.max(0, distanceOuter - wallThickness * 1.1);
+      const detailGap = Math.max(0, distanceDetail - wallThickness * 1.1);
       const ratio = outerGap + detailGap < 1e-8 ? 0 : outerGap / (outerGap + detailGap);
-      position.setY(i, clearanceMm * ratio);
+      position.setY(i, nearestDetail.clearanceMm * ratio);
     }
     position.needsUpdate = true;
     geometry.computeVertexNormals();
