@@ -354,6 +354,73 @@ describe('cutterRecipe', () => {
     } finally { for (const artifact of artifacts) disposeObject3D(artifact.object); }
   });
 
+  it('V5 aplica Ignorar a un path interior sin cambiar el SVG original', async () => {
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M0 0 L100 0 L100 100 L0 100 Z"/><path d="M30 30 L70 30 L70 70 L30 70 Z"/></svg>';
+    const document = {
+      ...createCutterDocument(createDefaultCutterParameters(), svg),
+      schemaVersion: 5 as const,
+      bridges: [],
+      contourOperations: [{ pathIndex: 1, operation: 'ignore' as const }]
+    };
+    const artifacts = await cutterRecipe.generate(document, generationContext(new AbortController().signal));
+    try {
+      expect(artifacts).toHaveLength(1);
+      expect(artifacts[0].validation.valid).toBe(true);
+      expect(artifacts[0].object.userData.contourCount).toBe(1);
+      const inputSvg = generateCookieCutterMock.mock.lastCall?.[0];
+      expect(inputSvg).toContain('M0 0 L100 0');
+      expect(inputSvg).not.toContain('M30 30 L70 30');
+      expect(document.sketch.svg).toBe(svg);
+    } finally {
+      for (const artifact of artifacts) disposeObject3D(artifact.object);
+    }
+  });
+
+  it.each(['emboss', 'engrave'] as const)('V5 bloquea %s sin fabricar una geometría falsa', async operation => {
+    const svg = '<svg viewBox="0 0 100 100"><path d="M0 0 L100 0 L100 100 L0 100 Z"/></svg>';
+    const document = {
+      ...createCutterDocument(createDefaultCutterParameters(), svg),
+      schemaVersion: 5 as const,
+      bridges: [],
+      contourOperations: [{ pathIndex: 0, operation }]
+    };
+    const previousCalls = generateCookieCutterMock.mock.calls.length;
+    let error: unknown;
+    try {
+      await cutterRecipe.generate(document, generationContext(new AbortController().signal));
+    } catch (cause) { error = cause; }
+    expect(error).toMatchObject({ code: 'INVALID_PARAMS', details: { field: 'contourOperations', pathIndex: 0, operation } });
+    expect(generateCookieCutterMock.mock.calls.length).toBe(previousCalls);
+  });
+
+  it('V5 rechaza ignorar todos los contornos sin invocar el generador', async () => {
+    const svg = '<svg viewBox="0 0 100 100"><path d="M0 0 L100 0 L100 100 L0 100 Z"/></svg>';
+    const document = {
+      ...createCutterDocument(createDefaultCutterParameters(), svg),
+      schemaVersion: 5 as const,
+      bridges: [],
+      contourOperations: [{ pathIndex: 0, operation: 'ignore' as const }]
+    };
+    const previousCalls = generateCookieCutterMock.mock.calls.length;
+    await expect(cutterRecipe.generate(document, generationContext(new AbortController().signal)))
+      .rejects.toMatchObject({ code: 'NO_VALID_CONTOURS' });
+    expect(generateCookieCutterMock.mock.calls.length).toBe(previousCalls);
+  });
+
+  it('V5 no interpreta silenciosamente contornos dentro de grupos', async () => {
+    const svg = '<svg viewBox="0 0 100 100"><g><path d="M0 0 L100 0 L100 100 L0 100 Z"/></g><path d="M20 20 L30 20 L30 30 Z"/></svg>';
+    const document = {
+      ...createCutterDocument(createDefaultCutterParameters(), svg),
+      schemaVersion: 5 as const,
+      bridges: [],
+      contourOperations: [{ pathIndex: 1, operation: 'ignore' as const }]
+    };
+    const previousCalls = generateCookieCutterMock.mock.calls.length;
+    await expect(cutterRecipe.generate(document, generationContext(new AbortController().signal)))
+      .rejects.toMatchObject({ code: 'INVALID_PARAMS' });
+    expect(generateCookieCutterMock.mock.calls.length).toBe(previousCalls);
+  });
+
   it('propage intact le code d’échec capturé par la fixture legacy', async () => {
     const document = createCutterDocument(
       { ...legacyCutterFixture.failure.parameters },
