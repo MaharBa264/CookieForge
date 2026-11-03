@@ -51,8 +51,8 @@ export function assessFirstReliefLayout(document: CutterDocumentV5): ReliefLayou
   if (document.contourOperations.some(a => a.operation === 'engrave' || a.operation === 'ignore')) {
     return failed('Este relieve inicial no admite Grabado ni Ignorar junto con Relieve.');
   }
-  if (details.length < 1 || details.length > 3) {
-    return failed('Se admiten de uno a tres detalles de Relieve independientes.');
+  if (details.length < 1 || details.length > 6) {
+    return failed('Se admiten de uno a seis detalles de Relieve independientes.');
   }
   const parsed = new DOMParser().parseFromString(document.sketch.svg, 'image/svg+xml');
   const root = parsed.documentElement;
@@ -86,7 +86,7 @@ export function assessFirstReliefLayout(document: CutterDocumentV5): ReliefLayou
   for (const detail of details) {
     const polygon = contours[detail.pathIndex];
     if (Math.abs(signedArea(polygon)) >= Math.abs(signedArea(outer)) ||
-        !polygon.every(point => isInside(point, outer))) {
+        !polygon.every(point => isInside(point, outer)) || polygonsCross(polygon, outer)) {
       return failed('Cada relieve debe estar completamente dentro del borde exterior.');
     }
   }
