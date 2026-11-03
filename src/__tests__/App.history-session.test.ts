@@ -32,7 +32,7 @@ function button(label: string) {
 async function click(label: string) { button(label).click(); await tick(); }
 async function parameters() {
   await vi.waitFor(() => expect(get(generationState).phase).toBe('ready'), { timeout: 10000 });
-  await click('Réglages');
+  await click('Ajustes');
 }
 async function dirty(expected: boolean) {
   await click('Proyectos locales');
