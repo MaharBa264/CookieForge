@@ -573,6 +573,36 @@ describe('cutterRecipe', () => {
     }
   });
 
+  it('V5 exporta un relieve con puente ramificado entre dos detalles interiores', async () => {
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">' +
+      '<path d="M0 0 L100 0 L100 100 L0 100 Z"/>' +
+      '<path d="M25 20 L40 20 L40 40 L25 40 Z"/>' +
+      '<path d="M55 20 L70 20 L70 40 L55 40 Z"/></svg>';
+    const bridges = [
+      { id: 'root', from: { x: 0, y: 30 }, to: { x: 25, y: 30 }, widthMm: 2 },
+      { id: 'branch', from: { x: 40, y: 30 }, to: { x: 55, y: 30 }, widthMm: 2 }
+    ];
+    const parameters = { ...createDefaultCutterParameters(), taperAngle: 0, enableHandle: false, handleStyle: 'none' as const };
+    const document = { ...createCutterDocument(parameters, svg), schemaVersion: 5 as const, bridges,
+      contourOperations: [
+        { pathIndex: 0, operation: 'cut' as const },
+        { pathIndex: 1, operation: 'emboss' as const, depthMm: 0.9 },
+        { pathIndex: 2, operation: 'emboss' as const, depthMm: 2.2 }
+      ] };
+    const artifacts = await cutterRecipe.generate(document, generationContext(new AbortController().signal));
+    try {
+      expect(artifacts).toHaveLength(1);
+      expect(artifacts[0].validation.valid, artifacts[0].validation.errors.join('\n')).toBe(true);
+      expect(artifacts[0].validation.shells).toBe(1);
+      expect(artifacts[0].object.children.filter(child => child instanceof THREE.Mesh)).toHaveLength(1);
+      const stl = serializeSTL(artifacts[0].object, true);
+      expect(stl).toBeInstanceOf(DataView);
+      if (!(stl instanceof DataView)) throw Error('Se esperaba STL binario');
+      expect(stl.byteLength).toBe(84 + artifacts[0].validation.triangles * 50);
+      expect(serialize3MF(artifacts[0].object, parameters).byteLength).toBeGreaterThan(100);
+    } finally { for (const artifact of artifacts) disposeObject3D(artifact.object); }
+  });
+
   it('V5 falla cerrado si Relieve carece de puente o conserva un mango', async () => {
     const svg = '<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0 L100 0 L100 100 L0 100 Z"/><path d="M30 30 L70 30 L70 70 L30 70 Z"/></svg>';
     const bridge = { id: 'join', from: { x: 0, y: 50 }, to: { x: 30, y: 50 }, widthMm: 2 };
