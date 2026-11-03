@@ -10,7 +10,7 @@ import type {
   SizeMode
 } from '../types/CookieCutter';
 import { extractClosedContours, type NormalizedContour } from './contourExtraction';
-import { createTaperedWallGeometry, createBridgedWallGeometry } from './cutterGeometry';
+import { createTaperedWallGeometry, createBridgedWallGeometry, createReliefBridgedWallGeometry } from './cutterGeometry';
 import {
   CutterGenerationError,
   validateCookieCutterParams
@@ -36,6 +36,13 @@ const HANDLE_SPREAD: Readonly<Record<Exclude<HandleStyle, 'none'>, number>> = Ob
 
 const SIZE_FIT_MAX_ITERATIONS = 5;
 const SIZE_FIT_MIN_SCALE = 1e-6;
+
+export interface FirstReliefProfile {
+  readonly outerIndex: number;
+  readonly detailIndex: number;
+  /** Separación desde la punta cortante (Y=0) hasta la punta interior. */
+  readonly clearanceMm: number;
+}
 
 function createCutterMaterial(): THREE.MeshStandardMaterial {
   return new THREE.MeshStandardMaterial(MATERIAL_OPTIONS);
@@ -247,8 +254,20 @@ function measuredPlanarDimension(group: THREE.Group, mode: SizeMode): number {
 
 async function createBridgedContourGeometry(
   contours: ReadonlyArray<NormalizedContour>, bridges: readonly Bridge[],
-  params: Readonly<CookieCutterParams>, scale: number
+  params: Readonly<CookieCutterParams>, scale: number,
+  relief?: Readonly<FirstReliefProfile>
 ): Promise<THREE.BufferGeometry> {
+  if (relief) {
+    if (params.taperAngle !== 0 || hasActiveHandle(params) || contours.length !== 2 || bridges.length !== 1) {
+      throw new CutterGenerationError('INVALID_PARAMS', 'El primer relieve requiere paredes rectas, sin mango y exactamente un puente.', { field: 'contourOperations' });
+    }
+    const geometry = await createReliefBridgedWallGeometry(
+      contours[relief.outerIndex], contours[relief.detailIndex], bridges,
+      { scale, wallThickness: params.wallThickness, height: params.cuttingHeight, clearanceMm: relief.clearanceMm }
+    );
+    try { assertWatertightGeometry(geometry); return geometry; }
+    catch (error) { geometry.dispose(); throw error; }
+  }
   const activeHandle = hasActiveHandle(params);
   const taper = Math.tan(params.taperAngle * Math.PI / 180) * params.cuttingHeight;
   const topWidth = params.wallThickness + 2 * taper;
@@ -280,14 +299,15 @@ async function buildCutterGroup(
   contours: ReadonlyArray<NormalizedContour>,
   params: Readonly<CookieCutterParams>,
   scale: number,
-  bridges: readonly Bridge[] = []
+  bridges: readonly Bridge[] = [],
+  relief?: Readonly<FirstReliefProfile>
 ): Promise<THREE.Group> {
   const group = new THREE.Group();
   group.name = 'cookieCutter';
 
   try {
     if (bridges.length > 0) {
-      const geometry = await createBridgedContourGeometry(contours, bridges, params, scale);
+      const geometry = await createBridgedContourGeometry(contours, bridges, params, scale, relief);
       const mesh = new THREE.Mesh(geometry, createCutterMaterial());
       mesh.name = 'cutter-body-bridged';
       group.add(mesh);
@@ -311,7 +331,8 @@ async function buildCutterGroup(
 async function buildFittedCutterGroup(
   contours: ReadonlyArray<NormalizedContour>,
   params: Readonly<CookieCutterParams>,
-  bridges: readonly Bridge[] = []
+  bridges: readonly Bridge[] = [],
+  relief?: Readonly<FirstReliefProfile>
 ): Promise<{ group: THREE.Group; scale: number }> {
   let scale = params.targetSize / sourceDimension(contours, params.sizeMode);
   const tolerance = Math.max(0.02, params.targetSize * 0.0005);
@@ -325,7 +346,7 @@ async function buildFittedCutterGroup(
       );
     }
 
-    const group = await buildCutterGroup(contours, params, scale, bridges);
+    const group = await buildCutterGroup(contours, params, scale, bridges, relief);
     const measured = measuredPlanarDimension(group, params.sizeMode);
     const difference = Math.abs(measured - params.targetSize);
 
@@ -389,14 +410,15 @@ function assertFitsBuildPlate(
 export async function generateCookieCutter(
   svgString: string,
   paramsValue: Readonly<CookieCutterParams>,
-  bridges: readonly Bridge[] = []
+  bridges: readonly Bridge[] = [],
+  relief?: Readonly<FirstReliefProfile>
 ): Promise<THREE.Group> {
   const params = validateCookieCutterParams(paramsValue);
   const contours = extractClosedContours(svgString);
   let group: THREE.Group | null = null;
 
   try {
-    const fitted = await buildFittedCutterGroup(contours, params, bridges);
+    const fitted = await buildFittedCutterGroup(contours, params, bridges, relief);
     group = fitted.group;
 
     const bounds = assertFitsBuildPlate(group, params);
