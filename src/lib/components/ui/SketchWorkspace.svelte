@@ -143,7 +143,7 @@
           <p>{reliefLayout.reason}</p>
           {#if reliefLayout.topologyReady}
             <p>Altura de separación de la punta de corte: {reliefLayout.markingClearanceMm} mm.
-            Este análisis no habilita la exportación; todavía falta construir y validar la malla 3D.</p>
+            Para generar el primer relieve 3D, configurá ángulo de pared 0° y desactivá el mango. La generación verifica que el STL sea una sola pieza estanca.</p>
           {/if}
         </div>
       {/if}
@@ -171,7 +171,7 @@
           <p class="notice">La profundidad es independiente por contorno y se guarda en el proyecto. Rango: 0,4 a 3 mm, sin superar la altura de corte. Todavía no se fabrica en 3D.</p>
         {/if}
 
-        <p class="notice">La operación forma parte del documento y participa de Deshacer/Rehacer. Usá Guardar proyecto o Exportar proyecto para conservarla después de cerrar. Corte conserva el contorno e Ignorar lo excluye del STL solamente en SVG simples con trazados independientes. Relieve y Grabado aún no generan geometría: bloquean la exportación hasta que se implementen. Si editás el SVG, se limpian las asignaciones para evitar índices incorrectos.</p>
+        <p class="notice">La operación forma parte del documento y participa de Deshacer/Rehacer. Usá Guardar proyecto o Exportar proyecto para conservarla después de cerrar. Corte conserva el contorno e Ignorar lo excluye del STL solamente en SVG simples con trazados independientes. Relieve ya genera geometría 3D para un borde exterior convexo, un detalle interior y un puente válido, sin mango y con paredes rectas. Grabado aún bloquea la exportación. Si editás el SVG, se limpian las asignaciones para evitar índices incorrectos.</p>
       </div>
     {/if}
     {#if path?.reason}<p role="status">{path.reason}</p>{/if}
