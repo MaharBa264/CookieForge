@@ -1,4 +1,4 @@
-import type { DesignDocument, DesignDocumentV1, DesignDocumentV2, MultiCutterDocument, StampDocumentV4 } from '../domain/designDocument';
+import type { DesignDocument, DesignDocumentV1, DesignDocumentV2, MultiCutterDocument, StampDocumentV4, CutterDocumentV5 } from '../domain/designDocument';
 import { parseDesignDocument } from '../domain/documentValidation';
 import {
   migrateV0ToV1,
@@ -9,6 +9,7 @@ export const PROJECT_FORMAT = 'cookie-cutter-designer-project' as const;
 export const PROJECT_VERSION = 1 as const; // Historical V1 envelope; never change its meaning.
 export const PROJECT_VERSION_V2 = 2 as const;
 export const PROJECT_VERSION_V4 = 4 as const;
+export const PROJECT_VERSION_V5 = 5 as const;
 
 export interface ProjectEnvelopeV1 {
   readonly format: typeof PROJECT_FORMAT;
@@ -32,7 +33,12 @@ export interface ProjectEnvelopeV4 {
   readonly version: typeof PROJECT_VERSION_V4;
   readonly document: StampDocumentV4;
 }
-export type ProjectEnvelope = ProjectEnvelopeV1 | ProjectEnvelopeV2 | ProjectEnvelopeV3 | ProjectEnvelopeV4;
+export interface ProjectEnvelopeV5 {
+  readonly format: typeof PROJECT_FORMAT;
+  readonly version: typeof PROJECT_VERSION_V5;
+  readonly document: CutterDocumentV5;
+}
+export type ProjectEnvelope = ProjectEnvelopeV1 | ProjectEnvelopeV2 | ProjectEnvelopeV3 | ProjectEnvelopeV4 | ProjectEnvelopeV5;
 
 export interface DecodedProject {
   readonly document: DesignDocument;
@@ -120,18 +126,18 @@ function validateEnvelopeHeader(record: UnknownRecord): void {
     );
   }
 
-  if (record.version !== PROJECT_VERSION && record.version !== PROJECT_VERSION_V2 && record.version !== 3 && record.version !== PROJECT_VERSION_V4) {
+  if (record.version !== PROJECT_VERSION && record.version !== PROJECT_VERSION_V2 && record.version !== 3 && record.version !== PROJECT_VERSION_V4 && record.version !== PROJECT_VERSION_V5) {
     if (
       typeof record.version === 'number' &&
       Number.isFinite(record.version) &&
-      record.version > PROJECT_VERSION_V4
+      record.version > PROJECT_VERSION_V5
     ) {
       invalid(
         'version',
         `version future ${record.version} non prise en charge.`
       );
     }
-    invalid('version', 'version inconnue ; seules les versions 1, 2, 3 et 4 sont prises en charge.');
+    invalid('version', 'version inconnue ; seules les versions 1, 2, 3, 4 et 5 sont prises en charge.');
   }
 }
 
@@ -148,7 +154,9 @@ export function encodeProject(document: unknown): string {
       ? { format: PROJECT_FORMAT, version: PROJECT_VERSION_V2, document: parsedDocument }
       : parsedDocument.schemaVersion === 3
         ? { format: PROJECT_FORMAT, version: 3, document: parsedDocument }
-        : { format: PROJECT_FORMAT, version: PROJECT_VERSION_V4, document: parsedDocument };
+        : parsedDocument.schemaVersion === 4
+          ? { format: PROJECT_FORMAT, version: PROJECT_VERSION_V4, document: parsedDocument }
+          : { format: PROJECT_FORMAT, version: PROJECT_VERSION_V5, document: parsedDocument };
   return JSON.stringify(envelope, null, 2);
 }
 
