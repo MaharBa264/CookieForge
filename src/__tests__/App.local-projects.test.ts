@@ -178,7 +178,7 @@ it.each(['open', 'new'])('real BatchMode blocks project save/export and paramete
   batch.mesh = new Group(); click('Production en série');
   await vi.waitFor(() => expect(document.querySelector('.batch-mode .toggle-btn')).not.toBeNull());
   document.querySelector<HTMLButtonElement>('.batch-mode .toggle-btn')!.click(); await tick();
-  click('+ Ajouter le dessin actuel'); await tick(); click('Générer la série complète');
+  click('+ Agregar el diseño actual'); await tick(); click('Generar serie completa');
   await vi.waitFor(() => expect(get(model)?.mesh).toBe(batch.mesh)); await library();
   expect(document.body.textContent).toContain('La vista previa de una serie no se puede guardar');
   expect(button('Guardar proyecto').disabled).toBe(true); expect(button('Exportar proyecto').disabled).toBe(true);
@@ -233,7 +233,7 @@ async function startRealBatch() {
   click('Production en série');
   await vi.waitFor(() => expect(document.querySelector('.batch-mode .toggle-btn')).not.toBeNull());
   document.querySelector<HTMLButtonElement>('.batch-mode .toggle-btn')!.click(); await tick();
-  click('+ Ajouter le dessin actuel'); await tick(); click('Générer la série complète');
+  click('+ Agregar el diseño actual'); await tick(); click('Generar serie completa');
 }
 function ownedBatch() {
   const geometry = new BoxGeometry(), material = new MeshBasicMaterial(), mesh = new Group();
@@ -244,7 +244,7 @@ it('late real batch A cannot clear or publish over opened B and is disposed once
   const { session } = setup(fixture('A')); await ready();
   const pending = deferred(), owned = ownedBatch(); batch.gate = () => pending.promise;
   await startRealBatch();
-  await vi.waitFor(() => expect(document.body.textContent).toContain('Annuler (0/1)'));
+  await vi.waitFor(() => expect(document.body.textContent).toContain('Cancelar (0/1)'));
   await library(); click('Abrir B'); await prompt(); click('Descartar cambios');
   await vi.waitFor(() => expect(session.getDocument()?.id).toBe('B')); await ready();
   const snapshot = session.getDocument(), epoch = session.getSessionEpoch(), preview = get(model)?.mesh;
@@ -260,7 +260,7 @@ it('late real batch A cannot clear or publish over opened B and is disposed once
 it('batch validity is bound to producer start even while BatchMode stays mounted in session B', async () => {
   const { session } = setup(fixture('A')); await ready(); const pending = deferred(), owned = ownedBatch();
   batch.gate = () => pending.promise; await startRealBatch();
-  await vi.waitFor(() => expect(document.body.textContent).toContain('Annuler (0/1)'));
+  await vi.waitFor(() => expect(document.body.textContent).toContain('Cancelar (0/1)'));
   const panel = document.querySelector('.batch-mode'); session.replace(fixture('B')); await tick();
   expect(document.querySelector('.batch-mode')).toBe(panel);
   const snapshot = session.getDocument(), epoch = session.getSessionEpoch(); pending.resolve();
