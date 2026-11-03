@@ -36,7 +36,7 @@ async function parameters() {
 }
 async function dirty(expected: boolean) {
   await click('Proyectos locales');
-  expect(document.querySelector('.project-manager [role="status"]')?.textContent).toBe(expected ? 'Modifications non enregistrées' : 'Enregistré localement');
+  expect(document.querySelector('.project-manager [role="status"]')?.textContent).toBe(expected ? 'Modifications non enregistrées' : 'Guardado localmente');
 }
 async function editSize(value: number) {
   await parameters();
@@ -52,7 +52,7 @@ afterEach(async () => { if (app) await unmount(app); app = undefined; document.b
 it('real Undo/Redo returns to the exact saved codec and clean workflow in the same session', async () => {
   const { session, records } = setup();
   await click('Proyectos locales'); await click('Guardar proyecto');
-  await vi.waitFor(() => expect(document.querySelector('.project-manager [role="status"]')?.textContent).toBe('Enregistré localement'));
+  await vi.waitFor(() => expect(document.querySelector('.project-manager [role="status"]')?.textContent).toBe('Guardado localmente'));
   const saved = session.getDocument()!; const codecA = encodeProject(records.get('A')); const epoch = session.sessionEpoch;
   await editSize(90);
   // Include a sketch revision: history must not issue fresh mutation commands on restore.
@@ -74,7 +74,7 @@ it('real Undo/Redo returns to the exact saved codec and clean workflow in the sa
 it('records rename and viewport interleaved with geometry, rather than silently rolling metadata back', async () => {
   const { session } = setup();
   await click('Proyectos locales'); await click('Guardar proyecto');
-  await vi.waitFor(() => expect(document.querySelector('.project-manager [role="status"]')?.textContent).toBe('Enregistré localement'));
+  await vi.waitFor(() => expect(document.querySelector('.project-manager [role="status"]')?.textContent).toBe('Guardado localmente'));
   const saved = session.getDocument()!;
   await editSize(90); const geometry = session.getDocument()!;
   await click('Proyectos locales');
@@ -97,7 +97,7 @@ it('records rename and viewport interleaved with geometry, rather than silently 
 it('opening B clears A history and Undo cannot cross project boundaries', async () => {
   const { session } = setup();
   await editSize(90); await click('Proyectos locales'); await click('Guardar proyecto');
-  await vi.waitFor(() => expect(document.querySelector('.project-manager [role="status"]')?.textContent).toBe('Enregistré localement'));
+  await vi.waitFor(() => expect(document.querySelector('.project-manager [role="status"]')?.textContent).toBe('Guardado localmente'));
   await vi.waitFor(() => expect(document.querySelector('button[aria-label="Abrir B"]')).not.toBeNull());
   await click('Abrir B');
   await vi.waitFor(() => expect(session.getDocument()?.id).toBe('B'));
