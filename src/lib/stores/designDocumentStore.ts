@@ -4,6 +4,7 @@ import type {
   Bridge,
   CutterSeriesLayout,
   StampImprintMode,
+  ContourOperation,
   ViewportPreferences
 } from '../domain/designDocument';
 import type { ImplementedDesignKind } from '../domain/designKind';
@@ -26,6 +27,8 @@ export interface DesignDocumentStore extends Readable<DesignDocument> {
   replace(value: unknown): void;
   rename(name: string): void;
   updateSketch(svg: string): void;
+  /** Primera asignación promueve Cutter V1/V2 a V5. 'unassigned' elimina la asignación. */
+  updateContourOperation(pathIndex: number, operation: ContourOperation | 'unassigned'): void;
   /** Promote V1 only on the first bridge edit; the input is validated and detached. */
   updateBridges(bridges: readonly Bridge[]): void;
   /** Atomic promotion/update; same identity and epoch, no generated objects. */
@@ -54,6 +57,10 @@ function freezePersistentSnapshot(document: DesignDocument): DesignDocument {
     Object.freeze(document.bridges);
   }
   if (document.schemaVersion === 3) Object.freeze(document.layout);
+  if (document.schemaVersion === 5) {
+    for (const assignment of document.contourOperations) Object.freeze(assignment);
+    Object.freeze(document.contourOperations);
+  }
   return Object.freeze(document);
 }
 
@@ -115,10 +122,32 @@ export function createDesignDocumentStore(
       const current = get(internal);
       publishMutation(current, {
         ...current,
+        // Los índices pertenecen al SVG anterior; ningún cambio de dibujo puede conservarlos silenciosamente.
+        ...(current.schemaVersion === 5 ? { contourOperations: [] } : {}),
         sketch: {
           svg,
           revision: current.sketch.revision + 1
         }
+      });
+    },
+    updateContourOperation(pathIndex: number, operation: ContourOperation | 'unassigned'): void {
+      const current = get(internal);
+      if (current.kind !== 'cutter' || current.schemaVersion === 3 || current.schemaVersion === 4) {
+        throw new Error('Las operaciones por contorno solo están disponibles en cortantes individuales.');
+      }
+      if (!Number.isSafeInteger(pathIndex) || pathIndex < 0 || pathIndex > 1023) throw new RangeError('Índice de contorno inválido.');
+      const previous = current.schemaVersion === 5 ? current.contourOperations : [];
+      const existing = previous.find(item => item.pathIndex === pathIndex)?.operation ?? 'unassigned';
+      if (existing === operation) return;
+      const contourOperations = previous.filter(item => item.pathIndex !== pathIndex);
+      if (operation !== 'unassigned') contourOperations.push({ pathIndex, operation });
+      contourOperations.sort((a, b) => a.pathIndex - b.pathIndex);
+      const { schemaVersion: _version, ...other } = current;
+      publishMutation(current, {
+        ...other,
+        schemaVersion: 5,
+        bridges: current.schemaVersion === 1 ? [] : current.bridges,
+        contourOperations
       });
     },
 
@@ -133,6 +162,7 @@ export function createDesignDocumentStore(
     updateSeries(layout: CutterSeriesLayout): void {
       const current = get(internal);
       if (current.kind !== 'cutter' && current.kind !== 'multi-cutter') throw new Error('Une série nécessite un Cutter.');
+      if (current.schemaVersion === 5) throw new Error('Las operaciones por contorno deben eliminarse antes de crear una serie.');
       if (current.schemaVersion === 3 && JSON.stringify(current.layout) === JSON.stringify(layout)) return;
       publishMutation(current, { ...current, schemaVersion: 3, kind: 'multi-cutter',
         bridges: current.schemaVersion === 1 ? [] : current.bridges, layout });
@@ -171,6 +201,7 @@ export function createDesignDocumentStore(
     changeKind(kind: ImplementedDesignKind): void {
       const current = get(internal);
       if (current.kind === kind) return;
+      if (current.schemaVersion === 5) throw new Error('Las operaciones por contorno deben eliminarse antes de cambiar de tipo de diseño.');
       if (kind === 'multi-cutter') {
         if (current.kind !== 'cutter') throw new Error('Une série nécessite un Cutter.');
         publishMutation(current, { ...current, kind, schemaVersion: 3,
