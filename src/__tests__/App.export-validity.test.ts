@@ -78,7 +78,7 @@ it('collision auto-fix cannot move canonical contours, even through a forced cli
   const snapshot = session.getDocument(), epoch = session.getSessionEpoch();
   const positions = mesh.children.map(child => child.position.toArray());
   button('Proyectos locales').click(); await tick(); button('Guardar proyecto').click();
-  await vi.waitFor(() => expect(document.querySelector('.project-manager [role="status"]')?.textContent).toBe('Enregistré localement'));
+  await vi.waitFor(() => expect(document.querySelector('.project-manager [role="status"]')?.textContent).toBe('Guardado localmente'));
   const history = get(historyStore), historyIndex = get(historyStore.currentIndex);
   button('Materiales y optimización').click();
   // Wait for the actual lazy control, just as ready() waits for real generation.
@@ -97,7 +97,7 @@ it('collision auto-fix cannot move canonical contours, even through a forced cli
   expect(get(historyStore)).toBe(history);
   expect(get(historyStore.currentIndex)).toBe(historyIndex);
   button('Proyectos locales').click(); await tick();
-  expect(document.querySelector('.project-manager [role="status"]')?.textContent).toBe('Enregistré localement');
+  expect(document.querySelector('.project-manager [role="status"]')?.textContent).toBe('Guardado localmente');
   const exportAction = await exportPanel();
   exportAction.click();
   expect(downloads.stl.mock.calls[0][0]).toBe(mesh);
