@@ -117,14 +117,14 @@ it.each([10, 75, 200])('permits detail inspection for a %s mm model and resets t
   expect(camera.near).toBeLessThan(controls.minDistance / 5);
   expect(controls.zoomToCursor).toBe(true); expect(controls.screenSpacePanning).toBe(true);
   const initialDistance = controls.getDistance();
-  const closer = target.querySelector<HTMLButtonElement>('[aria-label="Rapprocher le modèle"]');
-  const farther = target.querySelector<HTMLButtonElement>('[aria-label="Éloigner le modèle"]');
+  const closer = target.querySelector<HTMLButtonElement>('[aria-label="Acercar modelo"]');
+  const farther = target.querySelector<HTMLButtonElement>('[aria-label="Alejar modelo"]');
   expect(closer).not.toBeNull(); expect(farther).not.toBeNull();
   closer!.click(); await tick(); const closeDistance = controls.getDistance(); expect(closeDistance).toBeLessThan(initialDistance);
   farther!.click(); await tick(); expect(controls.getDistance()).toBeGreaterThan(closeDistance);
   for (let n = 0; n < 80; n++) closer!.click(); await tick();
   expect(controls.getDistance()).toBeCloseTo(controls.minDistance, 6);
-  target.querySelector<HTMLButtonElement>('[aria-label="Ajuster le modèle à la vue"]')!.click(); await tick();
+  target.querySelector<HTMLButtonElement>('[aria-label="Ajustar modelo a la vista"]')!.click(); await tick();
   expect(controls.getDistance()).toBeCloseTo(initialDistance, 5);
   expect(bytes(source)).toEqual(originalSTL);
 });
