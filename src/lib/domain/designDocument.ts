@@ -95,6 +95,8 @@ export type ContourOperation = 'cut' | 'emboss' | 'engrave' | 'ignore';
 export interface ContourAssignment {
   readonly pathIndex: number;
   readonly operation: ContourOperation;
+  /** Altura física del detalle interior, en mm; solo Relieve y Grabado. */
+  readonly depthMm?: number;
 }
 
 /** Solo Cutter, por ahora: V1-V4 se mantienen sin modificaciones. */
