@@ -86,7 +86,7 @@ it('revectorizes explicitly in session, preserving original source/identity/para
   await vi.waitFor(() => expect(session.getDocument()?.sketch.svg).toBe(changed)); await ready();
   expect(session.getDocument()).toMatchObject({ id: original.id, source: original.source, name: original.name, parameters: original.parameters });
   expect(decodeProject(encodeProject(session.getDocument()!)).document).toEqual(session.getDocument());
-  click('Réglages'); await tick(); click('Annuler');
+  click('Ajustes'); await tick(); click('Cancelar');
   await vi.waitFor(() => expect(session.getDocument()?.sketch.svg).toBe(original.sketch.svg));
 });
 it.each(['cancel', 'edit', 'replace'])('discards late retracing after %s', async transition => {
@@ -94,7 +94,7 @@ it.each(['cancel', 'edit', 'replace'])('discards late retracing after %s', async
   await vi.waitFor(() => expect(raster.calls).toHaveLength(1)); raster.calls[0].resolve(svg); await ready();
   click('Importer un dessin'); await tick(); click('Revectoriser l’image actuelle');
   await vi.waitFor(() => expect(raster.calls).toHaveLength(2)); const pending = raster.calls[1];
-  if (transition === 'cancel') click('Annuler l’importation');
+  if (transition === 'cancel') click('Cancelar importación');
   if (transition === 'edit') session.rename('Edited while tracing');
   if (transition === 'replace') session.replace(fixture('Replacement'));
   const accepted = session.getDocument(); pending.resolve(svg.replace('r="20"', 'r="25"')); await settled();
@@ -171,7 +171,7 @@ it('shows cancellable import progress and discards a late raster without touchin
   const original = session.getDocument(), mesh = get(model)?.mesh;
   await upload(new File(['r'], 'slow.webp', { type: 'image/webp' }));
   await vi.waitFor(() => expect(raster.calls).toHaveLength(1));
-  expect(document.querySelector('[role="status"]')?.textContent).toContain('Importation de l’image'); click('Annuler l’importation');
+  expect(document.querySelector('[role="status"]')?.textContent).toContain('Importation de l’image'); click('Cancelar importación');
   expect(raster.calls[0].signal?.aborted).toBe(true); raster.calls[0].resolve(svg); await settled();
   expect(session.getDocument()).toBe(original); expect(get(model)?.mesh).toBe(mesh); expect(document.querySelector('dialog[open]')).toBeNull();
 });
@@ -213,7 +213,7 @@ it('Annuler in the dirty import guard retains exact identity, source, mesh and e
   const session = setup(fixture()); await ready();
   const original = session.getDocument(), mesh = get(model)?.mesh, epoch = session.getSessionEpoch();
   await upload(new File([svg], 'new.svg', { type: 'image/svg+xml' }));
-  await vi.waitFor(() => expect(document.querySelector('dialog[open]')).not.toBeNull()); click('Annuler'); await settled();
+  await vi.waitFor(() => expect(document.querySelector('dialog[open]')).not.toBeNull()); click('Cancelar'); await settled();
   expect(session.getDocument()).toBe(original); expect(session.getDocument()?.source).toBe(original?.source); expect(get(model)?.mesh).toBe(mesh); expect(session.getSessionEpoch()).toBe(epoch);
 });
 
