@@ -89,7 +89,7 @@ it.each(['rename', 'viewport', 'params', 'replace', 'raster', 'open'] as const)(
   else if (change === 'viewport') session.updateViewport({ showGrid: true, showAxes: false, showWallThickness: false });
   else if (change === 'params') session.updateParameters('cutter', { totalHeight: 37 });
   else if (change === 'replace') session.replace(fixture('B'));
-  else if (change === 'open') { click('Proyectos locales'); await vi.waitFor(() => expect(document.querySelector('button[aria-label="Abrir Library B"]')).not.toBeNull()); click('Abrir Library B'); await prompt(); click('Ignorer les modifications'); await vi.waitFor(() => expect(session.getDocument()?.id).toBe('B')); }
+  else if (change === 'open') { click('Proyectos locales'); await vi.waitFor(() => expect(document.querySelector('button[aria-label="Abrir Library B"]')).not.toBeNull()); click('Abrir Library B'); await prompt(); click('Descartar cambios'); await vi.waitFor(() => expect(session.getDocument()?.id).toBe('B')); }
   else { const input = document.querySelector<HTMLInputElement>('input[type="file"]')!; Object.defineProperty(input, 'files', { value: [new File(['x'], 'new.png', { type: 'image/png' })] }); input.dispatchEvent(new Event('change', { bubbles: true })); await vi.waitFor(() => expect(raster.started).toHaveBeenCalledTimes(1)); }
   const latest = session.getDocument(), epoch = session.getSessionEpoch(); gate.resolve();
   await vi.waitFor(() => expect(resume().disabled).toBe(false));
@@ -159,7 +159,7 @@ it.each(['rename', 'raster'] as const)('rejects edits and source starts during t
     Object.defineProperty(input, 'files', { value: [new File(['x'], 'latest.png', { type: 'image/png' })] });
     input.dispatchEvent(new Event('change', { bubbles: true })); await vi.waitFor(() => expect(raster.started).toHaveBeenCalledTimes(1));
   }
-  const latest = session.getDocument(), epoch = session.getSessionEpoch(); click('Ignorer les modifications');
+  const latest = session.getDocument(), epoch = session.getSessionEpoch(); click('Descartar cambios');
   await vi.waitFor(() => expect(resume().disabled).toBe(false)); expect(session.getDocument()).toBe(latest); expect(session.getSessionEpoch()).toBe(epoch); expect(drafts.get(expected.draftId)).toEqual(expected);
 });
 it('failed save-and-resume keeps the workflow error visible on startup and never replaces the session', async () => {
