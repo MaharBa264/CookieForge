@@ -59,7 +59,7 @@ function button(label: string) {
 }
 async function ready() { await vi.waitFor(() => expect(get(generationState).phase).toBe('ready'), { timeout: 10000 }); }
 async function exportPanel(format = 'stl') {
-  button('Exporter le dessin').click();
+  button('Exportar diseño').click();
   await vi.waitFor(() => expect(document.querySelector('.advanced-export .toggle-btn')).not.toBeNull());
   document.querySelector<HTMLButtonElement>('.advanced-export .toggle-btn')!.click(); await tick();
   if (format !== 'stl') {
@@ -80,7 +80,7 @@ it('collision auto-fix cannot move canonical contours, even through a forced cli
   button('Proyectos locales').click(); await tick(); button('Guardar proyecto').click();
   await vi.waitFor(() => expect(document.querySelector('.project-manager [role="status"]')?.textContent).toBe('Enregistré localement'));
   const history = get(historyStore), historyIndex = get(historyStore.currentIndex);
-  button('Matériaux et optimisation').click();
+  button('Materiales y optimización').click();
   // Wait for the actual lazy control, just as ready() waits for real generation.
   await vi.waitFor(() => expect(document.querySelector('.collision-detector .toggle-btn')).not.toBeNull(), { timeout: 10000 });
   document.querySelector<HTMLButtonElement>('.collision-detector .toggle-btn')!.click();
