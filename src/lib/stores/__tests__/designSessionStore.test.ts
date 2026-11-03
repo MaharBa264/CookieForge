@@ -95,7 +95,9 @@ describe('createDesignSessionStore history restoration', () => {
 
 describe('Cutter V5 contour assignment history', () => {
   it('promotes V1 once, restores exact assignments through history, and clears them on SVG change', () => {
-    const session = createDesignSessionStore(projectDocument(), { now: () => NEXT });
+    const twoPaths = '<svg viewBox="0 0 10 10"><path d="M0 0L4 0L4 4Z"/><path d="M6 6L10 6L10 10Z"/></svg>';
+    const base = projectDocument();
+    const session = createDesignSessionStore({ ...base, sketch: { ...base.sketch, svg: twoPaths } }, { now: () => NEXT });
     const before = session.getDocument()!;
     const epoch = session.getSessionEpoch();
     session.updateContourOperation(0, 'cut');
