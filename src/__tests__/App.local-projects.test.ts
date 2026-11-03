@@ -204,10 +204,10 @@ it.each(['open', 'new'])('real BatchMode blocks project save/export and paramete
 });
 
 async function startRealAI() {
-  click('Outils IA (Gemini)');
+  click('Herramientas de IA (Gemini)');
   await vi.waitFor(() => expect(document.querySelector('.ai-toggle')).not.toBeNull());
   document.querySelector<HTMLButtonElement>('.ai-toggle')!.click(); await tick();
-  button('⚡ Analyser').click(); await tick(); button('Analyser le SVG').click();
+  button('⚡ Analizar').click(); await tick(); button('Analizar SVG').click();
 }
 it.each(['open', 'replace'])('real optimization A cannot replace clean B after %s', async transition => {
   let resolve!: (svg: string) => void;
