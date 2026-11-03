@@ -32,8 +32,8 @@ it('integrates current sketch, one-step history, fresh generation, save and relo
  expect(changed.id).toBe(baseline.id); expect(changed.name).toBe(baseline.name); expect(changed.parameters).toEqual(baseline.parameters);
  expect(session.getSessionEpoch()).toBe(epoch); expect(historyStore.getLength()).toBe(length + 1);
  expect(get(generationState).phase).not.toBe('ready');
- click('Annuler'); await tick(); expect(session.getDocument()).toEqual(baseline);
- click('Rétablir'); await tick(); expect(session.getDocument()).toEqual(changed);
+ click('Deshacer'); await tick(); expect(session.getDocument()).toEqual(baseline);
+ click('Rehacer'); await tick(); expect(session.getDocument()).toEqual(changed);
  await vi.waitFor(() => expect(get(generationState).result?.document).toEqual(changed), { timeout: 10000 });
  click('Projets locaux'); await tick(); click('Enregistrer le projet'); await vi.waitFor(() => expect(records.get(changed.id)).toEqual(changed));
  const portable = encodeProject(records.get(changed.id)!);
