@@ -39,7 +39,7 @@ it('integrates current sketch, one-step history, fresh generation, save and relo
  const portable = encodeProject(records.get(changed.id)!);
  expect(decodeProject(portable).document).toEqual(changed);
  session.clear(); await tick(); click('Proyectos locales');
- await vi.waitFor(() => expect([...document.querySelectorAll('button')].some(b => b.getAttribute('aria-label') === 'Ouvrir Current project')).toBe(true));
- click('Ouvrir Current project'); await vi.waitFor(() => expect(session.getDocument()).toEqual(changed));
+ await vi.waitFor(() => expect([...document.querySelectorAll('button')].some(b => b.getAttribute('aria-label') === 'Abrir Current project')).toBe(true));
+ click('Abrir Current project'); await vi.waitFor(() => expect(session.getDocument()).toEqual(changed));
  await vi.waitFor(() => expect(get(generationState).result?.document).toEqual(changed), { timeout: 10000 });
 }, 30000);
