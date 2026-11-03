@@ -95,6 +95,31 @@ describe('diagnóstico topológico de primer relieve', () => {
       ]
     })).topologyReady).toBe(false);
   });
+  it('admite seis detalles con enlaces independientes al exterior y rechaza el séptimo', () => {
+    const centers = [27, 72, 117];
+    const paths = ['<path d="M0 0 L160 0 L160 160 L0 160 Z"/>'];
+    const bridges: Array<{ id: string; from: { x: number; y: number }; to: { x: number; y: number }; widthMm: number }> = [];
+    const operations: Array<{ pathIndex: number; operation: 'cut' | 'emboss'; depthMm?: number }> =
+      [{ pathIndex: 0, operation: 'cut' }];
+    for (let i = 0; i < 6; i++) {
+      const right = i >= 3, y = centers[i % 3], x0 = right ? 120 : 25, x1 = right ? 135 : 40;
+      paths.push(`<path d="M${x0} ${y-7} L${x1} ${y-7} L${x1} ${y+7} L${x0} ${y+7} Z"/>`);
+      bridges.push({ id: `link-${i}`, from: { x: right ? 160 : 0, y }, to: { x: right ? 135 : 25, y }, widthMm: 2 });
+      operations.push({ pathIndex: i+1, operation: 'emboss', depthMm: 0.5 + i*0.4 });
+    }
+    const svg6 = `<svg viewBox="0 0 160 160">${paths.join('')}</svg>`;
+    const ready = assessFirstReliefLayout(fixture({
+      sketch: { svg: svg6, revision: 1 }, bridges, contourOperations: operations
+    }));
+    expect(ready.topologyReady, ready.reason).toBe(true);
+    expect(ready.detailProfiles).toHaveLength(6);
+    expect(ready.detailProfiles?.map(p => p.clearanceMm)).toEqual([0.5,0.9,1.3,1.7,2.1,2.5]);
+    const invalid = assessFirstReliefLayout(fixture({
+      sketch: { svg: svg6, revision: 1 }, bridges,
+      contourOperations: [...operations, { pathIndex: 7, operation: 'emboss' }]
+    }));
+    expect(invalid.topologyReady).toBe(false);
+  });
   it('no confunde la calificación topológica con grabado o dos relieves', () => {
     expect(assessFirstReliefLayout(fixture({ contourOperations: [{ pathIndex: 1, operation: 'engrave', depthMm: 1 }] })))
       .toMatchObject({ topologyReady: false });
