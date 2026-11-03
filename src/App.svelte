@@ -127,7 +127,7 @@
 
   function geometryKey(document: DesignDocument): string {
     // Match the integration's semantic generation key, not name/timestamps/view.
-    return JSON.stringify([document.kind, document.sketch, document.parameters, document.schemaVersion !== 1 ? document.bridges : [], document.schemaVersion === 3 ? document.layout : null, document.schemaVersion === 4 ? document.imprintMode : null]);
+    return JSON.stringify([document.kind, document.sketch, document.parameters, document.schemaVersion !== 1 ? document.bridges : [], document.schemaVersion === 3 ? document.layout : null, document.schemaVersion === 4 ? document.imprintMode : null, document.schemaVersion === 5 ? document.contourOperations : null]);
   }
 
   function captureGeometryExport(): { mesh: ModelObject; params: Readonly<CookieCutterParams> | undefined; filename: string } | null {
@@ -813,7 +813,7 @@
     const epoch = session.getSessionEpoch();
     const geometry = () => {
       const document = session.getDocument();
-      return JSON.stringify([document?.kind, document?.sketch, document?.parameters, document && document.schemaVersion !== 1 ? document.bridges : [], document?.schemaVersion === 3 ? document.layout : null]);
+      return JSON.stringify([document?.kind, document?.sketch, document?.parameters, document && document.schemaVersion !== 1 ? document.bridges : [], document?.schemaVersion === 3 ? document.layout : null, document?.schemaVersion === 5 ? document.contourOperations : null]);
     };
     const key = geometry();
     return () => alive && revision === sourceRevision
@@ -880,7 +880,7 @@
     const epoch = session.getSessionEpoch();
     const geometry = () => {
       const document = session.getDocument();
-      return JSON.stringify([document?.kind, document?.sketch, document?.parameters, document && document.schemaVersion !== 1 ? document.bridges : [], document?.schemaVersion === 3 ? document.layout : null]);
+      return JSON.stringify([document?.kind, document?.sketch, document?.parameters, document && document.schemaVersion !== 1 ? document.bridges : [], document?.schemaVersion === 3 ? document.layout : null, document?.schemaVersion === 5 ? document.contourOperations : null]);
     };
     const key = geometry();
     return () => alive && revision === sourceRevision
