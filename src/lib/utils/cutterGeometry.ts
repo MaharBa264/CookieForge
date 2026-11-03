@@ -906,3 +906,58 @@ export async function createBridgedWallGeometry(
     throw error;
   }
 }
+
+
+/**
+ * Primera malla experimental de relieve unido: deforma ÚNICAMENTE la cara
+ * inferior de una banda+puente ya triangulada y estanca.
+ * El borde cortante permanece en Y=0; el detalle queda a Y=clearanceMm.
+ * Es una sola pieza (mismos índices/aristas), no una suma de islas solapadas.
+ */
+export async function createReliefBridgedWallGeometry(
+  outer: NormalizedContour,
+  detail: NormalizedContour,
+  bridges: readonly Bridge[],
+  options: Readonly<{ scale: number; wallThickness: number; height: number; clearanceMm: number }>
+): Promise<THREE.BufferGeometry> {
+  const { scale, wallThickness, height, clearanceMm } = options;
+  if (!Number.isFinite(clearanceMm) || clearanceMm < 0.4 || clearanceMm > 3 || clearanceMm >= height) {
+    throw generationError('INVALID_GEOMETRY', 'Invalid relief clearance.', { field: 'contourOperations', clearanceMm });
+  }
+  const geometry = await createBridgedWallGeometry([outer, detail], bridges, {
+    scale, bottomWidthMm: wallThickness, topWidthMm: wallThickness,
+    bottomBridgeGrowthMm: 0, topBridgeGrowthMm: 0,
+    baseHeight: 0, height, capBottom: true, capTop: true
+  });
+  try {
+    const position = geometry.getAttribute('position') as THREE.BufferAttribute;
+    const minDistance = (x: number, z: number, contour: NormalizedContour): number => {
+      const point = { x, y: z };
+      let nearest = Number.POSITIVE_INFINITY;
+      for (let i = 0; i < contour.length; i++) {
+        const a = contour[i], b = contour[(i + 1) % contour.length];
+        nearest = Math.min(nearest, distanceToSegment(point, a, b));
+      }
+      return nearest;
+    };
+    const scaledOuter = outer.map(p => ({ x: p.x * scale, y: p.y * scale }));
+    const scaledDetail = detail.map(p => ({ x: p.x * scale, y: p.y * scale }));
+    for (let i = 0; i < position.count; i++) {
+      if (Math.abs(position.getY(i)) > 1e-6) continue; // techo y cara del mango intactos
+      const x = position.getX(i), z = position.getZ(i);
+      const distOuter = minDistance(x, z, scaledOuter);
+      const distDetail = minDistance(x, z, scaledDetail);
+      const outerGap = Math.max(0, distOuter - wallThickness * 1.1);
+      const detailGap = Math.max(0, distDetail - wallThickness * 1.1);
+      const ratio = outerGap + detailGap < 1e-8 ? 0 : outerGap / (outerGap + detailGap);
+      position.setY(i, clearanceMm * ratio);
+    }
+    position.needsUpdate = true;
+    geometry.computeVertexNormals();
+    validateGeometry(geometry);
+    return geometry;
+  } catch (error) {
+    geometry.dispose();
+    throw error;
+  }
+}
