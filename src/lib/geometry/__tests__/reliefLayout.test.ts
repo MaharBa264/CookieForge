@@ -137,6 +137,48 @@ describe('diagnóstico topológico de primer relieve', () => {
     }));
     expect(assessment.topologyReady).toBe(false);
   });
+  it('acepta una red ramificada: un detalle interior unido a otro ya conectado al exterior', () => {
+    const branchSvg = '<svg viewBox="0 0 100 100">' +
+      '<path d="M0 0 L100 0 L100 100 L0 100 Z"/>' +
+      '<path d="M25 20 L40 20 L40 40 L25 40 Z"/>' +
+      '<path d="M55 20 L70 20 L70 40 L55 40 Z"/></svg>';
+    const result = assessFirstReliefLayout(fixture({
+      sketch: { svg: branchSvg, revision: 1 },
+      bridges: [
+        { id: 'root', from: { x: 0, y: 30 }, to: { x: 25, y: 30 }, widthMm: 2 },
+        { id: 'branch', from: { x: 40, y: 30 }, to: { x: 55, y: 30 }, widthMm: 2 }
+      ],
+      contourOperations: [
+        { pathIndex: 0, operation: 'cut' },
+        { pathIndex: 1, operation: 'emboss', depthMm: 0.9 },
+        { pathIndex: 2, operation: 'emboss', depthMm: 2.2 }
+      ]
+    }));
+    expect(result.topologyReady, result.reason).toBe(true);
+    expect(result.detailProfiles).toEqual([
+      { pathIndex: 1, clearanceMm: 0.9, bridgeId: 'root' },
+      { pathIndex: 2, clearanceMm: 2.2, bridgeId: 'branch' }
+    ]);
+  });
+  it('rechaza una subred desconectada aunque cada puente toque dos contornos', () => {
+    const branchSvg = '<svg viewBox="0 0 100 100">' +
+      '<path d="M0 0 L100 0 L100 100 L0 100 Z"/>' +
+      '<path d="M25 20 L40 20 L40 40 L25 40 Z"/>' +
+      '<path d="M55 20 L70 20 L70 40 L55 40 Z"/></svg>';
+    const result = assessFirstReliefLayout(fixture({
+      sketch: { svg: branchSvg, revision: 1 },
+      bridges: [
+        { id: 'root', from: { x: 0, y: 30 }, to: { x: 25, y: 30 }, widthMm: 2 },
+        { id: 'second', from: { x: 30, y: 0 }, to: { x: 30, y: 20 }, widthMm: 2 }
+      ],
+      contourOperations: [
+        { pathIndex: 0, operation: 'cut' },
+        { pathIndex: 1, operation: 'emboss', depthMm: 0.9 },
+        { pathIndex: 2, operation: 'emboss', depthMm: 2.2 }
+      ]
+    }));
+    expect(result.topologyReady).toBe(false);
+  });
   it('no confunde la calificación topológica con grabado o dos relieves', () => {
     expect(assessFirstReliefLayout(fixture({ contourOperations: [{ pathIndex: 1, operation: 'engrave', depthMm: 1 }] })))
       .toMatchObject({ topologyReady: false });
