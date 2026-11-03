@@ -62,7 +62,7 @@ it('read-only preview retains selection, two contours and heatmap when deletion 
     await vi.waitFor(() => expect(target.querySelector('canvas')).not.toBeNull());
     target.querySelector<HTMLButtonElement>('[aria-label="Activer le mode sélection"]')!.click(); await tick();
     target.querySelector('canvas')!.dispatchEvent(new MouseEvent('click', { bubbles: true })); await tick();
-    const button = target.querySelector<HTMLButtonElement>('[aria-label="Supprimer l’élément sélectionné"]')!;
+    const button = target.querySelector<HTMLButtonElement>('[aria-label="Eliminar elemento seleccionado"]')!;
     expect(button).not.toBeNull(); expect(button.disabled).toBe(true);
     expect(target.querySelector('#viewer-deletion-reason')?.textContent).toContain('lecture seule');
     const display = (rendered.scene as THREE.Scene).children.find(child => child instanceof THREE.Group) as THREE.Group;
@@ -73,7 +73,7 @@ it('read-only preview retains selection, two contours and heatmap when deletion 
     expect(deleted).not.toHaveBeenCalled(); expect(mesh.children).toHaveLength(2);
     expect(displayedFirst.geometry).toBe(displayed); expect(first.geometry).toBe(geometry);
     expect(cloneDisposed).not.toHaveBeenCalled(); expect(disposed).not.toHaveBeenCalled();
-    expect(target.querySelector('[aria-label="Supprimer l’élément sélectionné"]')).toBe(button);
+    expect(target.querySelector('[aria-label="Eliminar elemento seleccionado"]')).toBe(button);
     await unmount(app); expect(cloneDisposed).toHaveBeenCalledTimes(1); expect(first.geometry).toBe(geometry);
   } finally { if (target.childNodes.length) await unmount(app); target.remove(); intersect.mockRestore(); geometry.dispose(); material.dispose(); }
 });
