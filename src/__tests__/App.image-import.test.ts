@@ -75,24 +75,24 @@ it('revectorizes explicitly in session, preserving original source/identity/para
   await vi.waitFor(() => expect(raster.calls).toHaveLength(1));
   expect(raster.calls[0].preset).toBe('contrast'); raster.calls[0].resolve(svg);
   await ready(); const original = session.getDocument()!;
-  click('Importer un dessin'); await tick(); choosePreset('photo'); await tick();
+  click('Importar un diseño'); await tick(); choosePreset('photo'); await tick();
   expect(session.getDocument()).toBe(original);
-  click('Revectoriser l’image actuelle'); await vi.waitFor(() => expect(photo.calls).toHaveLength(1), { timeout: 10000 });
+  click('Volver a vectorizar la imagen actual'); await vi.waitFor(() => expect(photo.calls).toHaveLength(1), { timeout: 10000 });
   expect(raster.calls).toHaveLength(1);
   const changed = svg.replace('r="20"', 'r="25"'); photo.calls[0].resolve(photoResult(changed));
-  await vi.waitFor(() => expect([...document.querySelectorAll<HTMLButtonElement>('button')].find(button => button.textContent === 'Appliquer le contour photo')?.disabled).toBe(false));
+  await vi.waitFor(() => expect([...document.querySelectorAll<HTMLButtonElement>('button')].find(button => button.textContent === 'Aplicar contorno de la foto')?.disabled).toBe(false));
   expect(session.getDocument()).toBe(original);
-  click('Appliquer le contour photo');
+  click('Aplicar contorno de la foto');
   await vi.waitFor(() => expect(session.getDocument()?.sketch.svg).toBe(changed)); await ready();
   expect(session.getDocument()).toMatchObject({ id: original.id, source: original.source, name: original.name, parameters: original.parameters });
   expect(decodeProject(encodeProject(session.getDocument()!)).document).toEqual(session.getDocument());
-  click('Ajustes'); await tick(); click('Cancelar');
+  click('Ajustes'); await tick(); click('Deshacer');
   await vi.waitFor(() => expect(session.getDocument()?.sketch.svg).toBe(original.sketch.svg));
 });
 it.each(['cancel', 'edit', 'replace'])('discards late retracing after %s', async transition => {
   const session = setup(); await upload(new File(['pixels'], 'original.png', { type: 'image/png' }));
   await vi.waitFor(() => expect(raster.calls).toHaveLength(1)); raster.calls[0].resolve(svg); await ready();
-  click('Importer un dessin'); await tick(); click('Revectoriser l’image actuelle');
+  click('Importar un diseño'); await tick(); click('Volver a vectorizar la imagen actual');
   await vi.waitFor(() => expect(raster.calls).toHaveLength(2)); const pending = raster.calls[1];
   if (transition === 'cancel') click('Cancelar importación');
   if (transition === 'edit') session.rename('Edited while tracing');
@@ -104,7 +104,7 @@ it('requests original raster reimport after restoring a V1 project, never invent
   const initial = createDesignDocument({ name: 'Reloaded', kind: 'cutter', source: { type: 'raster', fileName: 'original.png', mimeType: 'image/png', vectorizedSvg: svg } });
   setup(decodeProject(encodeProject(initial)).document); await tick();
   expect(document.body.textContent).toContain('Réimportez');
-  expect([...document.querySelectorAll('button')].some(button => button.textContent === 'Revectoriser l’image actuelle')).toBe(false);
+  expect([...document.querySelectorAll('button')].some(button => button.textContent === 'Volver a vectorizar la imagen actual')).toBe(false);
   expect(raster.calls).toHaveLength(0);
 });
 it('pastes one binary SVG through the canonical session pipeline, never text markup', async () => {
@@ -156,7 +156,7 @@ it('file and clipboard raster imports share the canonical sketch and round-trip 
   await upload(file); await vi.waitFor(() => expect(raster.calls).toHaveLength(1)); raster.calls[0].resolve(svg);
   await vi.waitFor(() => expect(session.getDocument()?.source.type).toBe('raster'));
   const first = session.getDocument()!;
-  click('Importer un dessin'); await tick(); paste([file]);
+  click('Importar un diseño'); await tick(); paste([file]);
   await vi.waitFor(() => expect(raster.calls).toHaveLength(2)); raster.calls[1].resolve(svg);
   await vi.waitFor(() => expect(document.querySelector('dialog[open]')).not.toBeNull()); click('Ignorer les modifications');
   await vi.waitFor(() => expect(session.getDocument()?.id).not.toBe(first.id));
@@ -186,8 +186,8 @@ it.each(['new-image', 'shape', 'open', 'unmount'])('a late raster is invalidated
     click('Biblioteca de formas'); await tick(); click('Usar la forma Círculo');
     await vi.waitFor(() => expect(session.getDocument()?.source.fileName).toBe('circle.svg'));
   } else if (transition === 'open') {
-    click('Projets locaux'); await vi.waitFor(() => expect(document.querySelector('button[aria-label="Ouvrir Other"]')).not.toBeNull());
-    click('Ouvrir Other'); await vi.waitFor(() => expect(session.getDocument()?.name).toBe('Other'));
+    click('Projets locaux'); await vi.waitFor(() => expect(document.querySelector('button[aria-label="Abrir Other"]')).not.toBeNull());
+    click('Abrir Other'); await vi.waitFor(() => expect(session.getDocument()?.name).toBe('Other'));
   } else { await unmount(app!); app = undefined; }
   const accepted = session.getDocument(); slow.resolve(svg); await settled();
   expect(session.getDocument()).toBe(accepted); expect(slow.signal?.aborted).toBe(true);
@@ -196,8 +196,8 @@ it('opening a project invalidates conversion immediately, even while the dirty d
   const session = setup(fixture()); await ready();
   await upload(new File(['r'], 'slow.png', { type: 'image/png' }));
   await vi.waitFor(() => expect(raster.calls).toHaveLength(1)); const slow = raster.calls[0];
-  click('Projets locaux'); await vi.waitFor(() => expect(document.querySelector('button[aria-label="Ouvrir Other"]')).not.toBeNull());
-  click('Ouvrir Other'); await vi.waitFor(() => expect(document.querySelector('dialog[open]')).not.toBeNull());
+  click('Projets locaux'); await vi.waitFor(() => expect(document.querySelector('button[aria-label="Abrir Other"]')).not.toBeNull());
+  click('Abrir Other'); await vi.waitFor(() => expect(document.querySelector('dialog[open]')).not.toBeNull());
   expect(slow.signal?.aborted).toBe(true);
   slow.resolve(svg); await settled(); click('Ignorer les modifications');
   await vi.waitFor(() => expect(session.getDocument()?.name).toBe('Other'));
@@ -206,8 +206,8 @@ it('opening a project invalidates conversion immediately, even while the dirty d
 it('start screen routes to the existing shape library and local project library', async () => {
   setup(); await vi.waitFor(() => expect(document.querySelector('.start-screen')).not.toBeNull());
   click('Formas'); await tick(); expect(document.querySelector('button[aria-label="Usar la forma Círculo"]')).not.toBeNull();
-  click('Importer un dessin'); await vi.waitFor(() => expect(document.querySelector('.start-screen')).not.toBeNull()); click('Reprendre un projet');
-  await vi.waitFor(() => expect(document.querySelector('button[aria-label="Ouvrir Other"]')).not.toBeNull());
+  click('Importar un diseño'); await vi.waitFor(() => expect(document.querySelector('.start-screen')).not.toBeNull()); click('Continuar un proyecto');
+  await vi.waitFor(() => expect(document.querySelector('button[aria-label="Abrir Other"]')).not.toBeNull());
 });
 it('Annuler in the dirty import guard retains exact identity, source, mesh and epoch', async () => {
   const session = setup(fixture()); await ready();
@@ -223,9 +223,9 @@ it('photo import is a reviewed draft, not a silent replacement', async () => {
   await vi.waitFor(() => expect(photo.calls).toHaveLength(1), { timeout: 10000 });
   expect(session.getDocument()).toBeNull(); expect(raster.calls).toHaveLength(0);
   photo.calls[0].resolve(photoResult(svg));
-  await vi.waitFor(() => expect([...document.querySelectorAll<HTMLButtonElement>('button')].find(button => button.textContent === 'Appliquer le contour photo')?.disabled).toBe(false));
+  await vi.waitFor(() => expect([...document.querySelectorAll<HTMLButtonElement>('button')].find(button => button.textContent === 'Aplicar contorno de la foto')?.disabled).toBe(false));
   expect(session.getDocument()).toBeNull();
-  click('Appliquer le contour photo');
+  click('Aplicar contorno de la foto');
   await vi.waitFor(() => expect(session.getDocument()?.source).toMatchObject({ type: 'raster', fileName: 'camera.jpg', mimeType: 'image/jpeg', vectorizedSvg: svg }));
   await ready(); expect(session.getDocument()?.sketch.svg).toBe(svg);
 });
@@ -235,7 +235,7 @@ it('blocked photo and edited controls cannot apply an unreviewed contour', async
   choosePreset('photo'); await tick(); await upload(new File(['photo'], 'camera.png', { type: 'image/png' }));
   await vi.waitFor(() => expect(photo.calls).toHaveLength(1), { timeout: 10000 });
   photo.calls[0].resolve(photoResult(svg, false)); await settled();
-  const apply = [...document.querySelectorAll<HTMLButtonElement>('button')].find(button => button.textContent === 'Appliquer le contour photo')!;
+  const apply = [...document.querySelectorAll<HTMLButtonElement>('button')].find(button => button.textContent === 'Aplicar contorno de la foto')!;
   expect(apply.disabled).toBe(true); apply.click(); expect(session.getDocument()).toBe(original);
   click('Recalculer l’aperçu photo'); await vi.waitFor(() => expect(photo.calls).toHaveLength(2));
   photo.calls[1].resolve(photoResult(svg)); await settled(); expect(apply.disabled).toBe(false);
@@ -268,6 +268,6 @@ it('photo setting changes cancel in-flight computation and ignore its reply', as
   noise.value = '4'; noise.dispatchEvent(new Event('input', { bubbles: true })); await tick();
   expect(pending.signal?.aborted).toBe(true);
   pending.resolve(photoResult(svg)); await settled();
-  const apply = [...document.querySelectorAll<HTMLButtonElement>('button')].find(button => button.textContent === 'Appliquer le contour photo')!;
+  const apply = [...document.querySelectorAll<HTMLButtonElement>('button')].find(button => button.textContent === 'Aplicar contorno de la foto')!;
   expect(apply.disabled).toBe(true); expect(session.getDocument()).toBeNull();
 });
