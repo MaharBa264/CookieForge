@@ -28,7 +28,7 @@ Estas funciones pueden ser útiles, pero no se vuelven **requisitos tácitos** a
 - [x] **Base recuperable:** documento V5, selecciones, operaciones por contorno, alturas independientes y puentes; pruebas automáticas existentes.
 - [x] **Generación restringida:** STL/3MF con hasta seis relieves y conexión en árbol, una malla estanca bajo las restricciones conocidas.
 - [x] **Ensayo integrado CI:** guardar V5, decodificar sin pérdidas, regenerar y serializar STL/3MF en una sola prueba. Validado en el commit `07585484` ([GitHub Actions](https://github.com/MaharBa264/CookieForge/actions/runs/41741679385)).
-- [ ] **Carta piloto:** elegir/preparar UNA ilustración (preferencia: La Estrella XVII), separar contornos de corte y detalle, crear cortante y sello si hace falta, comprobar en visor y slicer las medidas del diseño y la orientación.
+- [ ] **Carta piloto:** La Estrella XVII tiene dos SVG de prueba (`examples/tarot-estrella-xvii/`): cortante exterior y sello simbólico simplificado. **Ambos pasaron la prueba integrada de guardado, reapertura, STL/3MF y dimensiones** en [`7946bb5f`](https://github.com/MaharBa264/CookieForge/actions/runs/41743214463). Pendiente: vectorizar fielmente la ilustración original, comprobar la visualización y las medidas en laminador, y revisar orientación/espejado antes de imprimir.
 - [ ] **Ensayo físico:** imprimir al menos una pieza, comprobar que sea íntegra, estable y que marque masa de galletitas. Ajustar únicamente problemas comprobados en ese ensayo. Registrar boquilla/material/orientación y resultados.
 - [ ] **Release 1.0:** pasar la CI en el commit definitivo, actualizar instrucciones de uso y limitaciones, preparar tag/release después de aprobación explícita. No fusionar a `main` automáticamente.
 
