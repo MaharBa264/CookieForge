@@ -1,6 +1,7 @@
 import type { CutterDesignParameters } from '../../domain/designParameters';
 import { createDefaultCutterParameters } from '../../domain/designParameters';
 import type { GeneratedArtifact } from '../../domain/generatedArtifact';
+import { assessFirstReliefLayout } from '../../geometry/reliefLayout';
 import { generateCookieCutter } from '../../utils/cookieCutterGenerator';
 import { disposeObject3D } from '../../utils/disposeThree';
 import {
@@ -100,12 +101,12 @@ function resolveV5CutterSvg(document: import('../../domain/designDocument').Desi
   }
 
   const unsupported = document.contourOperations.find(
-    assignment => assignment.operation === 'emboss' || assignment.operation === 'engrave'
+    assignment => assignment.operation === 'engrave'
   );
   if (unsupported) {
     throw new CutterGenerationError(
       'INVALID_PARAMS',
-      'Las operaciones Relieve y Grabado aún no generan geometría 3D. Quitá estas asignaciones antes de exportar.',
+      'La operación Grabado aún no genera geometría 3D. Quitá esta asignación antes de exportar.',
       { field: 'contourOperations', pathIndex: unsupported.pathIndex, operation: unsupported.operation }
     );
   }
@@ -186,11 +187,32 @@ export const cutterRecipe = Object.freeze({
     let ownedObject: Awaited<ReturnType<typeof generateCookieCutter>> | undefined;
 
     try {
-      const svgForCutter = resolveV5CutterSvg(document);
+      const hasRelief = document.schemaVersion === 5 &&
+        document.contourOperations.some(item => item.operation === 'emboss');
+      const assessed = hasRelief && document.schemaVersion === 5
+        ? assessFirstReliefLayout(document) : null;
+      if (assessed && (!assessed.topologyReady || assessed.outerPathIndex === undefined ||
+          assessed.detailPathIndex === undefined || assessed.markingClearanceMm === undefined)) {
+        throw new CutterGenerationError('INVALID_PARAMS',
+          assessed.reason, { field: 'contourOperations' });
+      }
+      if (assessed && (validation.parameters.taperAngle !== 0 || validation.parameters.enableHandle)) {
+        throw new CutterGenerationError('INVALID_PARAMS',
+          'El relieve inicial requiere ángulo de pared 0° y mango desactivado.',
+          { field: 'contourOperations' });
+      }
+      const svgForCutter = assessed ? document.sketch.svg : resolveV5CutterSvg(document);
       const bridges = document.schemaVersion === 2 || document.schemaVersion === 5 ? document.bridges : [];
-      ownedObject = bridges.length > 0
-        ? await generateCookieCutter(svgForCutter, validation.parameters, bridges)
-        : await generateCookieCutter(svgForCutter, validation.parameters);
+      ownedObject = assessed && assessed.outerPathIndex !== undefined &&
+        assessed.detailPathIndex !== undefined && assessed.markingClearanceMm !== undefined
+        ? await generateCookieCutter(svgForCutter, validation.parameters, bridges, {
+            outerIndex: assessed.outerPathIndex,
+            detailIndex: assessed.detailPathIndex,
+            clearanceMm: assessed.markingClearanceMm
+          })
+        : bridges.length > 0
+          ? await generateCookieCutter(svgForCutter, validation.parameters, bridges)
+          : await generateCookieCutter(svgForCutter, validation.parameters);
       context.signal.throwIfAborted();
 
       const report = validatePrintableObject(ownedObject);
