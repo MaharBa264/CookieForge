@@ -113,7 +113,7 @@
       {/if}
     </svg>
     <p class="notice">Seleccioná un contorno haciendo clic en su línea o desde la lista. El contorno activo se destaca en azul. La selección no modifica el diseño.</p>
-    {#if path && !path.reason && document.kind === 'cutter' && document.schemaVersion !== 3}
+    {#if path && !path.reason && document.kind === 'cutter'}
       <div class="operation-draft" aria-label="Operación del contorno">
         <label>Operación del contorno {pathIndex + 1}
           <select aria-label="Operación del contorno" value={operations[pathIndex] ?? 'unassigned'}
