@@ -120,6 +120,23 @@ describe('diagnóstico topológico de primer relieve', () => {
     }));
     expect(invalid.topologyReady).toBe(false);
   });
+  it('rechaza el puente que atraviesa un relieve ajeno aunque ambos extremos encajen', () => {
+    const svg = '<svg viewBox="0 0 100 100"><path d="M0 0 L100 0 L100 100 L0 100 Z"/>' +
+      '<path d="M25 20 L40 20 L40 40 L25 40 Z"/>' +
+      '<path d="M25 60 L40 60 L40 80 L25 80 Z"/></svg>';
+    const assessment = assessFirstReliefLayout(fixture({
+      sketch: { svg, revision: 1 },
+      contourOperations: [
+        { pathIndex: 0, operation: 'cut' }, { pathIndex: 1, operation: 'emboss', depthMm: 1 },
+        { pathIndex: 2, operation: 'emboss', depthMm: 2 }
+      ],
+      bridges: [
+        { id: 'left', from: { x: 0, y: 30 }, to: { x: 25, y: 30 }, widthMm: 2 },
+        { id: 'vertical', from: { x: 30, y: 0 }, to: { x: 30, y: 60 }, widthMm: 2 }
+      ]
+    }));
+    expect(assessment.topologyReady).toBe(false);
+  });
   it('no confunde la calificación topológica con grabado o dos relieves', () => {
     expect(assessFirstReliefLayout(fixture({ contourOperations: [{ pathIndex: 1, operation: 'engrave', depthMm: 1 }] })))
       .toMatchObject({ topologyReady: false });
