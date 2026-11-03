@@ -165,7 +165,7 @@ it('a current real batch remains exportable with captured metadata, not later le
   const session = setup(); await ready(); button('Production en série').click();
   await vi.waitFor(() => expect(document.querySelector('.batch-mode .toggle-btn')).not.toBeNull());
   document.querySelector<HTMLButtonElement>('.batch-mode .toggle-btn')!.click(); await tick();
-  button('+ Ajouter le dessin actuel').click(); await tick(); setParams({ ...DEFAULT_PARAMS, wallThickness: 1.2 }); await tick(); button('Générer la série complète').click();
+  button('+ Agregar el diseño actual').click(); await tick(); setParams({ ...DEFAULT_PARAMS, wallThickness: 1.2 }); await tick(); button('Generar serie completa').click();
   await vi.waitFor(() => expect(document.querySelector('.current-file')?.textContent).toBe('batch-production.stl'), { timeout: 10000 });
   const batchMesh = get(model)!.mesh, captured = { ...DEFAULT_PARAMS };
   const action = await exportPanel('3mf'); setParams({ ...DEFAULT_PARAMS, totalHeight: 39 }); action.click();
@@ -197,9 +197,9 @@ it.each(['heterogeneous', 'legacy-unknown'])('omits global geometry claims for %
   await vi.waitFor(() => expect(document.querySelector('.batch-mode .toggle-btn')).not.toBeNull());
   document.querySelector<HTMLButtonElement>('.batch-mode .toggle-btn')!.click(); await tick();
   if (kind === 'heterogeneous') {
-    button('+ Ajouter le dessin actuel').click(); await tick();
+    button('+ Agregar el diseño actual').click(); await tick();
     setParams({ ...DEFAULT_PARAMS, wallThickness: 1.2 }); await tick();
-    button('+ Ajouter le dessin actuel').click(); await tick(); button('Générer la série complète').click();
+    button('+ Agregar el diseño actual').click(); await tick(); button('Generar serie completa').click();
   } else {
     const group = new THREE.Group(); group.add(new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshBasicMaterial()));
     for (const dispatch of viewerEvents.dispatchers) dispatch('batchCreated', group);
