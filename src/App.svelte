@@ -337,7 +337,7 @@
       const epoch = session.getSessionEpoch();
       const choice = await ask('Cambios sin guardar', `¿Guardar los cambios de ${document.name} antes de continuar?`, [
         { id: 'cancel', label: 'Cancelar' }, { id: 'save', label: 'Guardar y continuar' },
-        { id: 'discard', label: 'Ignorer les modifications', destructive: true }
+        { id: 'discard', label: 'Descartar cambios', destructive: true }
       ]);
       if (!alive || revision !== sourceRevision || epoch !== session.getSessionEpoch()) return 'cancel';
       // An external batch has no representable document to save.
@@ -346,7 +346,7 @@
     confirmCollision: async incoming => {
       const choice = await ask('Ya existe un proyecto', `¿Importar ${incoming.name} como copia o reemplazar el proyecto existente?`, [
         { id: 'cancel', label: 'Cancelar' }, { id: 'copy', label: 'Importar una copia' },
-        { id: 'replace', label: 'Remplacer le projet', destructive: true }
+        { id: 'replace', label: 'Reemplazar proyecto', destructive: true }
       ]);
       return choice === 'copy' ? 'copy' : choice === 'replace' ? 'replace' : 'cancel';
     }
@@ -1089,8 +1089,8 @@
           class="category-btn ai-btn"
           class:active={activeCategory === 'ai'}
           on:click={() => activeCategory = 'ai'}
-          title="Outils IA (Gemini)"
-          aria-label="Outils IA (Gemini)"
+          title="Herramientas de IA (Gemini)"
+          aria-label="Herramientas de IA (Gemini)"
           aria-current={activeCategory === 'ai' ? 'page' : undefined}
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1098,21 +1098,21 @@
             <circle cx="9" cy="16" r="1"/>
             <circle cx="15" cy="16" r="1"/>
           </svg>
-          <span class="nav-label" aria-hidden="true">Outils IA</span>
+          <span class="nav-label" aria-hidden="true">Herramientas de IA</span>
         </button>
 
         <button
           class="category-btn"
           class:active={activeCategory === 'gallery'}
           on:click={() => activeCategory = 'gallery'}
-          title="Galerie locale"
-          aria-label="Galerie locale"
+          title="Galería locale"
+          aria-label="Galería locale"
           aria-current={activeCategory === 'gallery' ? 'page' : undefined}
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
           </svg>
-          <span class="nav-label" aria-hidden="true">Galerie locale</span>
+          <span class="nav-label" aria-hidden="true">Galería locale</span>
         </button>
 
         {#if $model}
@@ -1158,7 +1158,7 @@
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M16 16h6v6M8 8H2V2"/>
             </svg>
-            <span class="nav-label" aria-hidden="true">Série</span>
+            <span class="nav-label" aria-hidden="true">Series</span>
           </button>
         {/if}
         {#if $model}
@@ -1204,11 +1204,11 @@
           <p>Elegí una etapa. Podés volver a los ajustes o al visor 3D en cualquier momento.</p>
           <button type="button" on:click={() => selectMobileCategory('upload')}>Importar una imagen</button>
           <button type="button" on:click={() => selectMobileCategory('shapes')}>Elegir una figura</button>
-          <button type="button" on:click={() => selectMobileCategory('advanced')}>Atelier 2D et ponts</button>
+          <button type="button" on:click={() => selectMobileCategory('advanced')}>Editor 2D y puentes</button>
           {#if batchAvailable}<button type="button" on:click={() => selectMobileCategory('batch')}>Serie de cortantes</button>{/if}
-          <h3>Autres outils</h3>
-          <button type="button" on:click={() => selectMobileCategory('ai')}>Outils IA</button>
-          <button type="button" on:click={() => selectMobileCategory('gallery')}>Galerie</button>
+          <h3>Otras herramientas</h3>
+          <button type="button" on:click={() => selectMobileCategory('ai')}>Herramientas de IA</button>
+          <button type="button" on:click={() => selectMobileCategory('gallery')}>Galería</button>
           {#if $model}
             <button type="button" on:click={() => selectMobileCategory('materials')}>Materiales y optimización</button>
             <button type="button" on:click={() => selectMobileCategory('preview')}>Preparación para imprimir</button>
@@ -1218,7 +1218,7 @@
       <div class="panel-content" class:mobile-start={!$session && activeCategory === 'upload' && photoDraft === null && !importPending} bind:this={panelContent}>
         {#if importPending}
           <div class="image-import-progress">
-            <p role="status" aria-live="polite">Importation de l’image… {TRACING_PRESETS.find(option => option.id === pendingPreset)?.label}</p>
+            <p role="status" aria-live="polite">Importando imagen… {TRACING_PRESETS.find(option => option.id === pendingPreset)?.label}</p>
             <button type="button" class="btn" on:click={cancelImageImport}>Cancelar importación</button>
           </div>
         {/if}
@@ -1345,13 +1345,13 @@
           {:then component}
             <component.default on:shapeCreated={(e) => handleShapeSelect(e.detail)} />
           {:catch}
-            <div class="panel-load-error" role="alert">No se pudieron cargar las opérations booléennes.</div>
+            <div class="panel-load-error" role="alert">No se pudieron cargar las operaciones booleanas.</div>
           {/await}
           </div>
 
         {:else if activeCategory === 'ai'}
           <header class="feature-header">
-            <h2>Outils IA</h2>
+            <h2>Herramientas de IA</h2>
             <p>Connectez Gemini pour obtenir de l’aide sur le dessin actuel.</p>
           </header>
           {#await import('./lib/components/ui/GeminiAPIConfig.svelte')}
@@ -1393,7 +1393,7 @@
           {:then component}
             <component.default on:materialChanged={handleMaterialChange} />
           {:catch}
-            <div class="panel-load-error" role="alert">No se pudieron cargar las matériaux.</div>
+            <div class="panel-load-error" role="alert">No se pudieron cargar los materiales.</div>
           {/await}
           {#await import('./lib/components/ui/OptimizationPanel.svelte')}
             <div class="panel-loading" role="status">Cargando herramientas de optimización…</div>
@@ -1509,7 +1509,7 @@
     </div>
     <nav class="mobile-sections" aria-label="Sections mobiles">
       <button type="button" aria-current={!mobileView3D && !mobileCreateMenu && activeCategory === 'projects' ? 'page' : undefined} on:click={() => selectMobileCategory('projects')}>Projet</button>
-      <button type="button" aria-current={!mobileView3D && (mobileCreateMenu || !['projects', 'params', 'export'].includes(activeCategory)) ? 'page' : undefined} on:click={openMobileCreate}>Créer</button>
+      <button type="button" aria-current={!mobileView3D && (mobileCreateMenu || !['projects', 'params', 'export'].includes(activeCategory)) ? 'page' : undefined} on:click={openMobileCreate}>Crear</button>
       <button type="button" aria-current={!mobileView3D && !mobileCreateMenu && activeCategory === 'params' ? 'page' : undefined} on:click={() => selectMobileCategory('params')}>Configurar</button>
       <button type="button" aria-current={mobileView3D ? 'page' : undefined} on:click={showMobile3D}>3D</button>
       <button type="button" aria-current={!mobileView3D && !mobileCreateMenu && activeCategory === 'export' ? 'page' : undefined} on:click={() => selectMobileCategory('export')}>Exportación</button>
