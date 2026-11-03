@@ -457,6 +457,56 @@ describe('cutterRecipe', () => {
     } finally { for (const artifact of artifacts) disposeObject3D(artifact.object); }
   });
 
+  it('V5 exporta dos relieves conectados con alturas independientes como una sola pieza', async () => {
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">' +
+      '<path d="M0 0 L100 0 L100 100 L0 100 Z"/>' +
+      '<path d="M25 20 L40 20 L40 40 L25 40 Z"/>' +
+      '<path d="M60 60 L75 60 L75 80 L60 80 Z"/></svg>';
+    const bridges = [
+      { id: 'left', from: { x: 0, y: 30 }, to: { x: 25, y: 30 }, widthMm: 2 },
+      { id: 'right', from: { x: 100, y: 70 }, to: { x: 75, y: 70 }, widthMm: 2 }
+    ];
+    const params = { ...createDefaultCutterParameters(), taperAngle: 0, enableHandle: false, handleStyle: 'none' as const };
+    const document = {
+      ...createCutterDocument(params, svg),
+      schemaVersion: 5 as const, bridges,
+      contourOperations: [
+        { pathIndex: 0, operation: 'cut' as const },
+        { pathIndex: 1, operation: 'emboss' as const, depthMm: 0.8 },
+        { pathIndex: 2, operation: 'emboss' as const, depthMm: 2.4 }
+      ]
+    };
+    const artifacts = await cutterRecipe.generate(document, generationContext(new AbortController().signal));
+    try {
+      expect(artifacts).toHaveLength(1);
+      expect(artifacts[0].validation.valid, artifacts[0].validation.errors.join('\n')).toBe(true);
+      expect(artifacts[0].validation.shells).toBe(1);
+      const object = artifacts[0].object;
+      expect(object.children.filter(child => child instanceof THREE.Mesh)).toHaveLength(1);
+      const mesh = object.children.find(child => child instanceof THREE.Mesh) as THREE.Mesh;
+      const position = mesh.geometry.getAttribute('position');
+      const scale = object.userData.effectiveScale as number;
+      const closeTo = (x: number, z: number, clearance: number) => {
+        const candidates = Array.from({ length: position.count }, (_, i) => ({
+          distance: Math.hypot(Math.abs(position.getX(i)) - x * scale, Math.abs(position.getZ(i)) - z * scale),
+          y: position.getY(i)
+        })).filter(p => p.distance < 1.4);
+        expect(candidates.length).toBeGreaterThan(0);
+        expect(candidates.some(p => Math.abs(p.y - clearance) < 0.35)).toBe(true);
+      };
+      closeTo(25, 30, 0.8);
+      closeTo(75, 70, 2.4);
+      const stl = serializeSTL(object, true);
+      expect(stl).toBeInstanceOf(DataView);
+      if (!(stl instanceof DataView)) throw new Error('STL esperado.');
+      expect(stl.byteLength).toBe(84 + artifacts[0].validation.triangles * 50);
+      expect(serialize3MF(object, params).byteLength).toBeGreaterThan(100);
+      expect(document.sketch.svg).toBe(svg);
+    } finally {
+      for (const artifact of artifacts) disposeObject3D(artifact.object);
+    }
+  });
+
   it('V5 falla cerrado si Relieve carece de puente o conserva un mango', async () => {
     const svg = '<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0 L100 0 L100 100 L0 100 Z"/><path d="M30 30 L70 30 L70 70 L30 70 Z"/></svg>';
     const bridge = { id: 'join', from: { x: 0, y: 50 }, to: { x: 30, y: 50 }, widthMm: 2 };
