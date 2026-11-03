@@ -200,14 +200,14 @@ describe('codec projet portable V1', () => {
       'format'
     );
     expectCodecError(
-      JSON.stringify({ format: PROJECT_FORMAT, version: 5, document: cutterDocument() }),
+      JSON.stringify({ format: PROJECT_FORMAT, version: 6, document: cutterDocument() }),
       'version',
       'future'
     );
     expectCodecError(
       JSON.stringify({
         format: PROJECT_FORMAT,
-        version: 5,
+        version: 6,
         document: cutterDocument(),
         futureMetadata: true
       }),
