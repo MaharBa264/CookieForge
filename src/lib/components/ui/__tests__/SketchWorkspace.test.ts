@@ -26,7 +26,7 @@ it('selects individual contours by stroke and keyboard without mutating the proj
  const targets = [...globalThis.document.querySelectorAll<SVGPathElement>('path[aria-label^="Seleccionar contorno"]')];
  expect(targets).toHaveLength(2);
  expect(targets[0].getAttribute('aria-pressed')).toBe('true');
- targets[1].click(); await tick();
+ targets[1].dispatchEvent(new MouseEvent('click', { bubbles: true })); await tick();
  expect(targets[0].getAttribute('aria-pressed')).toBe('false');
  expect(targets[1].getAttribute('aria-pressed')).toBe('true');
  expect(globalThis.document.querySelector<HTMLSelectElement>('.sketch-workspace select')?.value).toBe('1');
