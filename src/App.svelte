@@ -1269,7 +1269,7 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <circle cx="12" cy="12" r="10"/>
                 </svg>
-                Essayer un cercle de test
+                Probar un círculo de ejemplo
               </button>
             </div>
           {/if}
@@ -1315,7 +1315,7 @@
                 <component.default {session} />
               {/key}
             {:else}
-              <p role="status">Ouvrez un projet pour modifier son dessin.</p>
+              <p role="status">Abrí un proyecto para editar su diseño.</p>
             {/if}
           {:catch}
             <div class="panel-load-error" role="alert">No se pudo cargar el editor 2D.</div>
@@ -1502,7 +1502,7 @@
             </svg>
           </div>
           <h3>No hay ningún modelo cargado</h3>
-          <p>Importez un dessin ou choisissez une forme pour commencer.</p>
+          <p>Importá un diseño o elegí una figura para comenzar.</p>
           <button type="button" class="empty-create" on:click={openMobileCreate}>Elegir un método de creación</button>
         </div>
       {/if}
