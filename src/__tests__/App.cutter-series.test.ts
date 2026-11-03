@@ -49,13 +49,13 @@ it.each([1, 2] as const)('V%s creates one history step, keeps editable profiles/
   expect(historyStore.getLength()).toBe(length + 1);
   await ready(session); expect(get(generationState).result?.artifacts[0].validation.shells).toBe(4);
   const seriesCodec = encodeProject(series), seriesStl = stl();
-  await click('Réglages');
+  await click('Ajustes');
   await click('Annuler'); expect(encodeProject(session.getDocument())).toBe(originalCodec); await ready(session); expect(stl()).toEqual(originalStl);
   await click('Rétablir'); expect(encodeProject(session.getDocument())).toBe(seriesCodec); await ready(session); expect(stl()).toEqual(seriesStl);
-  await click('Réglages');
+  await click('Ajustes');
   document.querySelector<HTMLButtonElement>('[data-wall-profile="robust"]')!.click(); await tick(); await ready(session);
   expect(session.getDocument()).toMatchObject({ kind: 'multi-cutter', layout: { copies: 4, columns: 2, spacingMm: 5 }, parameters: { wallThickness: 1.5, taperAngle: 10 } });
-  await click('Création avancée');
+  await click('Creación avanzada');
   await vi.waitFor(() => expect(document.querySelector('.bridge-workspace')).not.toBeNull(), { timeout: 10_000 });
   if (version === 2) {
     const endpoint = document.querySelector<SVGElement>('[aria-label="Déplacer la fin du pont join"]')!;
@@ -99,7 +99,7 @@ it('invalid layout preserves the last series; accepted oversized layout blocks o
   const count = document.querySelector<HTMLInputElement>('#series-copies')!; count.value = '25'; count.dispatchEvent(new Event('input', { bubbles: true })); await tick();
   document.querySelector<HTMLButtonElement>('[data-apply-series]')!.click(); await tick(); expect(session.getDocument()).toBe(before); expect(document.querySelector('[role="alert"]')).not.toBeNull();
   session.updateSeries({ copies: 4, columns: 4, spacingMm: 5 });
-  await click('Exporter le dessin');
+  await click('Exportar diseño');
   await vi.waitFor(() => expect(document.querySelector('.advanced-export')).not.toBeNull());
   document.querySelector<HTMLButtonElement>('.advanced-export .toggle-btn')!.click(); await tick();
   expect(document.querySelectorAll('.advanced-export .export-btn')).toHaveLength(1);
