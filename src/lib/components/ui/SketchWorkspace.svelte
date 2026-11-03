@@ -124,7 +124,7 @@
           </select>
         </label>
         <p role="status">Operación asignada: {operationLabels[operations[pathIndex] ?? 'unassigned']}.</p>
-        <p class="notice">La operación forma parte del documento y participa de Deshacer/Rehacer. Usá Guardar proyecto o Exportar proyecto para conservarla después de cerrar. Todavía no modifica la geometría ni el STL. Si editás el SVG, se limpian las asignaciones para evitar índices incorrectos.</p>
+        <p class="notice">La operación forma parte del documento y participa de Deshacer/Rehacer. Usá Guardar proyecto o Exportar proyecto para conservarla después de cerrar. Corte conserva el contorno e Ignorar lo excluye del STL solamente en SVG simples con trazados independientes. Relieve y Grabado aún no generan geometría: bloquean la exportación hasta que se implementen. Si editás el SVG, se limpian las asignaciones para evitar índices incorrectos.</p>
       </div>
     {/if}
     {#if path?.reason}<p role="status">{path.reason}</p>{/if}
