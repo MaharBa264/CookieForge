@@ -98,7 +98,7 @@ it.each(['rename', 'viewport', 'params', 'replace', 'raster', 'open'] as const)(
 it('refuses a changed record rather than restoring a newer undisplayed version and refreshes', async () => {
   const { session, expected, drafts } = setup(); await listed();
   drafts.set(expected.draftId, parseProjectRecoveryEnvelope({ ...expected, savedAt: '2026-10-10T12:00:00Z', document: fixture('Changed draft') })); resume().click();
-  await vi.waitFor(() => expect(document.body.textContent).toContain('a changé')); expect(session.getDocument()).toBeNull();
+  await vi.waitFor(() => expect(document.body.textContent).toContain('cambió')); expect(session.getDocument()).toBeNull();
   await vi.waitFor(() => expect(resume().getAttribute('aria-label')).toContain('Changed draft'));
 });
 it('locks resume before the next Svelte tick', async () => {
@@ -124,7 +124,7 @@ it('delete binds the displayed version through the prompt and guards double clic
 it('unmount drains a pending accepted snapshot before storage close, without waiting 750ms', async () => {
   const gate = deferred(); const { session, put, close, drafts } = setup(null, { put: () => gate.promise }); await listed();
   session.replace(fixture('Last gesture')); const expected = JSON.parse(JSON.stringify(session.getDocument()));
-  await tick(); expect(document.body.textContent).toContain('Récupération en attente'); expect(put).not.toHaveBeenCalled();
+  await tick(); expect(document.body.textContent).toContain('Recuperación pendiente'); expect(put).not.toHaveBeenCalled();
   await unmount(app!); app = undefined; await vi.waitFor(() => expect(put).toHaveBeenCalledTimes(1)); expect(close).not.toHaveBeenCalled(); gate.resolve();
   await vi.waitFor(() => expect(close).toHaveBeenCalledTimes(1)); expect([...drafts.values()].some(d => JSON.stringify(d.document) === JSON.stringify(expected))).toBe(true);
 });
@@ -189,7 +189,7 @@ it('observes the latest canonical snapshot after a reentrant same-epoch edit, ne
   finally { unsubscribe(); }
 });
 it('a nonrepresentable batch suspends new captures without losing the last accepted canonical draft', async () => {
-  const { session, put, close } = setup(fixture('Current')); await ready(); session.rename('Accepted before batch'); const expected = JSON.parse(JSON.stringify(session.getDocument())); batch.mesh = new Group(); click('Production en série');
+  const { session, put, close } = setup(fixture('Current')); await ready(); session.rename('Accepted before batch'); const expected = JSON.parse(JSON.stringify(session.getDocument())); batch.mesh = new Group(); click('Producción en serie');
   await vi.waitFor(() => expect(document.querySelector('.batch-mode .toggle-btn')).not.toBeNull()); document.querySelector<HTMLButtonElement>('.batch-mode .toggle-btn')!.click(); await tick(); click('+ Agregar el diseño actual'); await tick(); click('Generar serie completa');
   await vi.waitFor(() => expect(get(model)?.mesh).toBe(batch.mesh)); session.rename('Not representable now'); await tick();
   await unmount(app!); app = undefined; await vi.waitFor(() => expect(close).toHaveBeenCalledTimes(1)); expect(put.mock.calls.at(-1)?.[0].document).toEqual(expected);
