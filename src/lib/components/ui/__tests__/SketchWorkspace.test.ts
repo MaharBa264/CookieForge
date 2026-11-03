@@ -21,6 +21,7 @@ it('selects individual contours by stroke and keyboard without mutating the proj
  const original = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M10 10 L40 10 L40 40 Z"/><path d="M60 60 L90 60 L90 90 Z"/></svg>';
  const document = createDesignDocument({ name: 'Two paths', kind: 'cutter', source: { type: 'svg', svg: original, fileName: 'two.svg' } });
  const session = createDesignSessionStore(document);
+ const baseline = session.getDocument();
  component = mount(SketchWorkspace, { target: globalThis.document.body.appendChild(globalThis.document.createElement('div')), props: { session } });
  await tick();
  const targets = [...globalThis.document.querySelectorAll<SVGPathElement>('path[aria-label^="Seleccionar contorno"]')];
@@ -30,11 +31,11 @@ it('selects individual contours by stroke and keyboard without mutating the proj
  expect(targets[0].getAttribute('aria-pressed')).toBe('false');
  expect(targets[1].getAttribute('aria-pressed')).toBe('true');
  expect(globalThis.document.querySelector<HTMLSelectElement>('.sketch-workspace select')?.value).toBe('1');
- expect(session.getDocument()).toBe(document);
+ expect(session.getDocument()).toBe(baseline);
  expect(session.getDocument()?.sketch.svg).toBe(original);
  targets[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })); await tick();
  expect(targets[0].getAttribute('aria-pressed')).toBe('true');
- expect(session.getDocument()).toBe(document);
+ expect(session.getDocument()).toBe(baseline);
 });
 it('opening does not mutate; drag preview commits once on release', async () => {
  const { session, canvas } = setup(); const baseline = session.getDocument(); await tick(); expect(session.getDocument()).toBe(baseline);
