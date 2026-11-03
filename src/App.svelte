@@ -1022,13 +1022,13 @@
     <aside class="mini-sidebar">
       <nav class="category-nav" aria-label="Herramientas de creación">
         <button class="category-btn" class:active={activeCategory === 'projects'}
-          on:click={() => activeCategory = 'projects'} aria-label="Projets locaux" title="Projets locaux"
-          aria-current={activeCategory === 'projects' ? 'page' : undefined}>📁<span class="nav-label">Projets locaux</span></button>
+          on:click={() => activeCategory = 'projects'} aria-label="Proyectos locales" title="Proyectos locales"
+          aria-current={activeCategory === 'projects' ? 'page' : undefined}>📁<span class="nav-label">Proyectos locales</span></button>
         <button
           class="category-btn"
           class:active={activeCategory === 'upload'}
           on:click={() => activeCategory = 'upload'}
-          title="Importer"
+          title="Importar"
           aria-label="Importar un diseño"
           aria-current={activeCategory === 'upload' ? 'page' : undefined}
         >
@@ -1037,7 +1037,7 @@
             <polyline points="17 8 12 3 7 8"/>
             <line x1="12" y1="3" x2="12" y2="15"/>
           </svg>
-          <span class="nav-label" aria-hidden="true">Importer</span>
+          <span class="nav-label" aria-hidden="true">Importar</span>
         </button>
 
         {#if $model}
@@ -1105,14 +1105,14 @@
           class="category-btn"
           class:active={activeCategory === 'gallery'}
           on:click={() => activeCategory = 'gallery'}
-          title="Galería locale"
-          aria-label="Galería locale"
+          title="Galería local"
+          aria-label="Galería local"
           aria-current={activeCategory === 'gallery' ? 'page' : undefined}
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
           </svg>
-          <span class="nav-label" aria-hidden="true">Galería locale</span>
+          <span class="nav-label" aria-hidden="true">Galería local</span>
         </button>
 
         {#if $model}
@@ -1151,7 +1151,7 @@
             class="category-btn"
             class:active={activeCategory === 'batch'}
             on:click={() => activeCategory = 'batch'}
-            title="Batch"
+            title="Series"
             aria-label="Producción en serie"
             aria-current={activeCategory === 'batch' ? 'page' : undefined}
           >
@@ -1508,7 +1508,7 @@
       {/if}
     </div>
     <nav class="mobile-sections" aria-label="Sections mobiles">
-      <button type="button" aria-current={!mobileView3D && !mobileCreateMenu && activeCategory === 'projects' ? 'page' : undefined} on:click={() => selectMobileCategory('projects')}>Projet</button>
+      <button type="button" aria-current={!mobileView3D && !mobileCreateMenu && activeCategory === 'projects' ? 'page' : undefined} on:click={() => selectMobileCategory('projects')}>Proyecto</button>
       <button type="button" aria-current={!mobileView3D && (mobileCreateMenu || !['projects', 'params', 'export'].includes(activeCategory)) ? 'page' : undefined} on:click={openMobileCreate}>Crear</button>
       <button type="button" aria-current={!mobileView3D && !mobileCreateMenu && activeCategory === 'params' ? 'page' : undefined} on:click={() => selectMobileCategory('params')}>Configurar</button>
       <button type="button" aria-current={mobileView3D ? 'page' : undefined} on:click={showMobile3D}>3D</button>
