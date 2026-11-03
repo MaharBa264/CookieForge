@@ -58,7 +58,7 @@ it.each([1, 2] as const)('V%s creates one history step, keeps editable profiles/
   await click('Creación avanzada');
   await vi.waitFor(() => expect(document.querySelector('.bridge-workspace')).not.toBeNull(), { timeout: 10_000 });
   if (version === 2) {
-    const endpoint = document.querySelector<SVGElement>('[aria-label="Déplacer la fin du pont join"]')!;
+    const endpoint = document.querySelector<SVGElement>('[aria-label="Mover final del puente join"]')!;
     expect(endpoint).not.toBeNull();
     endpoint.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
     await vi.waitFor(() => { const doc = session.getDocument(); expect(doc?.schemaVersion).toBe(3); if (doc?.schemaVersion === 3) expect(doc.bridges[0].to.y).toBe(51); });
