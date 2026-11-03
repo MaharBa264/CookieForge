@@ -98,6 +98,10 @@ function freezeDocument(document: ImplementedDesignDocument): ImplementedDesignD
     Object.freeze(document.bridges);
   }
   if (document.schemaVersion === 3) Object.freeze(document.layout);
+  if (document.schemaVersion === 5) {
+    for (const assignment of document.contourOperations) Object.freeze(assignment);
+    Object.freeze(document.contourOperations);
+  }
   return Object.freeze(document);
 }
 
