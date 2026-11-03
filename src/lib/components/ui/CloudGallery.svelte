@@ -72,7 +72,7 @@
   }
 
   function handleDelete(id: string) {
-    if (confirm('Voulez-vous vraiment supprimer ce modèle ?')) {
+    if (confirm('¿Querés eliminar este modelo?')) {
       deleteDesign(id);
       selectedDesigns.delete(id);
       selectedDesigns = selectedDesigns;
@@ -85,8 +85,8 @@
     if (count === 0) return;
 
     const message = count === 1
-      ? 'Voulez-vous vraiment supprimer ce modèle ?'
-      : `Voulez-vous vraiment supprimer ${count} modèles ?`;
+      ? '¿Querés eliminar este modelo?'
+      : `¿Querés eliminar ${count} modelos?`;
 
     if (confirm(message)) {
       selectedDesigns.forEach(id => deleteDesign(id));
@@ -173,10 +173,10 @@
     const diff = now.getTime() - date.getTime();
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
-    if (days === 0) return 'Aujourd’hui';
-    if (days === 1) return 'Hier';
-    if (days < 7) return `${days} jours`;
-    if (days < 30) return `${Math.floor(days / 7)} semaines`;
+    if (days === 0) return 'Hoy';
+    if (days === 1) return 'Ayer';
+    if (days < 7) return `${days} días`;
+    if (days < 30) return `${Math.floor(days / 7)} semanas`;
     return date.toLocaleDateString();
   }
 </script>
@@ -185,11 +185,11 @@
 
 <div class="cloud-gallery">
   <div class="gallery-header">
-    <h3>☁️ Galerie en ligne</h3>
+    <h3>☁️ Galería en línea</h3>
     <div class="header-actions">
       {#if currentSvg}
         <button class="save-btn" on:click={openSaveDialog}>
-          💾 Enregistrer le modèle
+          💾 Guardar modelo
         </button>
       {/if}
       <button class="toggle-btn" on:click={() => showGallery = !showGallery}>
@@ -207,14 +207,14 @@
           class:active={activeTab === 'community'}
           on:click={() => activeTab = 'community'}
         >
-          🌍 Communauté ({communityDesigns.length})
+          🌍 Comunidad ({communityDesigns.length})
         </button>
         <button
           class="tab"
           class:active={activeTab === 'myDesigns'}
           on:click={() => activeTab = 'myDesigns'}
         >
-          📁 Mes modèles ({myDesigns.length})
+          📁 Mis modelos ({myDesigns.length})
         </button>
       </div>
 
@@ -224,21 +224,21 @@
           <input
             type="text"
             class="search-input"
-            placeholder="Rechercher des modèles…"
+            placeholder="Buscar modelos…"
             bind:value={searchQuery}
           />
 
           <div class="sort-controls">
-            <label for="sortBy">Trier par :</label>
+            <label for="sortBy">Ordenar por:</label>
             <select id="sortBy" bind:value={sortBy}>
-              <option value="popular">Les plus populaires</option>
-              <option value="recent">Les plus récents</option>
-              <option value="downloads">Les plus téléchargés</option>
+              <option value="popular">Más populares</option>
+              <option value="recent">Más recientes</option>
+              <option value="downloads">Más descargados</option>
             </select>
           </div>
 
           <div class="tags-filter">
-            <div class="tags-label">Étiquettes populaires :</div>
+            <div class="tags-label">Etiquetas populares:</div>
             <div class="tags-list">
               {#each popularTags as tag}
                 <button
@@ -264,7 +264,7 @@
                 <h4 class="design-name">{design.metadata.name}</h4>
                 <p class="design-description">{design.metadata.description}</p>
                 <div class="design-meta">
-                  <span class="author">Par {design.metadata.author}</span>
+                  <span class="author">Por {design.metadata.author}</span>
                   <span class="date">{formatDate(design.metadata.createdAt)}</span>
                 </div>
                 <div class="design-tags">
@@ -277,7 +277,7 @@
                     ❤️ {design.metadata.likes}
                   </button>
                   <button class="action-btn" on:click={() => handleLoad(design)}>
-                    📥 Charger
+                    📥 Cargar
                   </button>
                 </div>
               </div>
@@ -288,9 +288,9 @@
         <!-- My Designs -->
         {#if selectedDesigns.size > 0}
           <div class="selection-toolbar">
-            <span class="selection-count">{selectedDesigns.size} sélectionné(s)</span>
+            <span class="selection-count">{selectedDesigns.size} seleccionados</span>
             <button class="btn-delete-selected" on:click={handleDeleteSelected}>
-              🗑️ Supprimer la sélection
+              🗑️ Eliminar selección
             </button>
           </div>
         {/if}
@@ -304,7 +304,7 @@
               <button
                 type="button"
                 class="selection-indicator"
-                aria-label={`Sélectionner ${design.metadata.name}`}
+                aria-label={`Seleccionar ${design.metadata.name}`}
                 aria-pressed={selectedDesigns.has(design.metadata.id)}
                 on:click={(e) => handleDesignClick(design, index, e)}
               >
@@ -325,10 +325,10 @@
                 </div>
                 <div class="card-actions">
                   <button class="action-btn primary" on:click|stopPropagation={() => handlePublish(design)}>
-                    📤 Publier
+                    📤 Publicar
                   </button>
                   <button class="action-btn" on:click|stopPropagation={() => handleLoad(design)}>
-                    📥 Charger
+                    📥 Cargar
                   </button>
                   <button class="action-btn danger" on:click|stopPropagation={() => handleDelete(design.metadata.id)}>
                     🗑️
@@ -340,8 +340,8 @@
 
           {#if myDesigns.length === 0}
             <div class="empty-state">
-              <p>Aucun modèle enregistré.</p>
-              <p class="hint">Enregistrez votre modèle actuel pour commencer !</p>
+              <p>No hay modelos guardados.</p>
+              <p class="hint">Guardá tu modelo actual para empezar.</p>
             </div>
           {/if}
         </div>
@@ -354,15 +354,15 @@
 {#if showSaveDialog}
   <div class="modal-overlay">
     <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="save-dialog-title">
-      <h3 id="save-dialog-title">Enregistrer le modèle</h3>
+      <h3 id="save-dialog-title">Guardar modelo</h3>
 
       <div class="form-group">
-        <label for="designName">Nom du modèle *</label>
+        <label for="designName">Nombre del modelo *</label>
         <input
           id="designName"
           type="text"
           bind:value={saveName}
-          placeholder="Mon emporte-pièce"
+          placeholder="Mi cortante"
         />
       </div>
 
@@ -371,27 +371,27 @@
         <textarea
           id="designDescription"
           bind:value={saveDescription}
-          placeholder="Décrivez votre modèle…"
+          placeholder="Describí tu modelo…"
           rows="3"
         ></textarea>
       </div>
 
       <div class="form-group">
-        <label for="designTags">Étiquettes (séparées par des virgules)</label>
+        <label for="designTags">Etiquetas (separadas por comas)</label>
         <input
           id="designTags"
           type="text"
           bind:value={saveTags}
-          placeholder="Noël, étoile, fête"
+          placeholder="Navidad, estrella, fiesta"
         />
       </div>
 
       <div class="modal-actions">
         <button class="btn-cancel" on:click={() => showSaveDialog = false}>
-          Annuler
+          Cancelar
         </button>
         <button class="btn-save" on:click={handleSave} disabled={!saveName}>
-          Enregistrer le modèle
+          Guardar modelo
         </button>
       </div>
     </div>
