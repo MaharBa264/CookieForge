@@ -72,7 +72,7 @@ it('separates sketch, bridges and batch in the mobile creation flow without chan
   mobileButton('Configurar').click(); await tick();
   expect(document.querySelector('.history-controls button[title^="Deshacer"]')).not.toBeNull();
   mobileButton('Proyecto').click(); await tick();
-  expect(document.querySelector('.panel-content')?.textContent).toMatch(/projet/i);
+  expect(document.querySelector('.panel-content')?.textContent).toMatch(/proyecto/i);
 });
 
 it('returns to the sketch instead of leaving an empty bridge tab after changing to Stamp', async () => {
