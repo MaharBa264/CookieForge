@@ -143,7 +143,7 @@
           <p>{reliefLayout.reason}</p>
           {#if reliefLayout.topologyReady}
             <p>Altura de separación de la punta de corte: {reliefLayout.markingClearanceMm} mm.
-            Para generar el primer relieve 3D, configurá ángulo de pared 0° y desactivá el mango. La generación verifica que el STL sea una sola pieza estanca.</p>
+            Para generar uno, dos o tres relieves 3D, configurá ángulo de pared 0°, desactivá el mango y agregá un puente del exterior a cada detalle. La generación verifica que el STL sea una sola pieza estanca.</p>
           {/if}
         </div>
       {/if}
@@ -168,10 +168,10 @@
               value={selectedAssignment?.depthMm ?? CONTOUR_DETAIL_DEPTH.defaultMm}
               on:change={event => setDepth(Number(event.currentTarget.value))} />
           </label>
-          <p class="notice">El valor representa cuánto se eleva la punta interior respecto del filo exterior (0,4 a 3 mm). Cada contorno conserva su ajuste. El primer Relieve conectado puede generarse en 3D; Grabado sigue pendiente. Según la inclinación del puente, la impresión puede necesitar soportes.</p>
+          <p class="notice">El valor representa cuánto se eleva la punta interior respecto del filo exterior (0,4 a 3 mm). Cada contorno conserva su ajuste. Hasta tres relieves separados pueden generarse con alturas diferentes y puentes independientes; Grabado sigue pendiente. Según la inclinación del puente, la impresión puede necesitar soportes.</p>
         {/if}
 
-        <p class="notice">La operación forma parte del documento y participa de Deshacer/Rehacer. Usá Guardar proyecto o Exportar proyecto para conservarla después de cerrar. Corte conserva el contorno e Ignorar lo excluye del STL solamente en SVG simples con trazados independientes. Relieve ya genera geometría 3D para un borde exterior convexo, un detalle interior y un puente válido, sin mango y con paredes rectas. Grabado aún bloquea la exportación. Si editás el SVG, se limpian las asignaciones para evitar índices incorrectos.</p>
+        <p class="notice">La operación forma parte del documento y participa de Deshacer/Rehacer. Usá Guardar proyecto o Exportar proyecto para conservarla después de cerrar. Corte conserva el contorno e Ignorar lo excluye del STL solamente en SVG simples con trazados independientes. Relieve genera geometría 3D para un borde exterior convexo y hasta tres detalles interiores separados, cada uno con su puente, sin mango y con paredes rectas. Grabado aún bloquea la exportación. Si editás el SVG, se limpian las asignaciones para evitar índices incorrectos.</p>
       </div>
     {/if}
     {#if path?.reason}<p role="status">{path.reason}</p>{/if}
