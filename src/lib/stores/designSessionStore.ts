@@ -16,6 +16,7 @@ export interface DesignSessionStore extends Readable<DesignDocument | null> {
   restoreHistory(value: unknown, expectedEpoch: number): void;
   rename: DesignDocumentStore['rename'];
   updateSketch: DesignDocumentStore['updateSketch'];
+  updateContourOperation: DesignDocumentStore['updateContourOperation'];
   updateBridges: DesignDocumentStore['updateBridges'];
   updateSeries: DesignDocumentStore['updateSeries'];
   updateStampImprintMode: DesignDocumentStore['updateStampImprintMode'];
@@ -98,6 +99,7 @@ export function createDesignSessionStore(
 
     rename: name => mutate(store => store.rename(name)),
     updateSketch: svg => mutate(store => store.updateSketch(svg)),
+    updateContourOperation: (index, operation) => mutate(store => store.updateContourOperation(index, operation)),
     updateBridges: bridges => mutate(store => store.updateBridges(bridges)),
     updateSeries: layout => mutate(store => store.updateSeries(layout)),
     updateStampImprintMode: mode => mutate(store => store.updateStampImprintMode(mode)),
