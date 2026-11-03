@@ -67,7 +67,7 @@ it.each([1, 2] as const)('V%s profiles use one history step and the same documen
   const records = new Map<string, DesignDocument>();
   let session = setup(fixture(version), records);
   await ready(session);
-  await click('Réglages');
+  await click('Ajustes');
   for (const profile of [
     { id: 'thin', wallThickness: 0.8, taperAngle: 5 },
     { id: 'standard', wallThickness: 1, taperAngle: 7 },
@@ -121,6 +121,6 @@ it.each([1, 2] as const)('V%s profiles use one history step and the same documen
   await ready(session);
   expect(encodeProject(session.getDocument())).toBe(encodeProject(saved));
   expect(stl()).toEqual(savedStl);
-  await click('Réglages');
+  await click('Ajustes');
   expect(document.querySelector('[data-wall-profile="robust"]')?.getAttribute('aria-pressed')).toBe('true');
 }, 30_000);
