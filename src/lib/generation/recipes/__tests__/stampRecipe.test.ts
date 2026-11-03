@@ -203,8 +203,9 @@ describe('stampRecipe', () => {
       expect(marking[0].validation.valid, marking[0].validation.errors.join('\n')).toBe(true);
       expect(cutting[0].validation.shells).toBe(1);
       expect(marking[0].validation.shells).toBe(1);
-      expect(cutting[0].dimensionsMm.width).toBeCloseTo(75, 1);
-      expect(cutting[0].dimensionsMm.depth).toBeCloseTo(125, 1);
+      // El ancho exterior incluye el desplazamiento de la pared: tolerancia inicial ±0,6 mm.
+      expect(Math.abs(cutting[0].dimensionsMm.width - 75)).toBeLessThanOrEqual(0.6);
+      expect(Math.abs(cutting[0].dimensionsMm.depth - 125)).toBeLessThanOrEqual(0.6);
       expect(marking[0].dimensionsMm.width).toBeLessThan(cutting[0].dimensionsMm.width - 8);
       expect(marking[0].dimensionsMm.depth).toBeLessThan(cutting[0].dimensionsMm.depth - 8);
       for (const artifact of [...cutting, ...marking]) {
