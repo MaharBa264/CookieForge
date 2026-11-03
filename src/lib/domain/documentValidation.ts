@@ -603,18 +603,9 @@ export function parseStampDocumentV4(value: unknown): import('./designDocument')
   return { ...base, schemaVersion: 4, bridges: [], imprintMode };
 }
 
-/** V5 Cutter: índices únicos y acotados, y valores exactos. No se interpretan aún en la geometría. */
+/** V5 Cutter: operaciones persistentes validadas; todavía no afectan la geometría. */
 export function parseCutterDocumentV5(value: unknown): import('./designDocument').CutterDocumentV5 {
-  const record = requireRecord(value, '
-export function parseDesignDocument(value: unknown): DesignDocument {
   const record = requireRecord(value, '$');
-  if (record.schemaVersion === 1) return parseDesignDocumentV1(value);
-  if (record.schemaVersion === 2) return parseDesignDocumentV2(value);
-  if (record.schemaVersion === 3) return parseMultiCutterDocument(value);
-  if (record.schemaVersion === 4) return parseStampDocumentV4(value);
-  if (record.schemaVersion === 5) return parseCutterDocumentV5(value);
-  invalid('schemaVersion', 'version de document non prise en charge.');
-});
   if (record.schemaVersion !== 5) invalid('schemaVersion', 'debe ser 5.');
   if (record.kind !== 'cutter') invalid('kind', 'V5 solo admite cutter.');
   requireExactKeys(record, '', [...V2_DOCUMENT_KEYS, 'contourOperations']);
@@ -648,5 +639,6 @@ export function parseDesignDocument(value: unknown): DesignDocument {
   if (record.schemaVersion === 2) return parseDesignDocumentV2(value);
   if (record.schemaVersion === 3) return parseMultiCutterDocument(value);
   if (record.schemaVersion === 4) return parseStampDocumentV4(value);
+  if (record.schemaVersion === 5) return parseCutterDocumentV5(value);
   invalid('schemaVersion', 'version de document non prise en charge.');
 }
