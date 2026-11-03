@@ -35,10 +35,10 @@ it('integrates current sketch, one-step history, fresh generation, save and relo
  click('Deshacer'); await tick(); expect(session.getDocument()).toEqual(baseline);
  click('Rehacer'); await tick(); expect(session.getDocument()).toEqual(changed);
  await vi.waitFor(() => expect(get(generationState).result?.document).toEqual(changed), { timeout: 10000 });
- click('Projets locaux'); await tick(); click('Enregistrer le projet'); await vi.waitFor(() => expect(records.get(changed.id)).toEqual(changed));
+ click('Proyectos locales'); await tick(); click('Guardar proyecto'); await vi.waitFor(() => expect(records.get(changed.id)).toEqual(changed));
  const portable = encodeProject(records.get(changed.id)!);
  expect(decodeProject(portable).document).toEqual(changed);
- session.clear(); await tick(); click('Projets locaux');
+ session.clear(); await tick(); click('Proyectos locales');
  await vi.waitFor(() => expect([...document.querySelectorAll('button')].some(b => b.getAttribute('aria-label') === 'Ouvrir Current project')).toBe(true));
  click('Ouvrir Current project'); await vi.waitFor(() => expect(session.getDocument()).toEqual(changed));
  await vi.waitFor(() => expect(get(generationState).result?.document).toEqual(changed), { timeout: 10000 });
