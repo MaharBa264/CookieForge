@@ -61,7 +61,7 @@ describe('App UX states', () => {
   it('explains Gemini data handling before enabling the connection action', async () => {
     renderApp();
 
-    document.querySelector<HTMLButtonElement>('button[title="Outils IA (Gemini)"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[title="Herramientas de IA (Gemini)"]')?.click();
 
     await vi.waitFor(() => {
       expect(document.querySelector('summary')?.textContent).toContain('Obtener una clave API gratuita');
