@@ -68,7 +68,7 @@ it.each(['circle', 'heart'] as const)('%s selects a session-owned mode with one 
   expect(get(generationState).result?.document).toMatchObject({ schemaVersion: 4, imprintMode: 'recessed' });
   const report = get(generationState).result!.artifacts[0].validation;
   expect(report.valid).toBe(true); expect(report.shells).toBe(1); expect(report.bounds!.max.y).toBe(4);
-  await click('Annuler'); expect(encodeProject(session.getDocument())).toBe(originalJson); await ready(session); expect(bytes()).toEqual(raised);
+  await click('Cancelar'); expect(encodeProject(session.getDocument())).toBe(originalJson); await ready(session); expect(bytes()).toEqual(raised);
   await click('Rétablir'); expect(encodeProject(session.getDocument())).toBe(recessedJson); await ready(session); expect(bytes()).toEqual(recessed);
   const depth = document.querySelector<HTMLInputElement>('#stampDepth')!;
   // Exercise an actual depth change even when the Heart starts at the 3 mm boundary.
@@ -92,7 +92,7 @@ it('refuses deep raised settings without loss and offers an explicit reduction a
   expect(button('Relieve').getAttribute('aria-pressed')).toBe('true');
   expect(document.querySelector('#stampImprint-error')?.textContent).toContain('3 mm');
   expect(button('Hueco').getAttribute('aria-describedby')).toContain('stampImprint-error');
-  await click('Réduire la profondeur à 3 mm'); expect(session.getDocument()?.parameters.stampDepth).toBe(3);
+  await click('Reducir la profundidad a 3 mm'); expect(session.getDocument()?.parameters.stampDepth).toBe(3);
   expect(session.getDocument()?.schemaVersion).toBe(1); await click('Hueco'); await ready(session);
   expect(session.getDocument()).toMatchObject({ schemaVersion: 4, imprintMode: 'recessed' });
 }, 20000);
