@@ -39,7 +39,7 @@ it.each([1, 2] as const)('V%s creates one history step, keeps editable profiles/
   const original = fixture(version), records = new Map<string, DesignDocument>();
   let session = setup(original, records); await ready(session);
   const originalCodec = encodeProject(session.getDocument()), originalStl = stl();
-  await click('Production en série');
+  await click('Producción en serie');
   await vi.waitFor(() => expect(document.querySelector('[data-apply-series]')).not.toBeNull());
   expect(encodeProject(session.getDocument())).toBe(originalCodec);
   const length = historyStore.getLength();
@@ -72,7 +72,7 @@ it.each([1, 2] as const)('V%s creates one history step, keeps editable profiles/
   await vi.waitFor(() => expect(document.querySelector(`[aria-label="Abrir Series V${version}"]`)).not.toBeNull());
   await click(`Abrir Series V${version}`); await ready(session);
   expect(encodeProject(session.getDocument())).toBe(codec); expect(stl()).toEqual(binary);
-  await click('Production en série'); await vi.waitFor(() => expect(document.querySelector('[data-single-cutter]')).not.toBeNull());
+  await click('Producción en serie'); await vi.waitFor(() => expect(document.querySelector('[data-single-cutter]')).not.toBeNull());
   document.querySelector<HTMLButtonElement>('[data-single-cutter]')!.click(); await tick(); await ready(session);
   expect(session.getDocument()).toMatchObject({ kind: 'cutter', parameters: saved.parameters, source: saved.source });
 }, 40_000);
@@ -82,7 +82,7 @@ it('reopens an oversized V3 project without geometry and allows repair through t
   await vi.waitFor(() => expect(get(generationState).phase).toBe('error'), { timeout: 10_000 });
   expect(get(model)).toBeNull();
   const before = encodeProject(session.getDocument());
-  await click('Production en série');
+  await click('Producción en serie');
   await vi.waitFor(() => expect(document.querySelector('#series-columns')).not.toBeNull());
   expect(encodeProject(session.getDocument())).toBe(before);
   const columns = document.querySelector<HTMLInputElement>('#series-columns')!;
@@ -93,7 +93,7 @@ it('reopens an oversized V3 project without geometry and allows repair through t
 }, 30_000);
 it('invalid layout preserves the last series; accepted oversized layout blocks old geometry but remains saveable', async () => {
   const records = new Map<string, DesignDocument>(), session = setup(fixture(1), records); await ready(session);
-  await click('Production en série'); await vi.waitFor(() => expect(document.querySelector('[data-apply-series]')).not.toBeNull());
+  await click('Producción en serie'); await vi.waitFor(() => expect(document.querySelector('[data-apply-series]')).not.toBeNull());
   document.querySelector<HTMLButtonElement>('[data-apply-series]')!.click(); await tick(); await ready(session);
   const before = session.getDocument();
   const count = document.querySelector<HTMLInputElement>('#series-copies')!; count.value = '25'; count.dispatchEvent(new Event('input', { bubbles: true })); await tick();
