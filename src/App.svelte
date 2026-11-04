@@ -36,7 +36,7 @@
   import { createProjectSessionIntegration, assertRepresentable } from './lib/projects/projectSessionIntegration';
   import { createDesignDocument } from './lib/projects/createDesignDocument';
   import { parseDesignDocument } from './lib/domain/documentValidation';
-  import { ACTIVE_COLLECTION_STORAGE_KEY, loadCollectionCatalog, saveCollectionCatalog, assignDesign, inheritCollectionDefaults } from './lib/collections/designCollections';
+
   import { documentParametersToLegacy, legacyParametersToDocument } from './lib/stores/legacyDocumentAdapter';
   import type { DesignDocument, ViewportPreferences, DesignSource } from './lib/domain/designDocument';
   import { historyStore } from './lib/stores/historyStore';
@@ -546,6 +546,8 @@
         kind: parameterDocument.kind,
         source: source ?? { type: 'svg', fileName: nextFileName, svg }
       });
+      const { ACTIVE_COLLECTION_STORAGE_KEY, loadCollectionCatalog, saveCollectionCatalog, assignDesign, inheritCollectionDefaults } = await import('./lib/collections/designCollections');
+      if (!alive || revision !== sourceRevision || epoch !== session.getSessionEpoch()) return false;
       // Collection settings are copied only into a newly created document.
       // Existing documents, imports and later individual edits remain independent.
       let collectionId: string | null = null;
