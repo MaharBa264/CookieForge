@@ -7,10 +7,18 @@
     ACTIVE_COLLECTION_STORAGE_KEY, type CollectionCatalog
   } from '../../collections/designCollections';
 
+  import {
+    assignCardPiece, createCollectionCard, loadCollectionCards, saveCollectionCards,
+    removeCollectionCard, type CollectionCardCatalog, type CardSlot
+  } from '../../collections/collectionCards';
+
   export let workflow: ProjectWorkflow;
   export let onConfirmDelete: (document: DesignDocument) => Promise<boolean> = async () => false;
 
   let catalog: CollectionCatalog = { schemaVersion: 1, collections: [], memberships: {} };
+  let cardCatalog: CollectionCardCatalog = { schemaVersion: 1, cards: [] };
+  let cardName = '';
+  let cardCollectionId = '';
   let activeCollectionId = '';
   let filterCollectionId = 'all';
   let editingCollectionId = '';
@@ -25,6 +33,7 @@
   function readCollections(): void {
     try {
       catalog = loadCollectionCatalog(localStorage);
+      cardCatalog = loadCollectionCards(localStorage);
       const selected = localStorage.getItem(ACTIVE_COLLECTION_STORAGE_KEY) ?? '';
       activeCollectionId = catalog.collections.some(collection => collection.id === selected) ? selected : '';
       collectionReady = true;
@@ -42,6 +51,39 @@
     } catch (cause) {
       collectionError = `No se guardaron las colecciones: ${cause instanceof Error ? cause.message : String(cause)}`;
     }
+  }
+  function commitCards(next: CollectionCardCatalog): void {
+    try {
+      saveCollectionCards(localStorage, next);
+      cardCatalog = next;
+      collectionError = null;
+    } catch (cause) {
+      collectionError = `No se guardaron las tarjetas: ${cause instanceof Error ? cause.message : String(cause)}`;
+    }
+  }
+  function createCard(): void {
+    if (!collectionReady || busy) return;
+    try {
+      const next = createCollectionCard(cardCatalog, catalog, cardCollectionId, cardName, crypto.randomUUID());
+      commitCards(next);
+      if (cardCatalog === next) cardName = '';
+    } catch (cause) {
+      collectionError = cause instanceof Error ? cause.message : String(cause);
+    }
+  }
+  function setCardPiece(cardId: string, slot: CardSlot, documentId: string): void {
+    if (!collectionReady || busy) return;
+    try {
+      commitCards(assignCardPiece(cardCatalog, catalog, $workflow.library.documents,
+        cardId, slot, documentId || null));
+    } catch (cause) {
+      collectionError = cause instanceof Error ? cause.message : String(cause);
+    }
+  }
+  function deleteCard(cardId: string): void {
+    if (!collectionReady || busy) return;
+    // Only metadata is deleted; both original designs remain untouched.
+    commitCards(removeCollectionCard(cardCatalog, cardId));
   }
   function chooseActiveCollection(id: string): void {
     try {
@@ -191,6 +233,50 @@
       {/each}</ul>
     {/if}
     {#if collectionError}<p role="alert">{collectionError} Los diseños originales no se modificaron.</p>{/if}
+  </fieldset>
+  <fieldset class="collection-editor">
+    <legend>Tarjetas de diseño (cortante + sello)</legend>
+    <p class="hint">Una tarjeta reúne dos proyectos guardados de la misma colección. No fusiona ni modifica sus archivos 3D.</p>
+    <label for="card-collection">Colección</label>
+    <select id="card-collection" bind:value={cardCollectionId} disabled={!collectionReady || busy}>
+      <option value="">Seleccionar colección</option>
+      {#each catalog.collections as collection (collection.id)}
+        <option value={collection.id}>{collection.name}</option>
+      {/each}
+    </select>
+    <label for="card-name">Nombre de tarjeta</label>
+    <input id="card-name" type="text" bind:value={cardName} placeholder="Ej.: La Sacerdotisa II" disabled={!collectionReady || busy} />
+    <button type="button" disabled={!collectionReady || busy || !cardCollectionId || !cardName.trim()} on:click={createCard}>Crear tarjeta</button>
+    {#if cardCatalog.cards.length}
+      <ul>
+        {#each cardCatalog.cards.filter(card => filterCollectionId === 'all' || filterCollectionId === card.collectionId) as card (card.id)}
+          <li>
+            <strong>{card.name}</strong>
+            <p>{catalog.collections.find(collection => collection.id === card.collectionId)?.name ?? 'Colección no disponible'}</p>
+            {#each ['cutter', 'stamp'] as slot}
+              <label for={`card-${card.id}-${slot}`}>{slot === 'cutter' ? 'Cortante' : 'Sello'}</label>
+              <select id={`card-${card.id}-${slot}`} disabled={!collectionReady || busy}
+                value={slot === 'cutter' ? card.cutterId ?? '' : card.stampId ?? ''}
+                on:change={(event) => setCardPiece(card.id, slot as CardSlot, event.currentTarget.value)}>
+                <option value="">Sin asignar</option>
+                {#each $workflow.library.documents.filter(doc => doc.kind === slot && catalog.memberships[doc.id] === card.collectionId) as doc (doc.id)}
+                  <option value={doc.id}>{doc.name}</option>
+                {/each}
+              </select>
+            {/each}
+            <div class="actions">
+              {#if card.cutterId && $workflow.library.documents.some(doc => doc.id === card.cutterId)}
+                <button type="button" disabled={busy} on:click={() => workflow.open(card.cutterId!)}>Abrir cortante</button>
+              {/if}
+              {#if card.stampId && $workflow.library.documents.some(doc => doc.id === card.stampId)}
+                <button type="button" disabled={busy} on:click={() => workflow.open(card.stampId!)}>Abrir sello</button>
+              {/if}
+              <button type="button" disabled={busy} on:click={() => deleteCard(card.id)}>Quitar tarjeta (conserva diseños)</button>
+            </div>
+          </li>
+        {/each}
+      </ul>
+    {/if}
   </fieldset>
   <p class="hint">Guardados únicamente en este navegador y en este sitio. Conservá un archivo de proyecto exportado como copia de seguridad transferible.</p>
   <label for="collection-filter">Mostrar diseños</label>
