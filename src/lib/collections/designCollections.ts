@@ -24,6 +24,7 @@ export interface CollectionCatalog {
 }
 
 export const COLLECTION_STORAGE_KEY = 'cookieforge-collections-v1';
+export const ACTIVE_COLLECTION_STORAGE_KEY = 'cookieforge-active-collection-v1';
 export const EMPTY_COLLECTION_CATALOG: CollectionCatalog = Object.freeze({
   schemaVersion: 1, collections: [], memberships: {}
 });
