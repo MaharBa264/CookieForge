@@ -4,6 +4,7 @@ import {
   removeCollection, saveCollectionCatalog, COLLECTION_STORAGE_KEY
 } from '../designCollections';
 import { createDesignDocument } from '../../projects/createDesignDocument';
+import { parseDesignDocument } from '../../domain/documentValidation';
 
 const source = { type: 'svg' as const, fileName: 'carta.svg', svg: '<svg xmlns="http://www.w3.org/2000/svg"/>' };
 const defaults = {
@@ -34,7 +35,7 @@ describe('colecciones independientes de documentos V1-V5', () => {
     expect(original.parameters.targetSize).toBe(75);
     const modified = { ...inherited, parameters: { ...inherited.parameters, targetSize: 95 } };
     expect(modified.parameters.targetSize).toBe(95);
-    expect(inheritCollectionDefaults(modified, collection).parameters.targetSize).toBe(125);
+    expect(inheritCollectionDefaults(parseDesignDocument(modified), collection).parameters.targetSize).toBe(125);
     // No implicit re-inheritance during opening or editing: it is a caller-only factory.
     expect(modified.parameters.targetSize).toBe(95);
   });
