@@ -4,13 +4,14 @@
   import type { ProjectWorkflow } from '../../projects/projectWorkflow';
   import {
     addCollection, assignDesign, loadCollectionCatalog, saveCollectionCatalog,
-    type CollectionCatalog
+    ACTIVE_COLLECTION_STORAGE_KEY, type CollectionCatalog
   } from '../../collections/designCollections';
 
   export let workflow: ProjectWorkflow;
   export let onConfirmDelete: (document: DesignDocument) => Promise<boolean> = async () => false;
 
   let catalog: CollectionCatalog = { schemaVersion: 1, collections: [], memberships: {} };
+  let activeCollectionId = '';
   let collectionName = '';
   let cutterHeight = 125;
   let stampHeight = 106;
@@ -19,6 +20,8 @@
   function readCollections(): void {
     try {
       catalog = loadCollectionCatalog(localStorage);
+      const selected = localStorage.getItem(ACTIVE_COLLECTION_STORAGE_KEY) ?? '';
+      activeCollectionId = catalog.collections.some(collection => collection.id === selected) ? selected : '';
       collectionReady = true;
       collectionError = null;
     } catch (cause) {
@@ -33,6 +36,16 @@
       collectionError = null;
     } catch (cause) {
       collectionError = `No se guardaron las colecciones: ${cause instanceof Error ? cause.message : String(cause)}`;
+    }
+  }
+  function chooseActiveCollection(id: string): void {
+    try {
+      if (id && !catalog.collections.some(item => item.id === id)) throw new Error('Colección inexistente.');
+      localStorage.setItem(ACTIVE_COLLECTION_STORAGE_KEY, id);
+      activeCollectionId = id;
+      collectionError = null;
+    } catch (cause) {
+      collectionError = cause instanceof Error ? cause.message : String(cause);
     }
   }
   function createCollection(): void {
@@ -109,6 +122,14 @@
   <fieldset class="collection-editor">
     <legend>Colecciones de diseños</legend>
     <p class="hint">Agrupá diseños existentes. Los tamaños de la colección serán valores iniciales para los diseños nuevos; no cambian proyectos guardados.</p>
+    <label for="active-collection">Colección activa para nuevos diseños</label>
+    <select id="active-collection" value={activeCollectionId} disabled={!collectionReady || busy}
+      on:change={(event) => chooseActiveCollection(event.currentTarget.value)}>
+      <option value="">Sin colección (parámetros normales)</option>
+      {#each catalog.collections as collection (collection.id)}
+        <option value={collection.id}>{collection.name}</option>
+      {/each}
+    </select>
     <label for="collection-name">Nombre de la colección</label>
     <input id="collection-name" type="text" bind:value={collectionName} placeholder="Ej.: Tarot Celestial" disabled={!collectionReady || busy} />
     <div class="collection-sizes">
