@@ -7,7 +7,8 @@ La ilustración de referencia es la carta completa de La Estrella XVII definida 
 ## Archivos
 
 - `cortante.svg` — silueta de carta de **75 × 125 mm**, con esquinas suavizadas por segmentos. Reutilizar esta silueta en las 78 cartas.
-- `sello-piloto.svg` — dibujo simplificado con **20 contornos cerrados**, sin título ni numeración, todos unidos mediante una base común por la receta Stamp.
+- `sello-piloto.svg` — dibujo simplificado con **20 contornos cerrados**, sin título ni numeración, todos unidos mediante una base común por la receta Stamp. **Este es el sello ya validado en STL/3MF**.
+- `sello-vectorizado.svg` — **trazado vectorial de la ilustración original**, conserva el marco, la estrella, la figura, las jarras, las ondas y las letras. Contiene aproximadamente 106 subtrazados cerrados con regiones interiores; es **un original de trabajo para la adaptación de impresión**, no una pieza con STL validado. No imprimir directamente antes de revisar anchuras mínimas y hacer una prueba de generación específica.
 
 No son SVG que se deban combinar en una única receta. Son **dos piezas independientes**: primero se corta y después se estampa la masa.
 
@@ -37,7 +38,7 @@ El sello es deliberadamente menor para entrar dentro del cortante. La prueba aut
 6. Abrí los dos STL en el laminador, comprobá tamaños, orientación y distancia disponible entre borde del sello y cortante.
 7. Imprimí una unidad de cada pieza y realizá una prueba sobre masa. Registrá calidad de trazo, marcas visibles, flexión y facilidad de limpieza.
 
-**Falta para La Estrella final:** redibujar el arte de referencia a trazos de ancho seguro, comprobar lectura de números y letras en espejo, corregir detalles que no estampen bien y repetir la prueba física. No extrapolar esta prueba a las 78 cartas.
+**Falta para La Estrella final:** usar `sello-vectorizado.svg` como base gráfica, eliminar detalles de menos de 1,2 mm y espacios de menos de 1,5 mm, corregir las letras en espejo para la cara de marcado, comprobar si el motor Stamp puede generar un sólido válido con su mayor complejidad y probarlo físicamente. No basta con que el SVG se vea parecido. No extrapolar esta prueba a las 78 cartas.
 
 ## Precauciones
 
