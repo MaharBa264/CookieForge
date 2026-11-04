@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  addCollection, assignDesign, inheritCollectionDefaults, loadCollectionCatalog,
+  addCollection, assignDesign, filterDesignsByCollection, updateCollectionDefaults, inheritCollectionDefaults, loadCollectionCatalog,
   removeCollection, saveCollectionCatalog, COLLECTION_STORAGE_KEY
 } from '../designCollections';
 import { createDesignDocument } from '../../projects/createDesignDocument';
@@ -50,6 +50,28 @@ describe('colecciones independientes de documentos V1-V5', () => {
     expect(stamp.parameters.stampDepth).toBe(1.2);
     expect(stamp.parameters.stampBase).toBe(true);
     expect(original.parameters.targetSize).toBe(75);
+  });
+
+  it('filtra por colección sin ocultar diseños independientes en la vista general', () => {
+    const base = addCollection(empty, 'Tarot', defaults, 'tarot', now);
+    const catalog = assignDesign(base, 'ii', 'tarot');
+    const designs = [{ id: 'ii' }, { id: 'libre' }];
+    expect(filterDesignsByCollection(designs, catalog, 'all')).toEqual(designs);
+    expect(filterDesignsByCollection(designs, catalog, 'tarot')).toEqual([{ id: 'ii' }]);
+    expect(filterDesignsByCollection(designs, catalog, 'unassigned')).toEqual([{ id: 'libre' }]);
+    expect(filterDesignsByCollection(designs, catalog, 'missing')).toEqual([]);
+  });
+
+  it('editar la plantilla conserva asociaciones y no modifica documentos existentes', () => {
+    const base = assignDesign(addCollection(empty, 'Tarot', defaults, 'tarot', now), 'ii', 'tarot');
+    const revised = updateCollectionDefaults(base, 'tarot', {
+      cutter: { targetSize: 130, sizeMode: 'height' },
+      stamp: { targetSize: 110, sizeMode: 'height' }
+    }, '2026-11-05T00:00:00Z');
+    expect(base.collections[0].defaults.cutter.targetSize).toBe(125);
+    expect(revised.collections[0].defaults.cutter.targetSize).toBe(130);
+    expect(revised.memberships.ii).toBe('tarot');
+    expect(() => updateCollectionDefaults(base, 'missing', defaults, now)).toThrow();
   });
 
   it('persiste el catálogo de forma aislada de los archivos de proyecto', () => {
