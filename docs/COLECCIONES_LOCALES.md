@@ -15,6 +15,17 @@ Agrupar diseños sin cambiar el contrato de los documentos `.ccd.json` V1–V5 n
 7. Usar **Mostrar diseños** para filtrar por colección, ver los independientes o volver a mostrar todos.
 8. Usar **Editar medidas** junto a una colección para cambiar sus tamaños iniciales futuros. Los diseños guardados no se modifican.
 
+## Tarjetas con dos piezas
+
+Dentro de **Tarjetas de diseño (cortante + sello)** seleccioná una colección y asigná un nombre como **La Sacerdotisa II**. Después vinculá un cortante y un sello ya guardados en esa colección. Cada tarjeta muestra **Abrir cortante** y **Abrir sello** cuando hay una pieza asociada.
+
+- La asociación es metadato independiente en `localStorage`, clave `cookieforge-collection-cards-v1`.
+- Una pieza no puede pertenecer a dos tarjetas simultáneamente.
+- No se permite asociar un sello como cortante, ni piezas que estén fuera de la colección.
+- Quitar una tarjeta solo elimina su asociación; no borra diseños, proyectos ni archivos STL.
+- Si un diseño se borra o se mueve a otra colección, la tarjeta puede conservar una referencia sin resolver hasta que el usuario la corrija. No se reescribe el proyecto.
+- La tarjeta **no** es todavía un archivo compuesto ni una exportación conjunta de las dos piezas.
+
 ## Aislamiento y recuperación
 
 - Los documentos antiguos no se migran, reescriben ni renombran al crear o asociar una colección.
@@ -28,8 +39,8 @@ Agrupar diseños sin cambiar el contrato de los documentos `.ccd.json` V1–V5 n
 ## Limitaciones del primer incremento
 
 - El tamaño heredado corresponde a la **altura objetivo** (`targetSize` + `sizeMode`), no garantiza una anchura exacta de 75 mm; eso depende de la proporción del trazado y del espesor final de paredes.
-- Cortante y sello siguen siendo **documentos separados** que pueden pertenecer a la misma colección.
-- La edición de plantillas se limita por ahora a las alturas de cortante y sello; todavía no hay exportación/importación de colección completa ni agrupación de dos piezas dentro de una carta.
+- Cortante y sello siguen siendo **documentos separados**, pero pueden vincularse mediante una tarjeta lógica dentro de la colección.
+- La edición de plantillas se limita por ahora a las alturas de cortante y sello; todavía no hay exportación/importación de colección completa ni empaquetado de las dos piezas en un único documento.
 - No hay sincronización entre dispositivos, usuarios o pestañas; no es una solución de respaldo de la colección.
 
 ## Regresión y validación
