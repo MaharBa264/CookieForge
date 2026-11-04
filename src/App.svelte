@@ -35,6 +35,7 @@
   import { createProjectWorkflow } from './lib/projects/projectWorkflow';
   import { createProjectSessionIntegration, assertRepresentable } from './lib/projects/projectSessionIntegration';
   import { createDesignDocument } from './lib/projects/createDesignDocument';
+  import { parseDesignDocument } from './lib/domain/documentValidation';
   import { ACTIVE_COLLECTION_STORAGE_KEY, loadCollectionCatalog, saveCollectionCatalog, assignDesign, inheritCollectionDefaults } from './lib/collections/designCollections';
   import { documentParametersToLegacy, legacyParametersToDocument } from './lib/stores/legacyDocumentAdapter';
   import type { DesignDocument, ViewportPreferences, DesignSource } from './lib/domain/designDocument';
@@ -548,7 +549,7 @@
       // Collection settings are copied only into a newly created document.
       // Existing documents, imports and later individual edits remain independent.
       let collectionId: string | null = null;
-      let newDocument = { ...candidate, parameters: parameterDocument.parameters };
+      let newDocument: DesignDocument = parseDesignDocument({ ...candidate, parameters: parameterDocument.parameters });
       try {
         const catalog = loadCollectionCatalog(localStorage);
         const selected = localStorage.getItem(ACTIVE_COLLECTION_STORAGE_KEY);
