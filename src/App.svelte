@@ -35,6 +35,7 @@
   import { createProjectWorkflow } from './lib/projects/projectWorkflow';
   import { createProjectSessionIntegration, assertRepresentable } from './lib/projects/projectSessionIntegration';
   import { createDesignDocument } from './lib/projects/createDesignDocument';
+  import { ACTIVE_COLLECTION_STORAGE_KEY, loadCollectionCatalog, saveCollectionCatalog, assignDesign, inheritCollectionDefaults } from './lib/collections/designCollections';
   import { documentParametersToLegacy, legacyParametersToDocument } from './lib/stores/legacyDocumentAdapter';
   import type { DesignDocument, ViewportPreferences, DesignSource } from './lib/domain/designDocument';
   import { historyStore } from './lib/stores/historyStore';
@@ -544,7 +545,34 @@
         kind: parameterDocument.kind,
         source: source ?? { type: 'svg', fileName: nextFileName, svg }
       });
-      const accepted = await workflow.startNew({ ...candidate, parameters: parameterDocument.parameters });
+      // Collection settings are copied only into a newly created document.
+      // Existing documents, imports and later individual edits remain independent.
+      let collectionId: string | null = null;
+      let newDocument = { ...candidate, parameters: parameterDocument.parameters };
+      try {
+        const catalog = loadCollectionCatalog(localStorage);
+        const selected = localStorage.getItem(ACTIVE_COLLECTION_STORAGE_KEY);
+        const collection = catalog.collections.find(item => item.id === selected);
+        if (collection) {
+          collectionId = collection.id;
+          newDocument = inheritCollectionDefaults(newDocument, collection);
+        }
+      } catch (cause) {
+        // No silent change of dimensions when collection metadata cannot be read.
+        $error = `No se pudo cargar la colección activa: ${cause instanceof Error ? cause.message : String(cause)}`;
+        return false;
+      }
+      const accepted = await workflow.startNew(newDocument);
+      if (accepted && collectionId !== null) {
+        try {
+          const catalog = loadCollectionCatalog(localStorage);
+          if (catalog.collections.some(item => item.id === collectionId)) {
+            saveCollectionCatalog(localStorage, assignDesign(catalog, candidate.id, collectionId));
+          }
+        } catch (cause) {
+          $error = `El diseño se creó, pero no se pudo asociar a la colección: ${cause instanceof Error ? cause.message : String(cause)}`;
+        }
+      }
       if (alive && accepted && rasterFile && session.getDocument()?.id === candidate.id
         && JSON.stringify(session.getDocument()?.source) === JSON.stringify(candidate.source)) {
         sessionRaster = { file: rasterFile, epoch: session.getSessionEpoch() };
