@@ -1,11 +1,13 @@
 import type { DesignDocument } from '../domain/designDocument';
+import { parseDesignDocument } from '../domain/documentValidation';
 import { ACTIVE_COLLECTION_STORAGE_KEY, assignDesign, inheritCollectionDefaults,
   loadCollectionCatalog, saveCollectionCatalog, type CollectionKeyValueStorage } from './designCollections';
 
-export function prepareCollectionDesign(document: DesignDocument, storage: CollectionKeyValueStorage): {
+export function prepareCollectionDesign(input: unknown, storage: CollectionKeyValueStorage): {
   readonly document: DesignDocument;
   readonly collectionId: string | null;
 } {
+  const document = parseDesignDocument(input);
   const catalog = loadCollectionCatalog(storage);
   const selected = storage.getItem(ACTIVE_COLLECTION_STORAGE_KEY);
   const collection = catalog.collections.find(item => item.id === selected);
