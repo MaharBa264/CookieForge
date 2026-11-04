@@ -546,33 +546,20 @@
         kind: parameterDocument.kind,
         source: source ?? { type: 'svg', fileName: nextFileName, svg }
       });
-      const { ACTIVE_COLLECTION_STORAGE_KEY, loadCollectionCatalog, saveCollectionCatalog, assignDesign, inheritCollectionDefaults } = await import('./lib/collections/designCollections');
+      const { prepareCollectionDesign, linkPreparedDesign } = await import('./lib/collections/collectionCreation');
       if (!alive || revision !== sourceRevision || epoch !== session.getSessionEpoch()) return false;
-      // Collection settings are copied only into a newly created document.
-      // Existing documents, imports and later individual edits remain independent.
-      let collectionId: string | null = null;
-      let newDocument: DesignDocument = parseDesignDocument({ ...candidate, parameters: parameterDocument.parameters });
+      let prepared;
       try {
-        const catalog = loadCollectionCatalog(localStorage);
-        const selected = localStorage.getItem(ACTIVE_COLLECTION_STORAGE_KEY);
-        const collection = catalog.collections.find(item => item.id === selected);
-        if (collection) {
-          collectionId = collection.id;
-          newDocument = inheritCollectionDefaults(newDocument, collection);
-        }
+        prepared = prepareCollectionDesign(
+          parseDesignDocument({ ...candidate, parameters: parameterDocument.parameters }), localStorage);
       } catch (cause) {
-        // No silent change of dimensions when collection metadata cannot be read.
         $error = `No se pudo cargar la colección activa: ${cause instanceof Error ? cause.message : String(cause)}`;
         return false;
       }
-      const accepted = await workflow.startNew(newDocument);
-      if (accepted && collectionId !== null) {
-        try {
-          const catalog = loadCollectionCatalog(localStorage);
-          if (catalog.collections.some(item => item.id === collectionId)) {
-            saveCollectionCatalog(localStorage, assignDesign(catalog, candidate.id, collectionId));
-          }
-        } catch (cause) {
+      const accepted = await workflow.startNew(prepared.document);
+      if (accepted) {
+        try { linkPreparedDesign(localStorage, candidate.id, prepared.collectionId); }
+        catch (cause) {
           $error = `El diseño se creó, pero no se pudo asociar a la colección: ${cause instanceof Error ? cause.message : String(cause)}`;
         }
       }
