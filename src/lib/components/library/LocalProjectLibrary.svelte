@@ -3,7 +3,7 @@
   import type { DesignDocument } from '../../domain/designDocument';
   import type { ProjectWorkflow } from '../../projects/projectWorkflow';
   import {
-    addCollection, assignDesign, loadCollectionCatalog, saveCollectionCatalog,
+    addCollection, assignDesign, filterDesignsByCollection, loadCollectionCatalog, saveCollectionCatalog, updateCollectionDefaults,
     ACTIVE_COLLECTION_STORAGE_KEY, type CollectionCatalog
   } from '../../collections/designCollections';
 
@@ -12,11 +12,16 @@
 
   let catalog: CollectionCatalog = { schemaVersion: 1, collections: [], memberships: {} };
   let activeCollectionId = '';
+  let filterCollectionId = 'all';
+  let editingCollectionId = '';
+  let editedCutterHeight = 125;
+  let editedStampHeight = 106;
   let collectionName = '';
   let cutterHeight = 125;
   let stampHeight = 106;
   let collectionError: string | null = null;
   let collectionReady = false;
+  $: visibleDocuments = filterDesignsByCollection($workflow.library.documents, catalog, filterCollectionId);
   function readCollections(): void {
     try {
       catalog = loadCollectionCatalog(localStorage);
@@ -44,6 +49,27 @@
       localStorage.setItem(ACTIVE_COLLECTION_STORAGE_KEY, id);
       activeCollectionId = id;
       collectionError = null;
+    } catch (cause) {
+      collectionError = cause instanceof Error ? cause.message : String(cause);
+    }
+  }
+  function startEditingCollection(id: string): void {
+    const collection = catalog.collections.find(item => item.id === id);
+    if (!collection) return;
+    editingCollectionId = id;
+    editedCutterHeight = collection.defaults.cutter.targetSize ?? 125;
+    editedStampHeight = collection.defaults.stamp.targetSize ?? 106;
+  }
+  function saveEditedCollection(): void {
+    const collection = catalog.collections.find(item => item.id === editingCollectionId);
+    if (!collection || !collectionReady) return;
+    try {
+      const next = updateCollectionDefaults(catalog, collection.id, {
+        cutter: { ...collection.defaults.cutter, targetSize: editedCutterHeight },
+        stamp: { ...collection.defaults.stamp, targetSize: editedStampHeight }
+      }, new Date().toISOString());
+      commitCatalog(next);
+      if (catalog === next) editingCollectionId = '';
     } catch (cause) {
       collectionError = cause instanceof Error ? cause.message : String(cause);
     }
@@ -143,12 +169,38 @@
     <button type="button" disabled={!collectionReady || busy || !collectionName.trim()} on:click={createCollection}>Crear colección</button>
     {#if catalog.collections.length}
       <ul>{#each catalog.collections as collection (collection.id)}
-        <li><strong>{collection.name}</strong> · Cortante {collection.defaults.cutter.targetSize} mm · Sello {collection.defaults.stamp.targetSize} mm</li>
+        <li>
+          <strong>{collection.name}</strong> · Cortante {collection.defaults.cutter.targetSize} mm · Sello {collection.defaults.stamp.targetSize} mm
+          {#if editingCollectionId === collection.id}
+            <div class="collection-sizes">
+              <label for="edit-cutter-size">Altura de cortante (mm)
+                <input id="edit-cutter-size" type="number" min="5" max="500" bind:value={editedCutterHeight} disabled={busy} />
+              </label>
+              <label for="edit-stamp-size">Altura de sello (mm)
+                <input id="edit-stamp-size" type="number" min="5" max="500" bind:value={editedStampHeight} disabled={busy} />
+              </label>
+            </div>
+            <div class="actions">
+              <button type="button" disabled={busy} on:click={saveEditedCollection}>Guardar medidas futuras</button>
+              <button type="button" on:click={() => editingCollectionId = ''}>Cancelar</button>
+            </div>
+          {:else}
+            <button type="button" disabled={busy || !collectionReady} on:click={() => startEditingCollection(collection.id)}>Editar medidas de {collection.name}</button>
+          {/if}
+        </li>
       {/each}</ul>
     {/if}
     {#if collectionError}<p role="alert">{collectionError} Los diseños originales no se modificaron.</p>{/if}
   </fieldset>
   <p class="hint">Guardados únicamente en este navegador y en este sitio. Conservá un archivo de proyecto exportado como copia de seguridad transferible.</p>
+  <label for="collection-filter">Mostrar diseños</label>
+  <select id="collection-filter" bind:value={filterCollectionId} disabled={!collectionReady || busy}>
+    <option value="all">Todos los diseños</option>
+    <option value="unassigned">Sin colección</option>
+    {#each catalog.collections as collection (collection.id)}
+      <option value={collection.id}>{collection.name}</option>
+    {/each}
+  </select>
   <button bind:this={refreshButton} type="button" disabled={busy || $workflow.library.loading}
     on:click={() => refresh()}>Actualizar proyectos locales</button>
   {#if $workflow.library.loading || !$workflow.library.loaded && !$workflow.library.listError}
@@ -164,9 +216,12 @@
     <p role="alert">{$workflow.error.message}</p>
   {/if}
   {#if confirmingDelete}<p role="status">Esperando confirmación para eliminar…</p>{/if}
-  {#if $workflow.library.documents.length}
+  {#if $workflow.library.loaded && !$workflow.library.loading && !$workflow.library.listError && $workflow.library.documents.length && !visibleDocuments.length}
+    <p role="status">No hay diseños en este filtro. Probá con «Todos los diseños».</p>
+  {/if}
+  {#if visibleDocuments.length}
     <ul>
-      {#each $workflow.library.documents as document (document.id)}
+      {#each visibleDocuments as document (document.id)}
         <li>
           <h4>{document.name}</h4>
           <p>{document.kind} · Actualizado el <time datetime={document.updatedAt}>{document.updatedAt}</time></p>
