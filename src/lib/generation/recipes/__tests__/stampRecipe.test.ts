@@ -39,6 +39,7 @@ import { cutterRecipe } from '../cutterRecipe';
 import { encodeProject, decodeProject } from '../../../projects/projectCodec';
 import { serialize3MF } from '../../../utils/advancedExporter';
 import { serializeSTL } from '../../../utils/stlExporter';
+import { extractClosedContours } from '../../../utils/contourExtraction';
 
 vi.mock('../../../utils/stampGenerator', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../../../utils/stampGenerator')>();
@@ -165,6 +166,22 @@ async function captureFailure(
 }
 
 describe('stampRecipe', () => {
+
+  it('conserva la ilustración vectorizada de La Estrella XVII como contornos cerrados importables', () => {
+    const svg = readFileSync(resolve(process.cwd(), 'examples/tarot-estrella-xvii/sello-vectorizado.svg'), 'utf8');
+    expect(svg).toContain('viewBox="0 0 75 125"');
+    expect(svg).toContain('fill-rule="evenodd"');
+    const contours = extractClosedContours(svg, 8);
+    expect(contours.length).toBeGreaterThanOrEqual(60);
+    expect(contours.length).toBeLessThanOrEqual(150);
+    const points = contours.flat();
+    expect(Math.min(...points.map(p => p.x))).toBeGreaterThanOrEqual(0);
+    expect(Math.max(...points.map(p => p.x))).toBeLessThanOrEqual(75);
+    expect(Math.min(...points.map(p => p.y))).toBeGreaterThanOrEqual(0);
+    expect(Math.max(...points.map(p => p.y))).toBeLessThanOrEqual(125);
+    // Este ensayo es de importación, NO equivale a un STL imprimible.
+  });
+
 
   it('piloto La Estrella XVII: guarda, abre y exporta cortante 75x125 y sello interior', async () => {
     const cutterSvg = readFileSync(resolve(process.cwd(), 'examples/tarot-estrella-xvii/cortante.svg'), 'utf8');
