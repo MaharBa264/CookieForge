@@ -134,3 +134,26 @@ export function inheritCollectionDefaults<T extends DesignDocument>(document: T,
   const defaults = document.kind === 'cutter' ? collection.defaults.cutter : collection.defaults.stamp;
   return { ...document, parameters: { ...document.parameters, ...defaults } } as T;
 }
+
+/** Update only the collection template. Existing design documents remain unchanged. */
+export function updateCollectionDefaults(
+  catalog: CollectionCatalog, id: string, defaults: CollectionDefaults, now: string
+): CollectionCatalog {
+  if (!catalog.collections.some(item => item.id === id)) throw new Error('La colección no existe.');
+  return validateCollectionCatalog({
+    ...catalog,
+    collections: catalog.collections.map(item => item.id === id
+      ? { ...item, defaults, updatedAt: now } : item)
+  });
+}
+
+export type CollectionFilter = 'all' | 'unassigned' | string;
+
+export function filterDesignsByCollection<T extends { readonly id: string }>(
+  designs: readonly T[], catalog: CollectionCatalog, selection: CollectionFilter
+): readonly T[] {
+  if (selection === 'all') return designs;
+  if (selection === 'unassigned') return designs.filter(item => !catalog.memberships[item.id]);
+  if (!catalog.collections.some(item => item.id === selection)) return [];
+  return designs.filter(item => catalog.memberships[item.id] === selection);
+}
