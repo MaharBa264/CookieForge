@@ -12,6 +12,8 @@ Agrupar diseños sin cambiar el contrato de los documentos `.ccd.json` V1–V5 n
 4. Importar una imagen o crear un diseño nuevo mediante el flujo habitual. Los parámetros de tamaño se copian **una sola vez** desde la colección activa al nuevo documento, usando `sizeMode: height`.
 5. Modificar las medidas del diseño individual libremente; quedan persistidas en ese proyecto como siempre.
 6. En la lista de proyectos guardados, usar **Colección** para asociar o desasociar un diseño ya existente. Esa asociación no cambia su geometría.
+7. Usar **Mostrar diseños** para filtrar por colección, ver los independientes o volver a mostrar todos.
+8. Usar **Editar medidas** junto a una colección para cambiar sus tamaños iniciales futuros. Los diseños guardados no se modifican.
 
 ## Aislamiento y recuperación
 
@@ -27,7 +29,7 @@ Agrupar diseños sin cambiar el contrato de los documentos `.ccd.json` V1–V5 n
 
 - El tamaño heredado corresponde a la **altura objetivo** (`targetSize` + `sizeMode`), no garantiza una anchura exacta de 75 mm; eso depende de la proporción del trazado y del espesor final de paredes.
 - Cortante y sello siguen siendo **documentos separados** que pueden pertenecer a la misma colección.
-- Todavía no hay edición de parámetros de colecciones existentes, exportación/importación de colección completa, filtrado por colección ni agrupación de dos piezas dentro de una carta.
+- La edición de plantillas se limita por ahora a las alturas de cortante y sello; todavía no hay exportación/importación de colección completa ni agrupación de dos piezas dentro de una carta.
 - No hay sincronización entre dispositivos, usuarios o pestañas; no es una solución de respaldo de la colección.
 
 ## Regresión y validación
