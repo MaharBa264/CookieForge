@@ -35,7 +35,6 @@
   import { createProjectWorkflow } from './lib/projects/projectWorkflow';
   import { createProjectSessionIntegration, assertRepresentable } from './lib/projects/projectSessionIntegration';
   import { createDesignDocument } from './lib/projects/createDesignDocument';
-  import { parseDesignDocument } from './lib/domain/documentValidation';
 
   import { documentParametersToLegacy, legacyParametersToDocument } from './lib/stores/legacyDocumentAdapter';
   import type { DesignDocument, ViewportPreferences, DesignSource } from './lib/domain/designDocument';
@@ -550,8 +549,7 @@
       if (!alive || revision !== sourceRevision || epoch !== session.getSessionEpoch()) return false;
       let prepared;
       try {
-        prepared = prepareCollectionDesign(
-          parseDesignDocument({ ...candidate, parameters: parameterDocument.parameters }), localStorage);
+        prepared = prepareCollectionDesign({ ...candidate, parameters: parameterDocument.parameters }, localStorage);
       } catch (cause) {
         $error = `No se pudo cargar la colección activa: ${cause instanceof Error ? cause.message : String(cause)}`;
         return false;
