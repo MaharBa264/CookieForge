@@ -1,0 +1,41 @@
+name: Docker miniPC smoke
+
+on:
+  push:
+    branches:
+      - feature/advanced-contour-editor
+    paths:
+      - Dockerfile
+      - compose.yaml
+      - .dockerignore
+      - deploy/**
+      - .github/workflows/docker-minipc.yml
+  workflow_dispatch:
+
+jobs:
+  build-and-serve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image with production assets
+        run: docker build -t cookieforge:smoke .
+      - name: Start container
+        run: docker run -d --rm --name cookieforge-smoke -p 127.0.0.1:18787:80 cookieforge:smoke
+      - name: Check root redirect, app and hashed assets
+        run: |
+          set -eu
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:18787/cookie-cutter-designer/ -o /tmp/cookieforge.html; then break; fi
+            sleep 2
+          done
+          test -s /tmp/cookieforge.html
+          curl -fsSI http://127.0.0.1:18787/ | grep -qi 'HTTP/1.1 302'
+          grep -q 'cookie-cutter-designer/assets/' /tmp/cookieforge.html
+          docker inspect --format '{{.State.Running}}' cookieforge-smoke | grep -q true
+      - name: Container diagnostics on failure
+        if: failure()
+        run: docker logs cookieforge-smoke || true
+      - name: Stop container
+        if: always()
+        run: docker rm -f cookieforge-smoke || true
