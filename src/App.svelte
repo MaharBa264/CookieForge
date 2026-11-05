@@ -1220,7 +1220,7 @@
             <line x1="12" y1="16" x2="12.01" y2="16"/>
           </svg>
           <div>
-            <strong>Erreur</strong>
+            <strong>Error</strong>
             <p>{importError ?? $error}</p>
           </div>
         </div>
