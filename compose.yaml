@@ -1,0 +1,12 @@
+services:
+  cookieforge:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cookieforge:local
+    container_name: cookieforge
+    restart: unless-stopped
+    ports:
+      - "${COOKIEFORGE_PORT:-8787}:80"
+    security_opt:
+      - no-new-privileges:true
