@@ -31,6 +31,8 @@ jobs:
           done
           test -s /tmp/cookieforge.html
           curl -fsSI http://127.0.0.1:18787/ | grep -qi 'HTTP/1.1 302'
+          curl -fsSI http://127.0.0.1:18787/ | grep -qi '^location: /cookie-cutter-designer/'
+          curl -fsSI http://127.0.0.1:18787/cookie-cutter-designer | grep -qi '^location: /cookie-cutter-designer/'
           grep -q 'cookie-cutter-designer/assets/' /tmp/cookieforge.html
           docker inspect --format '{{.State.Running}}' cookieforge-smoke | grep -q true
       - name: Container diagnostics on failure
