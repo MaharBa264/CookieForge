@@ -35,6 +35,7 @@
   import { createProjectWorkflow } from './lib/projects/projectWorkflow';
   import { createProjectSessionIntegration, assertRepresentable } from './lib/projects/projectSessionIntegration';
   import { createDesignDocument } from './lib/projects/createDesignDocument';
+  import { createUuid } from './lib/utils/createUuid';
 
   import { documentParametersToLegacy, legacyParametersToDocument } from './lib/stores/legacyDocumentAdapter';
   import type { DesignDocument, ViewportPreferences, DesignSource } from './lib/domain/designDocument';
@@ -333,7 +334,7 @@
   }
   const workflow = createProjectWorkflow({
     session, storage: projectStorage, assertRepresentable,
-    createId: () => crypto.randomUUID(),
+    createId: () => createUuid(),
     captureTransitionValidity: () => {
       // A competing project transition owns the source immediately, not only
       // after its asynchronous read/dirty confirmation has completed.
