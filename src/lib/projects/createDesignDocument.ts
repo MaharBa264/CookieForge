@@ -2,6 +2,7 @@ import type { DesignDocumentV1, DesignSource } from '../domain/designDocument';
 import type { ImplementedDesignKind } from '../domain/designKind';
 import { createDefaultCutterParameters, createDefaultStampParameters } from '../domain/designParameters';
 import { parseDesignDocumentV1 } from '../domain/documentValidation';
+import { createUuid } from '../utils/createUuid';
 
 export interface CreateDesignDocumentInput {
   readonly name: string;
@@ -19,7 +20,7 @@ export function createDesignDocument(
   options: CreateDesignDocumentOptions = {}
 ): DesignDocumentV1 {
   const timestamp = (options.now ?? (() => new Date().toISOString()))();
-  const id = (options.createId ?? (() => crypto.randomUUID()))();
+  const id = (options.createId ?? (() => createUuid()))();
   return parseDesignDocumentV1({
     schemaVersion: 1,
     id,
