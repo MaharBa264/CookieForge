@@ -2,6 +2,7 @@
   import { onDestroy, onMount, tick } from 'svelte';
   import type { DesignDocument } from '../../domain/designDocument';
   import type { ProjectWorkflow } from '../../projects/projectWorkflow';
+  import { createUuid } from '../../utils/createUuid';
   import {
     addCollection, assignDesign, filterDesignsByCollection, loadCollectionCatalog, saveCollectionCatalog, updateCollectionDefaults,
     ACTIVE_COLLECTION_STORAGE_KEY, type CollectionCatalog
@@ -64,7 +65,7 @@
   function createCard(): void {
     if (!collectionReady || busy) return;
     try {
-      const next = createCollectionCard(cardCatalog, catalog, cardCollectionId, cardName, crypto.randomUUID());
+      const next = createCollectionCard(cardCatalog, catalog, cardCollectionId, cardName, createUuid());
       commitCards(next);
       if (cardCatalog === next) cardName = '';
     } catch (cause) {
@@ -122,7 +123,7 @@
       const next = addCollection(catalog, collectionName, {
         cutter: { targetSize: cutterHeight, sizeMode: 'height' },
         stamp: { targetSize: stampHeight, sizeMode: 'height' }
-      }, crypto.randomUUID(), new Date().toISOString());
+      }, createUuid(), new Date().toISOString());
       commitCatalog(next);
       if (catalog === next) collectionName = '';
     } catch (cause) {
