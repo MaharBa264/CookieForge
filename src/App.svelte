@@ -28,7 +28,7 @@
   import { createProjectRecovery } from './lib/projects/projectRecovery';
   import { canonicalProjectRecoverySnapshot, createIndexedDbProjectRecoveryStorage, type ProjectRecoveryStorage, type ProjectRecoveryEnvelope } from './lib/projects/projectRecoveryStorage';
   import { encodeProject } from './lib/projects/projectCodec';
-  import LocalProjectLibrary from './lib/components/library/LocalProjectLibrary.svelte';
+
   import ProjectConfirmDialog from './lib/components/ui/ProjectConfirmDialog.svelte';
   import { createDesignSessionStore, type DesignSessionStore } from './lib/stores/designSessionStore';
   import { createIndexedDbProjectStorage, type ProjectStorage } from './lib/projects/projectStorage';
@@ -98,6 +98,17 @@
     mobileCreateMenu = false;
     mobileView3D = true;
   }
+  // The project library is not needed for the editor's initial render.
+  // Splitting it avoids charging collection/card management to the entry bundle.
+  let LocalProjectLibrary: typeof import('./lib/components/library/LocalProjectLibrary.svelte').default | null = null;
+  let localLibraryLoadError: string | null = null;
+  onMount(() => {
+    void import('./lib/components/library/LocalProjectLibrary.svelte').then(module => {
+      if (alive) LocalProjectLibrary = module.default;
+    }).catch(cause => {
+      if (alive) localLibraryLoadError = String(cause);
+    });
+  });
   let StartScreen: typeof import('./lib/components/ui/StartScreen.svelte').default | null = null;
   let startScreenError: string | null = null;
   onMount(() => {
@@ -1264,7 +1275,13 @@
         {/if}
         {#if activeCategory === 'projects'}
           <ProjectManager {session} {workflow} {unavailableReason} />
-          <LocalProjectLibrary {workflow} onConfirmDelete={confirmDelete} />
+          {#if LocalProjectLibrary}
+            <svelte:component this={LocalProjectLibrary} {workflow} onConfirmDelete={confirmDelete} />
+          {:else if localLibraryLoadError}
+            <p role="alert">No se pudo cargar la biblioteca de proyectos: {localLibraryLoadError}</p>
+          {:else}
+            <p role="status">Cargando biblioteca de proyectos…</p>
+          {/if}
         {:else if activeCategory === 'upload'}
           {#if $session === null}
             {#if StartScreen}
