@@ -157,14 +157,14 @@ function createResult<K extends 'cutter' | 'stamp' | 'multi-cutter'>(
 }
 
 function publicError(revision: number, error: unknown): PublicGenerationError {
-  let message = 'La génération a échoué.';
+  let message = 'La generación falló.';
   let code: string | undefined;
 
   if (error instanceof GenerationOrchestratorError) {
     message = error.message;
     code = error.code;
   } else if (error instanceof RecipeRegistryError) {
-    message = 'La recette de génération demandée est indisponible.';
+    message = 'La receta de generación solicitada no está disponible.';
     code = error.code;
   } else if (error instanceof CutterGenerationError) {
     message = error.message;

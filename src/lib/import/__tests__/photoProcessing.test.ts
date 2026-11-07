@@ -80,7 +80,7 @@ describe('photo segmentation: explicit choices, no blur or hidden object selecti
     expect(processPhotoPixels(low, DEFAULT_PHOTO_SETTINGS).diagnostics.canApply).toBe(false);
     const empty = processPhotoPixels(ringAndIsland(), { ...DEFAULT_PHOTO_SETTINGS, foreground: 'light', threshold: 255 });
     expect(empty.diagnostics).toMatchObject({ components: 0, canApply: false });
-    expect(empty.diagnostics.warnings.join(' ')).toMatch(/vide|empty/i);
+    expect(empty.diagnostics.warnings.join(' ')).toMatch(/vac[ií]a|empty/i);
     const clipped = processPhotoPixels(pixels(20, 20, (x, y) => x < 10 && y > 3 && y < 16 ? [0, 0, 0, 255] : [255, 255, 255, 255]), DEFAULT_PHOTO_SETTINGS);
     expect(clipped.diagnostics.canApply).toBe(false); expect(clipped.diagnostics.warnings.join(' ')).toMatch(/bord|edge/i);
     const noisy = processPhotoPixels(pixels(100, 100, (x, y) => x % 2 && y % 2 ? [0, 0, 0, 255] : [255, 255, 255, 255]), DEFAULT_PHOTO_SETTINGS);

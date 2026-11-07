@@ -35,7 +35,7 @@
     class="design-type"
     class:invalid={$parameterErrorField === 'mode'}
     role="group"
-    aria-label="Type de création"
+    aria-label="Tipo de creación"
     aria-describedby={$parameterErrorField === 'mode'
       ? 'mode-hint parameter-error-summary'
       : 'mode-hint'}
@@ -48,7 +48,7 @@
       on:click={() => updateParam('mode', 'cutter')}
       aria-pressed={$params.mode === 'cutter'}
     >
-      <span aria-hidden="true">✂️</span> Découpe
+      <span aria-hidden="true">✂️</span> Corte
     </button>
     <button
       type="button"
@@ -83,7 +83,7 @@
     <HandleSection />
   </ParameterAccordion>
 
-  <ParameterAccordion id="advanced" title="Avancé" description="Fonctions de génération facultatives" open={false}>
+  <ParameterAccordion id="advanced" title="Avanzado" description="Funciones de generación opcionales" open={false}>
     <AdvancedSection />
   </ParameterAccordion>
 </section>

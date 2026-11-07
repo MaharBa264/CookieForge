@@ -237,11 +237,11 @@ function runRequestTransaction<TResult>(
     };
 
     transaction.onerror = () => {
-      fail(transaction.error, 'La transaction IndexedDB a échoué.');
+      fail(transaction.error, 'La transacción de IndexedDB falló.');
     };
 
     transaction.onabort = () => {
-      fail(transaction.error, 'La transaction IndexedDB a été annulée.');
+      fail(transaction.error, 'La transacción de IndexedDB fue cancelada.');
     };
 
     transaction.oncomplete = () => {
@@ -249,7 +249,7 @@ function runRequestTransaction<TResult>(
         return;
       }
       if (!outcome.ready) {
-        fail(undefined, 'La transaction IndexedDB est terminée sans résultat.');
+        fail(undefined, 'La transacción de IndexedDB terminó sin resultado.');
         return;
       }
 

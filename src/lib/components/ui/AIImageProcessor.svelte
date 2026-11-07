@@ -149,17 +149,17 @@
               <option value="simple">Simple (ideal para logotipos)</option>
               <option value="detailed">Detallado (ideal para fotos)</option>
               <option value="outline">Contornos (detección de bordes)</option>
-              <option value="clean">Épuré (noir et blanc)</option>
+              <option value="clean">Limpio (blanco y negro)</option>
             </select>
           </label>
         </div>
 
         <div class="advanced-options">
-          <h4>Options avancées :</h4>
+          <h4>Opciones avanzadas:</h4>
 
           <label class="checkbox-label">
             <input type="checkbox" bind:checked={options.enhanceContrast} />
-            <span>Améliorer le contraste</span>
+            <span>Mejorar el contraste</span>
           </label>
 
           <label class="checkbox-label">

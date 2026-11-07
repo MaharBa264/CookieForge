@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import cdt2d from 'cdt2d';
 
 /**
  * Constructor de sólidos por capas (tapas planas + paredes verticales).
@@ -79,22 +80,41 @@ export class LayeredSolidBuilder {
   /** Cara horizontal en `z` cubriendo la región definida por los lazos (par-impar). */
   addCap(loops: ReadonlyArray<Loop>, z: number, facesUp: boolean): void {
     for (const polygon of polygonsFromLoops(loops)) {
-      const outer = polygon.outer.map(({ x, y }) => new THREE.Vector2(x, y));
-      const holes = polygon.holes.map((hole) => hole.map(({ x, y }) => new THREE.Vector2(x, y)));
-      const points = [...outer, ...holes.flat()];
-      const triangles = THREE.ShapeUtils.triangulateShape(outer, holes);
+      // Triangulación de Delaunay con restricciones: robusta con vértices alineados y huecos
+      // que se acercan al borde, donde el método de recorte de orejas deja la superficie abierta.
+      const index = new Map<string, number>();
+      const points: Array<[number, number]> = [];
+      const edges: Array<[number, number]> = [];
+      for (const loop of [polygon.outer, ...polygon.holes]) {
+        const ids = loop.map(({ x, y }) => {
+          const key = `${x},${y}`;
+          let id = index.get(key);
+          if (id === undefined) {
+            id = points.length;
+            index.set(key, id);
+            points.push([x, y]);
+          }
+          return id;
+        });
+        for (let position = 0; position < ids.length; position += 1) {
+          const from = ids[position];
+          const to = ids[(position + 1) % ids.length];
+          if (from !== to) edges.push([from, to]);
+        }
+      }
+      const triangles = cdt2d(points, edges, { exterior: false });
       for (const [a, b, c] of triangles) {
         const pa = points[a];
         const pb = points[b];
         const pc = points[c];
-        const cross = (pb.x - pa.x) * (pc.y - pa.y) - (pb.y - pa.y) * (pc.x - pa.x);
+        const cross = (pb[0] - pa[0]) * (pc[1] - pa[1]) - (pb[1] - pa[1]) * (pc[0] - pa[0]);
         if (cross === 0) continue;
         const counterClockwise = cross > 0;
         const ordered = counterClockwise === facesUp ? [pa, pb, pc] : [pa, pc, pb];
         this.pushTriangle(
-          [ordered[0].x, ordered[0].y, z],
-          [ordered[1].x, ordered[1].y, z],
-          [ordered[2].x, ordered[2].y, z]
+          [ordered[0][0], ordered[0][1], z],
+          [ordered[1][0], ordered[1][1], z],
+          [ordered[2][0], ordered[2][1], z]
         );
       }
     }

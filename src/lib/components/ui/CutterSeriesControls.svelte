@@ -25,7 +25,7 @@
 </script>
 <section class="cutter-series" aria-labelledby="series-title">
   <h3 id="series-title">Série enregistrable</h3>
-  <p id="series-help">Copias separadas del mismo cortador, sin conexión entre sí. Se conservan el dibujo, la pared, el asa y los puentes. Réglez puis appliquez ; ouvrir ce panneau ne modifie rien.</p>
+  <p id="series-help">Copias separadas del mismo cortador, sin conexión entre sí. Se conservan el dibujo, la pared, el asa y los puentes. Ajustá los valores y aplicalos; abrir este panel no modifica nada.</p>
   {#if currentDocument?.kind === 'cutter' || currentDocument?.kind === 'multi-cutter'}
     <div class="series-fields">
       <label for="series-copies">Copias (1–24)<input id="series-copies" type="number" min="1" max="24" step="1" bind:value={copies} aria-invalid={seriesError !== null} aria-describedby="series-help series-error" /></label>

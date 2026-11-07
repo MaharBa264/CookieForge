@@ -85,7 +85,7 @@ describe('wall profiles use current document values, not a saved profile name', 
     const { session, schedule, initial } = setup();
     expect(session.getDocument()).toBe(initial);
     expect(schedule).not.toHaveBeenCalled();
-    expect(document.querySelector('[data-wall-profile-status]')?.textContent).toContain('Personnalisé');
+    expect(document.querySelector('[data-wall-profile-status]')?.textContent).toContain('Personalizado');
     expect(profiles.map(p => profileButton(p.id).getAttribute('aria-pressed'))).toEqual(['false', 'false', 'false']);
     session.updateParameters('cutter', { wallThickness: 0.8, taperAngle: 5 });
     await tick();
@@ -94,7 +94,7 @@ describe('wall profiles use current document values, not a saved profile name', 
     await tick();
     expect(session.getDocument()?.parameters.wallThickness).toBe(0.9);
     expect(profileButton('thin').getAttribute('aria-pressed')).toBe('false');
-    expect(document.querySelector('[data-wall-profile-status]')?.textContent).toContain('Personnalisé');
+    expect(document.querySelector('[data-wall-profile-status]')?.textContent).toContain('Personalizado');
     input('wallThickness', 0.8);
     await tick();
     expect(profileButton('thin').getAttribute('aria-pressed')).toBe('true');
@@ -144,7 +144,7 @@ describe('wall profiles use current document values, not a saved profile name', 
       expect(document.querySelector(`label[for="${field}"]`)?.textContent).toContain(`${value}${unit === 'mm' ? ' ' : ''}${unit}`);
       expect(document.getElementById(field)?.getAttribute('aria-valuetext')).toBe(`${value} ${accessibleUnit}`);
     }
-    expect(document.querySelector('[data-wall-profile-status]')?.textContent).toContain('Personnalisé');
+    expect(document.querySelector('[data-wall-profile-status]')?.textContent).toContain('Personalizado');
   });
 
   it('does not expose cutter wall profiles in Stamp mode', async () => {

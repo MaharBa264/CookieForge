@@ -94,8 +94,8 @@
 </script>
 
 <svelte:window on:keydown={event => { if (event.key === 'Escape') { event.preventDefault(); cancel(); } }} />
-<section class="photo-review" aria-label="Préparation de la photo">
-  <h3 bind:this={reviewHeading} tabindex="-1">Préparer la photo</h3>
+<section class="photo-review" aria-label="Preparación de la foto">
+  <h3 bind:this={reviewHeading} tabindex="-1">Preparar la foto</h3>
   <p>Un objeto con buen contraste sobre un fondo simple da el mejor contorno. Recortá alrededor de la forma deseada, ajustá el umbral y revisá la vista previa. Tu dibujo no se reemplaza hasta que confirmes.</p>
   <div class="previews">
     <figure>
@@ -136,7 +136,7 @@
   {#if fresh && result}
     <p role="status" aria-live="polite">{result.diagnostics.width} × {result.diagnostics.height} px procesados; {result.diagnostics.components} forma(s), {result.diagnostics.holes} agujero(s), {result.diagnostics.removedComponents} isla(s) quitada(s), {result.diagnostics.filledHoles} agujero(s) rellenado(s).</p>
     {#each result.diagnostics.warnings as warning}<p class="warning">{warning}</p>{/each}
-    {#if !result.diagnostics.canApply}<p>Résultat non applicable. Recadrez davantage ou ajustez le seuil et le contraste de la photo.</p>{/if}
+    {#if !result.diagnostics.canApply}<p>Resultado no aplicable. Recortá más la foto o ajustá el umbral y el contraste.</p>{/if}
   {:else if pending}<p role="status" aria-live="polite">Calculando con procesamiento local…</p>
   {:else}<p role="status">Ajustes modificados: recalculá la vista previa antes de aplicarla.</p>{/if}
   <div class="actions">

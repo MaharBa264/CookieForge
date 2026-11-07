@@ -29,7 +29,7 @@
     {/each}
   </div>
   <p class="param-hint" data-wall-profile-status role="status">
-    {activeProfile?.label ?? 'Personnalisé'} · épaisseur {$params.wallThickness} mm · angle {$params.taperAngle}°
+    {activeProfile?.label ?? 'Personalizado'} · grosor {$params.wallThickness} mm · ángulo {$params.taperAngle}°
   </p>
   <p id="wall-profiles-hint" class="param-hint">
     Estos perfiles solo ajustan el espesor y el ángulo. Las alturas, el asa y los puentes no cambian.
@@ -38,7 +38,7 @@
 </fieldset>
 
 <div class="param-control">
-  <label for="wallThickness">Épaisseur de la paroi : {$params.wallThickness} mm</label>
+  <label for="wallThickness">Grosor de la pared: {$params.wallThickness} mm</label>
   <input id="wallThickness" data-field="wallThickness" type="range" min="0.6" max="2" step="0.1"
     value={$params.wallThickness} aria-valuetext={`${$params.wallThickness} milímetros`}
     aria-invalid={$parameterErrorField === 'wallThickness'} aria-describedby={describedBy('wallThickness')}
@@ -63,7 +63,7 @@
     value={$params.totalHeight} aria-valuetext={`${$params.totalHeight} milímetros`}
     aria-invalid={$parameterErrorField === 'totalHeight'} aria-describedby={describedBy('totalHeight')}
     oninput={(event) => updateParam('totalHeight', Number(event.currentTarget.value))} />
-  <p id="totalHeight-hint" class="param-hint">15–40 mm · Doit inclure la paroi de découpe et la poignée active.</p>
+  <p id="totalHeight-hint" class="param-hint">15–40 mm · Debe incluir la pared de corte y el asa activa.</p>
   {#if $parameterErrorField === 'totalHeight' && $parameterError}<p id="totalHeight-error" class="param-error" role="alert">{$parameterError}</p>{/if}
 </div>
 

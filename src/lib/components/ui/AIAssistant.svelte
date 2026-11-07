@@ -118,7 +118,7 @@
 
   async function optimizeSVG() {
     if (!apiKey || !svgContent) {
-      error = 'Clé API et contenu SVG requis';
+      error = 'Se requieren la clave de API y el contenido SVG';
       return;
     }
 

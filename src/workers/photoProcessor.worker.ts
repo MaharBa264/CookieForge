@@ -66,7 +66,7 @@ export async function preparePhotoInWorker(file: File, requestedSettings: PhotoS
   }
   let bitmap: ImageBitmap;
   try { bitmap = await createImageBitmap(file); }
-  catch { throw new Error('Photo illisible : réexportez-la en PNG, JPEG ou WebP puis réessayez.'); }
+  catch { throw new Error('No se puede leer la foto: volvé a exportarla como PNG, JPEG o WebP e intentá de nuevo.'); }
   let canvas: OffscreenCanvas | null = null;
   try {
     checkCancellation(signal);

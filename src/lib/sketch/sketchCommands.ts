@@ -84,7 +84,7 @@ export function editSketch(svg: string, command: SketchCommand): string {
   } else if (command.type === 'add' || command.type === 'delete' || command.type === 'close') {
     // Topology commands are restricted to a single linear contour; no implicit
     // deletion of Bézier handles or neighbouring holes/subpaths.
-    if (!path.linear || segments.filter(s => s.command === 'M').length !== 1) throw new Error('Add/delete/close require a single linear contour. Curves and subpaths are preserved.');
+    if (!path.linear || segments.filter(s => s.command === 'M').length !== 1) throw new Error('Agregar, eliminar y cerrar requieren un único contorno lineal. Las curvas y los subtrazados se conservan.');
     if (command.type === 'close') {
       if (path.closed) return svg;
       if (path.points.length < 3) throw new Error('Un contorno necesita al menos tres puntos.');

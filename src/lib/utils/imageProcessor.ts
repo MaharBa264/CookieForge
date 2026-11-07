@@ -89,7 +89,7 @@ export async function vectorizeImage(file: File, signal?: AbortSignal, preset: T
     const { preparePhoto } = await import('../import/photoImport');
     if (signal?.aborted) throw cancellationError();
     const result = await preparePhoto(file, undefined, signal);
-    if (!result.diagnostics.canApply) throw new Error(result.diagnostics.warnings.join(' ') || 'Préparez la photo et confirmez un contour valide.');
+    if (!result.diagnostics.canApply) throw new Error(result.diagnostics.warnings.join(' ') || 'Preparé la foto y confirmá un contorno válido.');
     return result.svg;
   }
   const imageData = typeof createImageBitmap === 'function'

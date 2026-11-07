@@ -29,7 +29,7 @@ function validResult(value: unknown): value is PhotoTraceResult {
 export async function preparePhoto(file: File, requestedSettings: PhotoSettings = DEFAULT_PHOTO_SETTINGS, signal?: AbortSignal): Promise<PhotoTraceResult> {
   checkCancellation(signal);
   const mime = validateImageFile(file);
-  if (mime === 'image/svg+xml') throw new Error('La préparation photo accepte PNG, JPEG et WebP ; importez un SVG en mode vectoriel.');
+  if (mime === 'image/svg+xml') throw new Error('La preparación de fotos acepta PNG, JPEG y WebP; importá un SVG en modo vectorial.');
   const settings = parsePhotoSettings(requestedSettings);
   const normalizedFile = file.type === mime ? file : new File([file], file.name, { type: mime, lastModified: file.lastModified });
   checkCancellation(signal);

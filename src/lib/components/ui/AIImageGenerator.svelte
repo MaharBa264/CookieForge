@@ -139,7 +139,7 @@
     'Simple heart shape': 'Corazón simple',
     'Snowflake with 6 points': 'Copo de nieve de 6 puntas',
     'Smiling sun': 'Sol sonriente',
-    'Moon and stars': 'Lune et étoiles',
+    'Moon and stars': 'Luna y estrellas',
   };
 
   function useExample(example: string) {

@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "@jscad/modeling": "^2.13.0",
+    "cdt2d": "^1.0.0",
     "fflate": "^0.8.3",
     "imagetracer": "^0.2.2",
     "js-angusj-clipper": "^1.3.1",

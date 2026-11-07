@@ -292,13 +292,28 @@ async function buildCutterGroup(
       mesh.name = 'cutter-body-bridged';
       group.add(mesh);
     } else {
+      // En imágenes con mucho detalle, algunos contornos diminutos no admiten pared
+      // (el desplazamiento cambia de topología). Se omiten en lugar de abortar todo.
+      let skipped = 0;
+      let lastError: unknown = null;
       for (let index = 0; index < contours.length; index += 1) {
-        const geometry = await createContourGeometry(contours[index], params, scale);
-        const mesh = new THREE.Mesh(geometry, createCutterMaterial());
-        mesh.name = `cutter-body-${index}`;
-        mesh.userData.contourIndex = index;
-        group.add(mesh);
+        try {
+          const geometry = await createContourGeometry(contours[index], params, scale);
+          const mesh = new THREE.Mesh(geometry, createCutterMaterial());
+          mesh.name = `cutter-body-${index}`;
+          mesh.userData.contourIndex = index;
+          group.add(mesh);
+        } catch (error) {
+          if (error instanceof CutterGenerationError && error.code === 'OFFSET_FAILED') {
+            skipped += 1;
+            lastError = error;
+            continue;
+          }
+          throw error;
+        }
       }
+      if (group.children.length === 0 && lastError) throw lastError;
+      group.userData.skippedContours = skipped;
     }
 
     return group;

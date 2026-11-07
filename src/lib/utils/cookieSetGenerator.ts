@@ -12,7 +12,7 @@ import { generateCookieCutter } from './cookieCutterGenerator';
 import { disposeObject3D } from './disposeThree';
 import { CutterGenerationError, validateCookieCutterParams } from './generationValidation';
 import { validatePrintableObject } from './geometryValidation';
-import { offsetPath } from './pathOperations';
+import { offsetPath, unionPaths } from './pathOperations';
 import { contourBounds, contourDepths, createReliefRegion } from './stampGenerator';
 import {
   LayeredSolidBuilder,
@@ -24,7 +24,7 @@ import {
 const modeling = (
   modelingModule as unknown as { readonly default?: typeof modelingModule }
 ).default ?? modelingModule;
-const { booleans, geometries } = modeling;
+const { booleans, geometries, transforms } = modeling;
 const { subtract, union } = booleans;
 const { geom2 } = geometries;
 
@@ -339,8 +339,11 @@ function buildRelief(inputs: ReliefInputs, fitRegion: Geom2): Geom2 {
     width: sourceBounds.width,
     height: sourceBounds.height
   };
+  // La unión de todas las regiones es lo más costoso: se calcula una sola vez y luego solo
+  // se escala respecto del origen (el relieve está centrado en el origen).
+  const baseRelief = createReliefRegion(contours, depths, bounds, scale);
   const reliefAt = (factor: number): Geom2 =>
-    createReliefRegion(contours, depths, bounds, scale * factor);
+    factor === 1 ? baseRelief : (transforms.scale([factor, factor, 1], baseRelief) as Geom2);
   const fits = (factor: number): boolean =>
     isEmpty(subtract(reliefAt(factor), fitRegion) as Geom2);
 
@@ -375,8 +378,58 @@ function loopsOf(region: Geom2): Loop[] {
     const first = points[0];
     const last = points[points.length - 1];
     if (points.length > 1 && first.x === last.x && first.y === last.y) points.pop();
-    return points;
+    return removeCollinearPoints(points);
   });
+}
+
+/** Distancia máxima (mm) a la recta vecina para considerar un vértice redundante. */
+const COLLINEAR_TOLERANCE_MM = 1e-4;
+
+/**
+ * Quita vértices alineados con sus vecinos. Generan triángulos de área nula al triangular
+ * las tapas, que el validador rechaza y que dejan la superficie abierta.
+ */
+function removeCollinearPoints(loop: Pt[]): Pt[] {
+  let points = loop;
+  let changed = true;
+  while (changed && points.length > 3) {
+    changed = false;
+    const kept: Pt[] = [];
+    for (let index = 0; index < points.length; index += 1) {
+      const previous = kept.length > 0 ? kept[kept.length - 1] : points[points.length - 1];
+      const current = points[index];
+      const next = points[(index + 1) % points.length];
+      const baseLength = Math.hypot(next.x - previous.x, next.y - previous.y);
+      const twiceArea = Math.abs(
+        (current.x - previous.x) * (next.y - previous.y) - (current.y - previous.y) * (next.x - previous.x)
+      );
+      const distance = baseLength > 0 ? twiceArea / baseLength : Math.hypot(current.x - previous.x, current.y - previous.y);
+      if (distance <= COLLINEAR_TOLERANCE_MM && kept.length + (points.length - index - 1) >= 3) {
+        changed = true;
+        continue;
+      }
+      kept.push(current);
+    }
+    points = kept;
+  }
+  return points;
+}
+
+/**
+ * Regulariza los lazos del relieve con Clipper (coordenadas enteras): fusiona piezas de
+ * tinta que se tocan a lo largo de un borde, algo que la unión 2D deja como lazos
+ * contiguos y que produce uniones en T (superficie abierta) al triangular.
+ */
+async function cleanLoops(loops: Loop[]): Promise<Loop[]> {
+  if (loops.length === 0) return loops;
+  try {
+    const merged = await unionPaths(loops);
+    const cleaned = merged.map((contour) => removeCollinearPoints(contour.map(({ x, y }) => ({ x, y }))));
+    return cleaned.filter((loop) => loop.length >= 3);
+  } catch (error) {
+    if (error instanceof CutterGenerationError) return loops;
+    throw error;
+  }
 }
 
 type HandleStyleName = CookieCutterParams['handleStyle'];
@@ -601,7 +654,21 @@ export async function generateCookieSet(
   assertImprintDepth(params, options.imprint);
 
   // Un JPG/PNG vectorizado trae capas blancas (fondo y detalles) que no son geometría.
-  const extracted = extractClosedContours(keepInkOnly(svgString), 48);
+  // Los trazados de imágenes con mucho detalle superan el límite de puntos con 48 segmentos
+  // por curva; se reintenta con menos segmentos (el vectorizador ya entrega tramos muy cortos).
+  const inkSvg = keepInkOnly(svgString);
+  let extracted: ReadonlyArray<NormalizedContour> | null = null;
+  for (const segments of [48, 24, 12, 6, 3, 2]) {
+    try {
+      extracted = extractClosedContours(inkSvg, segments);
+      break;
+    } catch (error) {
+      if (!(error instanceof CutterGenerationError) || error.code !== 'CONTOUR_TOO_COMPLEX' || segments === 2) {
+        throw error;
+      }
+    }
+  }
+  if (!extracted) fail('NO_VALID_CONTOURS', 'La imagen no tiene contornos utilizables.', { field: 'contours' });
   const extractedBounds = pointsBounds(extracted);
   const simplifyTolerance =
     Math.max(extractedBounds.width, extractedBounds.height) * SIMPLIFY_RELATIVE_TOLERANCE;
@@ -670,7 +737,7 @@ export async function generateCookieSet(
       const stampBuilder = buildPieceSolid({
         outer: loopsOf(plateRegion),
         cavity: null,
-        relief: loopsOf(relief),
+        relief: await cleanLoops(loopsOf(relief)),
         params,
         imprint: options.imprint
       });
@@ -710,7 +777,7 @@ export async function generateCookieSet(
     const singleBuilder = buildPieceSolid({
       outer: loopsOf(wallOuter),
       cavity: loopsOf(innerRegion),
-      relief: loopsOf(relief),
+      relief: await cleanLoops(loopsOf(relief)),
       params,
       imprint: options.imprint
     });

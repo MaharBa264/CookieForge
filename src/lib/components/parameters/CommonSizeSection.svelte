@@ -31,14 +31,14 @@
     aria-describedby={describedBy('targetSize')}
     on:change={(event) => updateParam('targetSize', event.currentTarget.valueAsNumber)}
   />
-  <p id="targetSize-hint" class="param-hint">10–{$params.buildPlateSize} mm · Dimension extérieure mesurée.</p>
+  <p id="targetSize-hint" class="param-hint">10–{$params.buildPlateSize} mm · Dimensión exterior medida.</p>
   {#if $parameterErrorField === 'targetSize' && $parameterError}
     <p id="targetSize-error" class="param-error" role="alert">{$parameterError}</p>
   {/if}
 </div>
 
 <div class="param-control">
-  <label for="sizeMode">Dimension mesurée</label>
+  <label for="sizeMode">Dimensión medida</label>
   <select
     id="sizeMode"
     data-field="sizeMode"
@@ -51,7 +51,7 @@
       <option value={mode.value}>{mode.label}</option>
     {/each}
   </select>
-  <p id="sizeMode-hint" class="param-hint">Détermine la dimension extérieure réglée par la dimension finale.</p>
+  <p id="sizeMode-hint" class="param-hint">Determina qué dimensión exterior se ajusta a la dimensión final.</p>
   {#if $parameterErrorField === 'sizeMode' && $parameterError}
     <p id="sizeMode-error" class="param-error" role="alert">{$parameterError}</p>
   {/if}

@@ -81,7 +81,7 @@
           </a>
         </li>
         <li>Iniciá sesión y creá una clave de API.</li>
-        <li>Revenez ici et collez la clé ci-dessous.</li>
+        <li>Volvé acá y pegá la clave abajo.</li>
       </ol>
     </details>
   {/if}
@@ -111,7 +111,7 @@
         type="button"
         class="toggle-visibility"
         onclick={() => showKey = !showKey}
-        aria-label={showKey ? 'Masquer la clé API' : 'Afficher la clé API'}
+        aria-label={showKey ? 'Ocultar la clave de API' : 'Mostrar la clave de API'}
         aria-pressed={showKey}
       >
         {showKey ? 'Ocultar' : 'Mostrar'}
@@ -133,7 +133,7 @@
       onclick={handleSave}
       disabled={isValidating || !apiKey.trim()}
     >
-      {isValidating ? 'Validando…' : hasSavedKey ? 'Remplacer la clé' : 'Conectar Gemini'}
+      {isValidating ? 'Validando…' : hasSavedKey ? 'Reemplazar la clave' : 'Conectar Gemini'}
     </button>
 
     {#if hasSavedKey}

@@ -51,7 +51,7 @@ describe('App UX states', () => {
     expect(document.querySelector('button[aria-label^="Usar la forma "]')).not.toBeNull();
 
     const seasonalFilter = Array.from(document.querySelectorAll<HTMLButtonElement>('.category-filter'))
-      .find((button) => button.textContent?.trim() === 'Saisons');
+      .find((button) => button.textContent?.trim() === 'Estaciones');
     seasonalFilter?.click();
     await vi.waitFor(() => {
       expect(seasonalFilter?.getAttribute('aria-pressed')).toBe('true');

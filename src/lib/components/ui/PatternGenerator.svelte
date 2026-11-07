@@ -68,7 +68,7 @@
 
 <div class="pattern-generator">
   <div class="panel-header">
-    <h3>🔄 Générateur de motifs</h3>
+    <h3>🔄 Generador de patrones</h3>
     <button
       class="toggle-btn"
       on:click={() => showPanel = !showPanel}

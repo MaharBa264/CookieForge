@@ -177,7 +177,7 @@
   <div class="layer-info-panel">
     <p class="hint">
       💡 Arrastrá las capas para reordenarlas<br/>
-      ✂️ Découpe : forme principale<br/>
+      ✂️ Corte: forma principal<br/>
       🔖 Sello: motivo en relieve<br/>
       ⚡ Grabado: motivo hundido
     </p>

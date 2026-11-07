@@ -40,7 +40,7 @@
     </div>
   </header>
 
-  <div class="categories" role="group" aria-label="Catégories de formes">
+  <div class="categories" role="group" aria-label="Categorías de formas">
     {#each categories as category}
       <button
         class="category-filter"

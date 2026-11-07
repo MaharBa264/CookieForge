@@ -134,7 +134,7 @@ export function processPhotoPixels(source: PhotoPixels, requestedSettings: Photo
   if (removedComponents) warnings.push(`${removedComponents} componente(s) eliminado(s) según tu limpieza ≤ ${settings.minComponentArea} píxeles; esta limpieza no rellenó ningún agujero.`);
   if (settings.fillHoles) warnings.push(`Silueta exterior: relleno de agujeros activado, ${filledHoles} agujero(s) rellenado(s) a pedido tuyo. Desactivá esta opción para conservar los detalles interiores.`);
   if (max - min < 12) block('Contraste insuficiente o foto uniforme: mejorá la iluminación o elegí otra foto.');
-  if (!foregroundPixels) block('Masque vide : ajustez le seuil, inversez le premier plan ou réduisez le nettoyage.');
+  if (!foregroundPixels) block('Máscara vacía: ajustá el umbral, invertí el primer plano o reducí la limpieza.');
   else if (foregroundPixels === count) block('Todo el recorte es primer plano: ajustá el umbral o invertí oscuro/claro.');
   if (components > 1) block(`${components} componentes distintos: no se eligió ningún objeto automáticamente. Recortá el sujeto o elegí explícitamente una limpieza adecuada.`);
   if (boundaryComponents) block('El primer plano toca el borde del recorte: el contorno podría quedar cortado. Ampliá el recorte, ajustá el umbral o invertí oscuro/claro.');

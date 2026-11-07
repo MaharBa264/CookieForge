@@ -207,7 +207,7 @@
 
 <div class="bezier-editor">
   <div class="editor-header">
-    <h3>✏️ Éditeur de courbes de Bézier</h3>
+    <h3>✏️ Editor de curvas de Bézier</h3>
   </div>
 
   <div class="editor-content">

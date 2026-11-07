@@ -473,8 +473,8 @@
       class="control-btn"
       class:active={selectionMode}
       on:click={toggleSelectionMode}
-      title={selectionMode ? 'Quitter le mode sélection' : 'Activer le mode sélection'}
-      aria-label={selectionMode ? 'Quitter le mode sélection' : 'Activer le mode sélection'}
+      title={selectionMode ? 'Salir del modo de selección' : 'Activar el modo de selección'}
+      aria-label={selectionMode ? 'Salir del modo de selección' : 'Activar el modo de selección'}
       aria-pressed={selectionMode}
     >
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

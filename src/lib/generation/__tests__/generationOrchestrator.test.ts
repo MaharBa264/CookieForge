@@ -331,7 +331,7 @@ describe('GenerationOrchestrator', () => {
     expect(orchestrator.getState()).toMatchObject({
       phase: 'error',
       result: null,
-      error: { revision: 1, message: 'La génération a échoué.' }
+      error: { revision: 1, message: 'La generación falló.' }
     });
   });
 
@@ -880,7 +880,7 @@ describe('GenerationOrchestrator', () => {
     const error = orchestrator.getState().error;
     expect(Object.isFrozen(orchestrator.getState())).toBe(true);
     expect(Object.isFrozen(error)).toBe(true);
-    expect(error).toEqual({ revision: 2, message: 'La génération a échoué.' });
+    expect(error).toEqual({ revision: 2, message: 'La generación falló.' });
     expect(error).not.toHaveProperty('code');
     expect(error).not.toHaveProperty('cause');
     expect(error).not.toHaveProperty('raw');
