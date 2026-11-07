@@ -23,7 +23,7 @@ function setup(withDocument = false) {
   return session;
 }
 function mobileButton(name: string): HTMLButtonElement {
-  const button = [...document.querySelectorAll<HTMLButtonElement>('nav[aria-label="Sections mobiles"] button')]
+  const button = [...document.querySelectorAll<HTMLButtonElement>('nav[aria-label="Secciones móviles"] button')]
     .find(candidate => candidate.textContent?.trim() === name);
   expect(button, name).toBeDefined();
   return button!;
@@ -39,18 +39,18 @@ afterEach(async () => {
 
 it('offers five stable named mobile destinations and a full-height create entry without a model', async () => {
   setup();
-  expect([...document.querySelectorAll('nav[aria-label="Sections mobiles"] button')].map(button => button.textContent?.trim()))
-    .toEqual(['Projet', 'Créer', 'Régler', '3D', 'Export']);
+  expect([...document.querySelectorAll('nav[aria-label="Secciones móviles"] button')].map(button => button.textContent?.trim()))
+    .toEqual(['Proyecto', 'Crear', 'Ajustar', '3D', 'Exportar']);
   expect(document.querySelector('.app-layout')?.classList.contains('mobile-viewing')).toBe(false);
   mobileButton('3D').click(); await tick();
   expect(document.querySelector('.app-layout')?.classList.contains('mobile-viewing')).toBe(true);
   expect(mobileButton('3D').getAttribute('aria-current')).toBe('page');
-  mobileButton('Export').click(); await tick();
+  mobileButton('Exportar').click(); await tick();
   expect(document.querySelector('.app-layout')?.classList.contains('mobile-viewing')).toBe(false);
   expect(document.querySelector('.panel-content')?.textContent).toMatch(/import|dessin/i);
-  mobileButton('Créer').click(); await tick();
-  expect(document.querySelector('[aria-label="Outils de création"]')).not.toBeNull();
-  click('Importer une image'); await tick();
+  mobileButton('Crear').click(); await tick();
+  expect(document.querySelector('[aria-label="Herramientas de creación"]')).not.toBeNull();
+  click('Importar una imagen'); await tick();
   expect(document.querySelector('.app-layout')?.classList.contains('mobile-choosing')).toBe(false);
   await vi.waitFor(() => expect(document.querySelector('.start-screen')).not.toBeNull());
 });
@@ -59,29 +59,29 @@ it('separates sketch, bridges and batch in the mobile creation flow without chan
   const session = setup(true);
   await vi.waitFor(() => expect(get(generationState).phase).toBe('ready'), { timeout: 10000 });
   const initial = session.getDocument();
-  mobileButton('Créer').click(); await tick();
-  click('Atelier 2D et ponts');
+  mobileButton('Crear').click(); await tick();
+  click('Taller 2D y puentes');
   await vi.waitFor(() => expect(document.querySelector('.sketch-workspace')).not.toBeNull(), { timeout: 10000 });
   expect(document.querySelector('.app-layout')?.classList.contains('mobile-workshop-sketch')).toBe(true);
-  click('Ponts'); await tick();
+  click('Puentes'); await tick();
   expect(document.querySelector('.app-layout')?.classList.contains('mobile-workshop-bridges')).toBe(true);
-  mobileButton('Créer').click(); await tick();
-  click('Série de Cutters'); await tick();
-  expect(document.querySelector('.panel-content')?.textContent).toMatch(/série|copies/i);
+  mobileButton('Crear').click(); await tick();
+  click('Serie de cortadores'); await tick();
+  expect(document.querySelector('.panel-content')?.textContent).toMatch(/serie|copias/i);
   expect(session.getDocument()).toBe(initial);
-  mobileButton('Régler').click(); await tick();
-  expect(document.querySelector('.history-controls button[title^="Annuler"]')).not.toBeNull();
-  mobileButton('Projet').click(); await tick();
-  expect(document.querySelector('.panel-content')?.textContent).toMatch(/projet/i);
+  mobileButton('Ajustar').click(); await tick();
+  expect(document.querySelector('.history-controls button[title^="Deshacer"]')).not.toBeNull();
+  mobileButton('Proyecto').click(); await tick();
+  expect(document.querySelector('.panel-content')?.textContent).toMatch(/proyecto/i);
 });
 
 it('returns to the sketch instead of leaving an empty bridge tab after changing to Stamp', async () => {
   const session = setup(true);
   await vi.waitFor(() => expect(get(generationState).phase).toBe('ready'), { timeout: 10000 });
-  mobileButton('Créer').click(); await tick(); click('Atelier 2D et ponts'); await tick();
-  click('Ponts'); await tick();
+  mobileButton('Crear').click(); await tick(); click('Taller 2D y puentes'); await tick();
+  click('Puentes'); await tick();
   expect(document.querySelector('.app-layout')?.classList.contains('mobile-workshop-bridges')).toBe(true);
   session.changeKind('stamp'); await tick();
   expect(document.querySelector('.app-layout')?.classList.contains('mobile-workshop-sketch')).toBe(true);
-  expect(document.querySelector('nav[aria-label="Atelier mobile"] button[aria-current="page"]')?.textContent).toBe('Atelier 2D');
+  expect(document.querySelector('nav[aria-label="Taller móvil"] button[aria-current="page"]')?.textContent).toBe('Taller 2D');
 });

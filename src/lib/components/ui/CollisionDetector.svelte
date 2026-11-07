@@ -47,7 +47,7 @@
       collisionResult = {
         hasCollisions: false,
         collisions: [],
-        warnings: ['Un seul objet détecté. Ajoutez des éléments pour vérifier les collisions.']
+        warnings: ['Se detectó un solo objeto. Agregá elementos para verificar las colisiones.']
       };
       return;
     }
@@ -97,7 +97,7 @@
 
 <div class="collision-detector">
   <div class="panel-header">
-    <h3>⚠️ Détection des collisions</h3>
+    <h3>⚠️ Detección de colisiones</h3>
     <button class="toggle-btn" on:click={() => showPanel = !showPanel}>
       {showPanel ? '▼' : '▶'}
     </button>
@@ -108,7 +108,7 @@
       <div class="controls">
         <label class="checkbox-label">
           <input type="checkbox" bind:checked={autoCheckEnabled} />
-          <span>Vérification automatique après modification</span>
+          <span>Verificación automática tras cada modificación</span>
         </label>
 
         <label>
@@ -137,14 +137,14 @@
             </div>
 
             <div class="collisions-list">
-              <h4>Détails des collisions :</h4>
+              <h4>Detalles de las colisiones:</h4>
               {#each collisionResult.collisions as collision}
                 <div class="collision-item">
                   <div class="collision-pair">
                     <strong>{collision.object1}</strong> ↔ <strong>{collision.object2}</strong>
                   </div>
                   {#if collision.overlap > 0}
-                    <div class="overlap">Chevauchement : {collision.overlap.toFixed(2)}mm</div>
+                    <div class="overlap">Superposición: {collision.overlap.toFixed(2)}mm</div>
                   {:else}
                     <div class="close">Écart : {collision.distance.toFixed(2)}mm (trop proche)</div>
                   {/if}
@@ -154,7 +154,7 @@
 
             {#if collisionResult.warnings.length > 0}
               <div class="warnings">
-                <h4>Avertissements :</h4>
+                <h4>Advertencias:</h4>
                 {#each collisionResult.warnings as warning}
                   <div class="warning-item">⚠️ {warning}</div>
                 {/each}
@@ -165,27 +165,27 @@
               <button class="fix-btn" on:click={handleAutoFix}
                 disabled={!allowPositionFix}
                 aria-describedby={!allowPositionFix ? 'collision-position-fix-reason' : undefined}>
-                🔧 Corriger les positions automatiquement
+                🔧 Corregir las posiciones automáticamente
               </button>
               <button class="viz-btn" on:click={toggleVisualization}>
-                {showVisualization ? '👁️ Masquer' : '👁️ Afficher'} la visualisation
+                {showVisualization ? '👁️ Ocultar' : '👁️ Mostrar'} la visualización
               </button>
             </div>
             {#if !allowPositionFix}
               <p id="collision-position-fix-reason" role="status">
-                Les positions de l’aperçu sont en lecture seule. Modifiez plutôt la source ou la disposition du lot.
+                Las posiciones de la vista previa son de solo lectura. Modificá mejor el origen o la disposición del lote.
               </p>
             {/if}
           {:else}
             <div class="status success">
-              <strong>✅ Aucune collision</strong>
-              <p>Tous les objets sont suffisamment espacés</p>
+              <strong>✅ Sin colisiones</strong>
+              <p>Todos los objetos tienen separación suficiente</p>
             </div>
           {/if}
         </div>
       {:else}
         <div class="no-results">
-          <p>Cliquez sur « Vérifier maintenant » pour rechercher les collisions</p>
+          <p>Hacé clic en «Verificar ahora» para buscar colisiones</p>
         </div>
       {/if}
     </div>

@@ -18,7 +18,7 @@ export interface MultiLayerDesign {
 }
 
 export const DEFAULT_LAYER: Omit<Layer, 'id' | 'svgData'> = {
-  name: 'New Layer',
+  name: 'Capa nueva',
   type: 'cutter',
   visible: true,
   depth: 2.5,

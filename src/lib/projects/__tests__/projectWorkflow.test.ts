@@ -102,13 +102,13 @@ describe('project workflow', () => {
     const activeSaving = workflow.getState().saving;
     gate.reject(new Error('quota'));
     expect(await saving).toBe(false);
-    expect(workflow.getState().error?.message).toBe('save: échec de l’opération. quota');
+    expect(workflow.getState().error?.message).toBe('save: la operación falló. quota');
     expect(activeSaving).toBe(true);
     expect(workflow.getState().saving).toBe(false);
-    expect(workflow.getState().saveError?.message).toBe('save: échec de l’opération. quota');
+    expect(workflow.getState().saveError?.message).toBe('save: la operación falló. quota');
     expect(workflow.getState().error).toBe(workflow.getState().saveError);
     expect(await workflow.export()).toBe(true);
-    expect(workflow.getState().saveError?.message).toBe('save: échec de l’opération. quota');
+    expect(workflow.getState().saveError?.message).toBe('save: la operación falló. quota');
     expect(workflow.getState().error).toBe(workflow.getState().saveError);
 
     const retry = deferred<void>();
@@ -135,12 +135,12 @@ describe('project workflow', () => {
     else firstGate.resolve();
     expect(await first).toBe(!lastSucceeds);
     expect(workflow.getState().saving).toBe(true);
-    expect(workflow.getState().saveError?.message ?? null).toBe(lastSucceeds ? 'save: échec de l’opération. first failure' : null);
+    expect(workflow.getState().saveError?.message ?? null).toBe(lastSucceeds ? 'save: la operación falló. first failure' : null);
     if (lastSucceeds) secondGate.resolve();
     else secondGate.reject(new Error('second failure'));
     expect(await second).toBe(lastSucceeds);
     expect(workflow.getState().saving).toBe(false);
-    expect(workflow.getState().saveError?.message ?? null).toBe(lastSucceeds ? null : 'save: échec de l’opération. second failure');
+    expect(workflow.getState().saveError?.message ?? null).toBe(lastSucceeds ? null : 'save: la operación falló. second failure');
     expect(workflow.getState().error).toBe(workflow.getState().saveError);
     expect(workflow.getState().dirty).toBe(!lastSucceeds);
   });
@@ -175,7 +175,7 @@ describe('project workflow', () => {
     download.mockRejectedValueOnce(new Error('download'));
     expect(await workflow.export()).toBe(false);
     expect(workflow.getState().error?.operation).toBe('export');
-    expect(workflow.getState().saveError?.message).toBe('save: échec de l’opération. quota');
+    expect(workflow.getState().saveError?.message).toBe('save: la operación falló. quota');
     expect(await workflow.export()).toBe(true);
     expect(workflow.getState().error).toBe(workflow.getState().saveError);
   });

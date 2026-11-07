@@ -80,62 +80,62 @@ function validateAttribute(attribute: Attr, path: string): void {
   const value = attribute.value;
 
   if (name.startsWith('on') || qualifiedName.startsWith('on')) {
-    invalid(path, `contient l'attribut événementiel interdit ${attribute.name}.`);
+    invalid(path, `contiene el atributo de evento prohibido ${attribute.name}.`);
   }
 
   if (name === 'style') {
-    invalid(path, `contient l'attribut interdit ${attribute.name}.`);
+    invalid(path, `contiene el atributo prohibido ${attribute.name}.`);
   }
 
   if (isXmlBaseAttribute(attribute)) {
-    invalid(path, `contient l'attribut interdit ${attribute.name}.`);
+    invalid(path, `contiene el atributo prohibido ${attribute.name}.`);
   }
 
   if (name === 'src') {
-    invalid(path, `contient l'attribut interdit ${attribute.name}.`);
+    invalid(path, `contiene el atributo prohibido ${attribute.name}.`);
   }
 
   if (value.includes('/*') || value.includes('*/') || value.includes('\\')) {
     invalid(
       path,
-      `contient une séquence CSS interdite dans ${attribute.name}.`
+      `contiene una secuencia CSS prohibida en ${attribute.name}.`
     );
   }
 
   if (containsJavascriptProtocol(value)) {
-    invalid(path, `contient une valeur javascript: interdite dans ${attribute.name}.`);
+    invalid(path, `contiene un valor javascript: prohibido en ${attribute.name}.`);
   }
 
   if (name === 'href' && !LOCAL_FRAGMENT_PATTERN.test(value)) {
-    invalid(path, `${attribute.name} doit être un fragment local de la forme #id.`);
+    invalid(path, `${attribute.name} debe ser un fragmento local con la forma #id.`);
   }
 
   if (
     CSS_URL_PATTERN.test(value) &&
     !LOCAL_URL_REFERENCE_PATTERN.test(value)
   ) {
-    invalid(path, `${attribute.name} doit référencer uniquement url(#id).`);
+    invalid(path, `${attribute.name} solo debe referenciar url(#id).`);
   }
 }
 
 export function validateSafeSvg(value: string, path: string): string {
   if (FORBIDDEN_DECLARATION_PATTERN.test(value)) {
-    invalid(path, 'contient une déclaration DOCTYPE ou ENTITY interdite.');
+    invalid(path, 'contiene una declaración DOCTYPE o ENTITY prohibida.');
   }
 
   if (XML_STYLESHEET_PATTERN.test(value)) {
-    invalid(path, "contient une instruction xml-stylesheet interdite.");
+    invalid(path, "contiene una instrucción xml-stylesheet prohibida.");
   }
 
   let document: Document;
   try {
     document = new DOMParser().parseFromString(value, 'image/svg+xml');
   } catch {
-    invalid(path, "n'est pas un document XML SVG bien formé.");
+    invalid(path, "no es un documento XML SVG bien formado.");
   }
 
   if (isParserError(document)) {
-    invalid(path, "n'est pas un document XML SVG bien formé.");
+    invalid(path, "no es un documento XML SVG bien formado.");
   }
 
   const root = document.documentElement;
@@ -144,20 +144,20 @@ export function validateSafeSvg(value: string, path: string): string {
     root.localName.toLowerCase() !== 'svg' ||
     !hasAllowedElementNamespace(root)
   ) {
-    invalid(path, 'doit avoir un élément <svg> comme racine.');
+    invalid(path, 'debe tener un elemento <svg> como raíz.');
   }
 
   const elements = [root, ...Array.from(root.getElementsByTagName('*'))];
   for (const element of elements) {
     const elementName = element.localName.toLowerCase();
     if (!ALLOWED_ELEMENTS.has(elementName)) {
-      invalid(path, `contient l'élément non autorisé <${element.localName}>.`);
+      invalid(path, `contiene el elemento no permitido <${element.localName}>.`);
     }
 
     if (!hasAllowedElementNamespace(element)) {
       invalid(
         path,
-        `contient l'élément <${element.localName}> dans un namespace non autorisé.`
+        `contiene el elemento <${element.localName}> en un espacio de nombres no permitido.`
       );
     }
 

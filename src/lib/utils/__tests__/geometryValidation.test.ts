@@ -60,7 +60,7 @@ describe('validatePrintableObject', () => {
     expect(report.valid).toBe(false);
     expect(report.triangles).toBe(0);
     expect(report.shells).toBe(0);
-    expect(messages(report)).toMatch(/no printable mesh/i);
+    expect(messages(report)).toMatch(/ninguna malla/i);
   });
 
   it('rejects non-finite positions and normals', () => {
@@ -71,8 +71,8 @@ describe('validatePrintableObject', () => {
     const report = validatePrintableObject(new THREE.Mesh(geometry));
 
     expect(report.valid).toBe(false);
-    expect(messages(report)).toMatch(/position.*finite/i);
-    expect(messages(report)).toMatch(/normal.*finite/i);
+    expect(messages(report)).toMatch(/no finita/i);
+    expect(messages(report)).toMatch(/normal no finita/i);
   });
 
   it('rejects a degenerate triangle', () => {
@@ -86,7 +86,7 @@ describe('validatePrintableObject', () => {
     const report = validatePrintableObject(new THREE.Mesh(geometry));
 
     expect(report.valid).toBe(false);
-    expect(messages(report)).toMatch(/degenerate triangle/i);
+    expect(messages(report)).toMatch(/triángulo degenerado/i);
   });
 
   it('rejects an out-of-range index without reading invalid vertices', () => {
@@ -104,7 +104,7 @@ describe('validatePrintableObject', () => {
     const report = validatePrintableObject(new THREE.Mesh(geometry));
 
     expect(report.valid).toBe(false);
-    expect(messages(report)).toMatch(/index.*range/i);
+    expect(messages(report)).toMatch(/índice fuera del rango/i);
   });
 
   it('rejects an open surface even when every triangle is finite', () => {
@@ -113,7 +113,7 @@ describe('validatePrintableObject', () => {
     const report = validatePrintableObject(mesh);
 
     expect(report.valid).toBe(false);
-    expect(messages(report)).toMatch(/not closed/i);
+    expect(messages(report)).toMatch(/no está cerrada/i);
   });
 
   it('counts disconnected closed components inside a single mesh', () => {
@@ -129,7 +129,7 @@ describe('validatePrintableObject', () => {
     expect(report.meshes).toBe(1);
     expect(report.shells).toBe(2);
     expect(report.volume).toBeCloseTo(16, 5);
-    expect(report.warnings.join(' ')).toMatch(/2 disconnected shells/i);
+    expect(report.warnings.join(' ')).toMatch(/2 cáscaras desconectadas/i);
   });
 
   it('can require a single connected printable component', () => {
@@ -144,7 +144,7 @@ describe('validatePrintableObject', () => {
     expect(report.valid).toBe(false);
     expect(report.meshes).toBe(2);
     expect(report.shells).toBe(2);
-    expect(messages(report)).toMatch(/single connected shell/i);
+    expect(messages(report)).toMatch(/única cáscara conectada/i);
   });
 
   it('rejects inconsistent winding around a shared edge', () => {
@@ -153,7 +153,7 @@ describe('validatePrintableObject', () => {
     const report = validatePrintableObject(new THREE.Mesh(geometry));
 
     expect(report.valid).toBe(false);
-    expect(messages(report)).toMatch(/inconsistent triangle orientation/i);
+    expect(messages(report)).toMatch(/orientación de triángulos inconsistente/i);
   });
 
   it('rejects a consistently closed mesh with inward-facing triangles', () => {
@@ -163,7 +163,7 @@ describe('validatePrintableObject', () => {
 
     expect(report.valid).toBe(false);
     expect(report.volume).toBeCloseTo(-8, 5);
-    expect(messages(report)).toMatch(/outward|positive volume/i);
+    expect(messages(report)).toMatch(/hacia afuera|volumen positivo/i);
   });
 
   it('rejects a zero world scale that collapses an otherwise valid mesh', () => {
@@ -173,6 +173,6 @@ describe('validatePrintableObject', () => {
     const report = validatePrintableObject(mesh);
 
     expect(report.valid).toBe(false);
-    expect(messages(report)).toMatch(/degenerate triangle|bounds/i);
+    expect(messages(report)).toMatch(/triángulo degenerado|límites/i);
   });
 });

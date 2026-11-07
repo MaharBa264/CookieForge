@@ -41,7 +41,7 @@ scope.onmessage = (event: MessageEvent<ImageWorkerRequest>) => {
         requestId,
         error: {
           code: 'INVALID_PIXELS',
-          message: 'Raster pixel dimensions do not match the transferred buffer.'
+          message: 'Las dimensiones en píxeles de la imagen no coinciden con el búfer transferido.'
         }
       });
       return;
@@ -66,7 +66,7 @@ scope.onmessage = (event: MessageEvent<ImageWorkerRequest>) => {
       requestId,
       error: {
         code: 'VECTORIZATION_FAILED',
-        message: error instanceof Error ? error.message : 'Unknown vectorization error.'
+        message: error instanceof Error ? error.message : 'Error de vectorización desconocido.'
       }
     });
   }

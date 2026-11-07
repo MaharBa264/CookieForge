@@ -92,7 +92,7 @@ export function checkPrintability(value: unknown): PrintabilityCheck {
     const message =
       validationError instanceof CutterGenerationError
         ? validationError.message
-        : 'The cutter parameters are invalid.';
+        : 'Los parámetros del cortador son inválidos.';
 
     return {
       isValid: false,
@@ -107,43 +107,43 @@ export function checkPrintability(value: unknown): PrintabilityCheck {
 
   // Check wall thickness
   if (params.wallThickness < 0.8) {
-    warnings.push('Wall thickness is below recommended minimum (0.8mm)');
+    warnings.push('El espesor de pared está por debajo del mínimo recomendado (0,8 mm)');
     isValid = false;
   } else if (params.wallThickness < 1.0) {
-    warnings.push('Thin walls may be fragile. Consider increasing to 1.0mm or more.');
+    warnings.push('Las paredes finas pueden ser frágiles. Considerá subir a 1,0 mm o más.');
   }
 
   if (params.wallThickness > 1.5) {
-    warnings.push('Very thick walls will use more material and take longer to print.');
+    warnings.push('Las paredes muy gruesas usan más material y tardan más en imprimirse.');
   }
 
   // Check cutting height
   if (params.cuttingHeight < 8) {
-    warnings.push('Cutting height is quite shallow. May not work well with thick dough.');
+    warnings.push('La altura de corte es bastante baja. Puede no funcionar bien con masa gruesa.');
   } else if (params.cuttingHeight > 20) {
-    warnings.push('Very tall cutting edge. Ensure your dough is thick enough.');
+    warnings.push('Filo de corte muy alto. Asegurate de que tu masa sea lo bastante gruesa.');
   }
 
   // Check taper angle
   if (params.taperAngle < 3) {
-    warnings.push('Low taper angle may make cookie removal difficult.');
+    warnings.push('Un ángulo de conicidad bajo puede dificultar sacar la galleta.');
   } else if (params.taperAngle > 15) {
-    warnings.push('High taper angle may make the cutter structurally weak.');
+    warnings.push('Un ángulo de conicidad alto puede debilitar estructuralmente el cortador.');
   }
 
   // Add recommendations
   if (params.wallThickness === 0.8) {
-    recommendations.push('Using 0.4mm nozzle: Set wall line count to 2 in slicer');
+    recommendations.push('Con boquilla de 0,4 mm: configurá 2 líneas de pared en el laminador');
   }
 
-  recommendations.push('Print upside down (cutting edge facing up)');
-  recommendations.push('Use PLA or PETG filament');
-  recommendations.push('Layer height: 0.2mm recommended');
-  recommendations.push('Infill: 20% with 2-3 perimeters');
+  recommendations.push('Imprimí boca abajo (con el filo de corte hacia arriba)');
+  recommendations.push('Usá filamento PLA o PETG');
+  recommendations.push('Altura de capa: se recomiendan 0,2 mm');
+  recommendations.push('Relleno: 20 % con 2-3 perímetros');
 
   if (params.enableEmbossing) {
-    recommendations.push('For embossing: Use 0.15-0.2mm layer height');
-    recommendations.push('Mirror text in your design for stamps');
+    recommendations.push('Para relieve: usá una altura de capa de 0,15-0,2 mm');
+    recommendations.push('Reflejá el texto en tu diseño para los sellos');
   }
 
   return {
@@ -188,7 +188,7 @@ function buildParamUpdate(
   if (candidate.totalHeight < requiredTotalHeight && explicitlyUpdatesTotalHeight) {
     throw new CutterGenerationError(
       'INVALID_PARAMS',
-      `The totalHeight parameter must be at least ${requiredTotalHeight} for the current cutting height and handle.`,
+      `El parámetro totalHeight debe ser al menos ${requiredTotalHeight} para la altura de corte y el asa actuales.`,
       { field: 'totalHeight', value: candidate.totalHeight }
     );
   }
@@ -197,7 +197,7 @@ function buildParamUpdate(
     if (requiredTotalHeight > GENERATION_LIMITS.maxTotalHeight) {
       throw new CutterGenerationError(
         'INVALID_PARAMS',
-        `The totalHeight required by this parameter update (${requiredTotalHeight}) exceeds the maximum totalHeight of ${GENERATION_LIMITS.maxTotalHeight}.`,
+        `El totalHeight requerido por esta actualización de parámetros (${requiredTotalHeight}) supera el totalHeight máximo de ${GENERATION_LIMITS.maxTotalHeight}.`,
         { field: 'totalHeight', value: requiredTotalHeight }
       );
     }

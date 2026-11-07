@@ -42,7 +42,7 @@ function exportFailure(
 function validatedManufacturingObject(object: THREE.Object3D): THREE.Group {
   const sourceReport = validatePrintableObject(object);
   if (!sourceReport.valid) {
-    exportFailure(`Export blocked: ${sourceReport.errors[0]}`, {
+    exportFailure(`Exportación bloqueada: ${sourceReport.errors[0]}`, {
       errors: sourceReport.errors,
       triangles: sourceReport.triangles,
       shells: sourceReport.shells,
@@ -55,7 +55,7 @@ function validatedManufacturingObject(object: THREE.Object3D): THREE.Group {
   const report = validatePrintableObject(manufacturingObject);
 
   if (!report.valid) {
-    exportFailure(`Export blocked: ${report.errors[0]}`, {
+    exportFailure(`Exportación bloqueada: ${report.errors[0]}`, {
       errors: report.errors,
       triangles: report.triangles,
       shells: report.shells,
@@ -69,7 +69,7 @@ function validatedManufacturingObject(object: THREE.Object3D): THREE.Group {
 
 function finiteCoordinate(value: number): number {
   if (!Number.isFinite(value)) {
-    exportFailure('The manufacturing model contains a non-finite coordinate.', {
+    exportFailure('El modelo de fabricación contiene una coordenada no finita.', {
       value
     });
   }
@@ -131,7 +131,7 @@ function collectModelMeshes(object: THREE.Object3D): ModelMesh[] {
   });
 
   if (meshes.length === 0) {
-    exportFailure('The manufacturing model contains no mesh.', {});
+    exportFailure('El modelo de fabricación no contiene ninguna malla.', {});
   }
 
   return meshes;

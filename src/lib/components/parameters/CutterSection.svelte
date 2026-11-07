@@ -14,7 +14,7 @@
 </script>
 
 <fieldset class="wall-profiles" aria-describedby="wall-profiles-hint">
-  <legend>Profil de paroi</legend>
+  <legend>Perfil de pared</legend>
   <div class="profile-options">
     {#each WALL_PROFILES as profile (profile.id)}
       <button
@@ -32,15 +32,15 @@
     {activeProfile?.label ?? 'Personnalisé'} · épaisseur {$params.wallThickness} mm · angle {$params.taperAngle}°
   </p>
   <p id="wall-profiles-hint" class="param-hint">
-    Ces profils règlent uniquement l’épaisseur et l’angle. Les hauteurs, la poignée et les ponts restent inchangés.
-    Ajustez librement les valeurs ci-dessous. Réglages indicatifs, sans certification de solidité ou de sécurité alimentaire.
+    Estos perfiles solo ajustan el espesor y el ángulo. Las alturas, el asa y los puentes no cambian.
+    Ajustá libremente los valores de abajo. Ajustes orientativos, sin certificación de solidez ni de seguridad alimentaria.
   </p>
 </fieldset>
 
 <div class="param-control">
   <label for="wallThickness">Épaisseur de la paroi : {$params.wallThickness} mm</label>
   <input id="wallThickness" data-field="wallThickness" type="range" min="0.6" max="2" step="0.1"
-    value={$params.wallThickness} aria-valuetext={`${$params.wallThickness} millimètres`}
+    value={$params.wallThickness} aria-valuetext={`${$params.wallThickness} milímetros`}
     aria-invalid={$parameterErrorField === 'wallThickness'} aria-describedby={describedBy('wallThickness')}
     oninput={(event) => updateParam('wallThickness', Number(event.currentTarget.value))} />
   <p id="wallThickness-hint" class="param-hint">0.6–2 mm · Recommandé : 0.8–1.2 mm.</p>
@@ -48,9 +48,9 @@
 </div>
 
 <div class="param-control">
-  <label for="cuttingHeight">Hauteur de découpe : {$params.cuttingHeight} mm</label>
+  <label for="cuttingHeight">Altura de corte: {$params.cuttingHeight} mm</label>
   <input id="cuttingHeight" data-field="cuttingHeight" type="range" min="8" max="25" step="1"
-    value={$params.cuttingHeight} aria-valuetext={`${$params.cuttingHeight} millimètres`}
+    value={$params.cuttingHeight} aria-valuetext={`${$params.cuttingHeight} milímetros`}
     aria-invalid={$parameterErrorField === 'cuttingHeight'} aria-describedby={describedBy('cuttingHeight')}
     oninput={(event) => updateParam('cuttingHeight', Number(event.currentTarget.value))} />
   <p id="cuttingHeight-hint" class="param-hint">8–25 mm · Recommandé : 10–15 mm.</p>
@@ -58,9 +58,9 @@
 </div>
 
 <div class="param-control">
-  <label for="totalHeight">Hauteur totale : {$params.totalHeight} mm</label>
+  <label for="totalHeight">Altura total: {$params.totalHeight} mm</label>
   <input id="totalHeight" data-field="totalHeight" type="range" min="15" max="40" step="1"
-    value={$params.totalHeight} aria-valuetext={`${$params.totalHeight} millimètres`}
+    value={$params.totalHeight} aria-valuetext={`${$params.totalHeight} milímetros`}
     aria-invalid={$parameterErrorField === 'totalHeight'} aria-describedby={describedBy('totalHeight')}
     oninput={(event) => updateParam('totalHeight', Number(event.currentTarget.value))} />
   <p id="totalHeight-hint" class="param-hint">15–40 mm · Doit inclure la paroi de découpe et la poignée active.</p>
@@ -73,7 +73,7 @@
     value={$params.taperAngle} aria-valuetext={`${$params.taperAngle} degrés`}
     aria-invalid={$parameterErrorField === 'taperAngle'} aria-describedby={describedBy('taperAngle')}
     oninput={(event) => updateParam('taperAngle', Number(event.currentTarget.value))} />
-  <p id="taperAngle-hint" class="param-hint">0–15° · Recommandé : 5–10° pour faciliter le démoulage.</p>
+  <p id="taperAngle-hint" class="param-hint">0–15° · Recomendado: 5–10° para facilitar el desmolde.</p>
   {#if $parameterErrorField === 'taperAngle' && $parameterError}<p id="taperAngle-error" class="param-error" role="alert">{$parameterError}</p>{/if}
 </div>
 

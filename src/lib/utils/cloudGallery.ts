@@ -37,7 +37,7 @@ export function getGalleryDesigns(): SavedDesign[] {
     const data = localStorage.getItem(STORAGE_KEY);
     return data ? JSON.parse(data) : getSeedDesigns();
   } catch (error) {
-    console.error('Error loading gallery:', error);
+    console.error('Error al cargar la galería:', error);
     return getSeedDesigns();
   }
 }
@@ -50,7 +50,7 @@ export function getUserDesigns(): SavedDesign[] {
     const data = localStorage.getItem(USER_DESIGNS_KEY);
     return data ? JSON.parse(data) : [];
   } catch (error) {
-    console.error('Error loading user designs:', error);
+    console.error('Error al cargar los diseños del usuario:', error);
     return [];
   }
 }
@@ -187,9 +187,9 @@ function getSeedDesigns(): SavedDesign[] {
     {
       metadata: {
         id: 'seed_1',
-        name: 'Classic Heart',
-        description: 'Perfect for Valentine\'s Day cookies',
-        author: 'Cookie Master',
+        name: 'Corazón clásico',
+        description: 'Ideal para galletas de San Valentín',
+        author: 'Maestro Galletero',
         createdAt: Date.now() - 86400000 * 7,
         updatedAt: Date.now() - 86400000 * 7,
         likes: 142,
@@ -220,9 +220,9 @@ function getSeedDesigns(): SavedDesign[] {
     {
       metadata: {
         id: 'seed_2',
-        name: 'Christmas Star',
-        description: 'Festive 5-point star for holiday baking',
-        author: 'Winter Baker',
+        name: 'Estrella navideña',
+        description: 'Estrella festiva de 5 puntas para hornear en fiestas',
+        author: 'Pastelero de Invierno',
         createdAt: Date.now() - 86400000 * 14,
         updatedAt: Date.now() - 86400000 * 14,
         likes: 98,
@@ -253,9 +253,9 @@ function getSeedDesigns(): SavedDesign[] {
     {
       metadata: {
         id: 'seed_3',
-        name: 'Flower Power',
-        description: 'Beautiful flower design for spring celebrations',
-        author: 'Flora Designer',
+        name: 'Poder floral',
+        description: 'Hermoso diseño de flor para celebrar la primavera',
+        author: 'Flora Diseñadora',
         createdAt: Date.now() - 86400000 * 3,
         updatedAt: Date.now() - 86400000 * 3,
         likes: 215,

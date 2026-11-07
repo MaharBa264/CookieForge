@@ -40,7 +40,7 @@ it('extracts a user-selected photographed coin without blur, auto object selecti
   const result = traceProcessedPhoto(processed);
   expect(result.diagnostics).toMatchObject({ width: 56, height: 55, components: 1, holes: 0, canApply: true });
   expect(result.diagnostics.filledHoles).toBeGreaterThan(0);
-  expect(result.diagnostics.warnings.join(' ')).toContain('comblement');
+  expect(result.diagnostics.warnings.join(' ')).toContain('relleno de agujeros');
   expect(result.svg).toContain('fill="rgb(0,0,0)"');
   expect(result.svg).not.toContain('fill="rgb(255,255,255)"');
   expect(result.svg.match(/<path\b/g)).toHaveLength(1);

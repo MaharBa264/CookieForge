@@ -6,7 +6,7 @@
   <div class="printability-info">
     {#if $printability.warnings.length > 0}
       <div class="warnings">
-        <h4>⚠️ Avertissements</h4>
+        <h4>⚠️ Advertencias</h4>
         <ul>
           {#each $printability.warnings as warning}
             <li>{warning}</li>
@@ -17,7 +17,7 @@
 
     {#if $printability.recommendations.length > 0}
       <div class="recommendations">
-        <h4>💡 Conseils d’impression</h4>
+        <h4>💡 Consejos de impresión</h4>
         <ul>
           {#each $printability.recommendations as recommendation}
             <li>{recommendation}</li>
@@ -28,8 +28,8 @@
 
     {#if $printability.isValid && $printability.warnings.length === 0}
       <div class="success">
-        <h4>✅ Prêt à imprimer</h4>
-        <p>Les paramètres de votre emporte-pièce semblent corrects !</p>
+        <h4>✅ Listo para imprimir</h4>
+        <p>¡Los parámetros de tu cortador se ven bien!</p>
       </div>
     {/if}
   </div>

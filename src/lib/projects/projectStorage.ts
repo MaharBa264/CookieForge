@@ -63,7 +63,7 @@ async function runStorageOperation<TResult>(
 
     throw new ProjectStorageError(
       operation,
-      `échec de l’opération.${describeCause(cause)}`,
+      `la operación falló.${describeCause(cause)}`,
       cause
     );
   }
@@ -76,7 +76,7 @@ function requireNonEmptyId(
   if (typeof id !== 'string' || id.trim().length === 0) {
     throw new ProjectStorageError(
       operation,
-      'l’identifiant du projet doit être une chaîne non vide.'
+      'el identificador del proyecto debe ser una cadena no vacía.'
     );
   }
 }
@@ -169,16 +169,16 @@ function openProjectDatabase(indexedDB: IDBFactory): Promise<IDBDatabase> {
         } catch {
           // L’échec d’upgrade initial reste la cause utile.
         }
-        fail(cause, 'La création du stockage IndexedDB a échoué.');
+        fail(cause, 'Falló la creación del almacenamiento IndexedDB.');
       }
     };
 
     request.onerror = () => {
-      fail(request.error, 'L’ouverture de la base IndexedDB a échoué.');
+      fail(request.error, 'Falló la apertura de la base IndexedDB.');
     };
 
     request.onblocked = () => {
-      fail(undefined, 'L’ouverture de la base IndexedDB est bloquée.');
+      fail(undefined, 'La apertura de la base IndexedDB está bloqueada.');
     };
 
     request.onsuccess = () => {
@@ -233,7 +233,7 @@ function runRequestTransaction<TResult>(
     };
 
     request.onerror = () => {
-      fail(request.error, 'La requête IndexedDB a échoué.');
+      fail(request.error, 'Falló la consulta a IndexedDB.');
     };
 
     transaction.onerror = () => {
@@ -322,7 +322,7 @@ export class IndexedDbProjectRecordBackend implements ProjectRecordBackend {
     if (this.#indexedDB === undefined) {
       return Promise.reject(
         new Error(
-          'IndexedDB est indisponible dans cet environnement ; aucun stockage projet natif ne peut être ouvert.'
+          'IndexedDB no está disponible en este entorno; no se puede abrir ningún almacenamiento nativo de proyectos.'
         )
       );
     }

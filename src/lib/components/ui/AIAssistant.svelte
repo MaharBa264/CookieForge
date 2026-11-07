@@ -64,7 +64,7 @@
     function handleAPIKeyChange() {
       apiKey = getAPIKey();
       if (showPanel && !apiKey) {
-        error = 'Configurez d’abord votre clé API Gemini';
+        error = 'Primero configurá tu clave de API de Gemini';
       } else if (apiKey) {
         error = '';
       }
@@ -83,7 +83,7 @@
     if (showPanel) {
       apiKey = getAPIKey();
       if (!apiKey) {
-        error = 'Configurez d’abord votre clé API Gemini';
+        error = 'Primero configurá tu clave de API de Gemini';
       }
     }
   }
@@ -95,7 +95,7 @@
     }
 
     if (!svgContent && !$pathData) {
-      error = 'Importez d’abord un dessin';
+      error = 'Primero importá un dibujo';
       return;
     }
 
@@ -110,7 +110,7 @@
       const result = await suggestDesignImprovements(dataToUse, params, apiKey);
       if (operation.current()) suggestions = result;
     } catch (err) {
-      if (operation.current()) error = err instanceof Error ? err.message : 'Impossible d’obtenir des suggestions';
+      if (operation.current()) error = err instanceof Error ? err.message : 'No se pudieron obtener sugerencias';
     } finally {
       if (operation.local()) isProcessing = false;
     }
@@ -134,15 +134,15 @@
       handoff(result, operation.validity);
       if (!operation.local()) return;
       // Show success message briefly
-      error = '✅ Analyse du SVG terminée ! Consultez la console du navigateur (F12) pour les recommandations d’optimisation.';
+      error = '✅ ¡Análisis del SVG terminado! Mirá la consola del navegador (F12) para ver las recomendaciones de optimización.';
       clearTimeout(successTimer);
       successTimer = setTimeout(() => {
         if (operation.local() && error.startsWith('✅')) error = '';
       }, 5000);
     } catch (err) {
       if (!operation.current()) return;
-      error = err instanceof Error ? err.message : 'Impossible d’analyser le SVG';
-      console.error('SVG Analysis error:', err);
+      error = err instanceof Error ? err.message : 'No se pudo analizar el SVG';
+      console.error('Error al analizar el SVG:', err);
     } finally {
       if (operation.local()) isProcessing = false;
     }
@@ -156,7 +156,7 @@
 
     const operation = beginOperation();
     if (!operation) return;
-    const description = prompt('Décrivez le dessin dont vous souhaitez des variantes :');
+    const description = prompt('Describí el dibujo del que querés variantes:');
     if (!description || !operation.current()) return;
 
     isProcessing = true;
@@ -167,7 +167,7 @@
       const result = await generateDesignVariations(description, apiKey);
       if (operation.current()) variations = result;
     } catch (err) {
-      if (operation.current()) error = err instanceof Error ? err.message : 'Impossible de générer des variantes';
+      if (operation.current()) error = err instanceof Error ? err.message : 'No se pudieron generar variantes';
     } finally {
       if (operation.local()) isProcessing = false;
     }
@@ -183,20 +183,20 @@
     aria-expanded={showPanel}
     aria-controls="ai-assistant-panel"
   >
-    🤖 Assistant IA {#if !apiKey}<span class="badge">Non connecté</span>{/if}
+    🤖 Asistente de IA {#if !apiKey}<span class="badge">Sin conectar</span>{/if}
   </button>
 
   {#if showPanel}
     <div class="ai-panel" id="ai-assistant-panel">
       <div class="panel-header">
-        <h3>🤖 Assistant IA de conception</h3>
-        <button class="close-btn" onclick={() => (showPanel = false)} aria-label="Fermer l’assistant IA">×</button>
+        <h3>🤖 Asistente de IA para el diseño</h3>
+        <button class="close-btn" onclick={() => (showPanel = false)} aria-label="Cerrar el asistente de IA">×</button>
       </div>
 
       {#if !apiKey}
         <div class="warning-box">
           <p><strong>⚠️ Clé API requise</strong></p>
-          <p>Configurez votre clé API Gemini dans les paramètres pour utiliser les fonctions IA.</p>
+          <p>Configurá tu clave de API de Gemini en los ajustes para usar las funciones de IA.</p>
         </div>
       {:else}
         <div class="tabs">
@@ -205,28 +205,28 @@
             class:active={activeTab === 'generate'}
             onclick={() => (activeTab = 'generate')}
           >
-            ✨ Générer
+            ✨ Generar
           </button>
           <button
             class="tab"
             class:active={activeTab === 'suggestions'}
             onclick={() => (activeTab = 'suggestions')}
           >
-            💡 Suggestions
+            💡 Sugerencias
           </button>
           <button
             class="tab"
             class:active={activeTab === 'optimize'}
             onclick={() => (activeTab = 'optimize')}
           >
-            ⚡ Analyser
+            ⚡ Analizar
           </button>
           <button
             class="tab"
             class:active={activeTab === 'variations'}
             onclick={() => (activeTab = 'variations')}
           >
-            🎨 Variations
+            🎨 Variantes
           </button>
         </div>
 
@@ -237,11 +237,11 @@
             </div>
           {:else if activeTab === 'suggestions'}
             <div class="tab-pane">
-              <p>Obtenez des suggestions de l’IA pour améliorer votre dessin avant l’impression 3D.</p>
+              <p>Obtené sugerencias de la IA para mejorar tu dibujo antes de la impresión 3D.</p>
 
               {#if !svgContent && !$pathData}
                 <div class="info-message">
-                  <p>⚠️ Importez d’abord un dessin pour obtenir des suggestions de l’IA.</p>
+                  <p>⚠️ Primero importá un dibujo para obtener sugerencias de la IA.</p>
                 </div>
               {/if}
 
@@ -250,12 +250,12 @@
                 onclick={getSuggestions}
                 disabled={isProcessing || (!svgContent && !$pathData)}
               >
-                {isProcessing ? 'Analyse…' : 'Obtenir des suggestions'}
+                {isProcessing ? 'Analizando…' : 'Obtener sugerencias'}
               </button>
 
               {#if suggestions.length > 0}
                 <div class="results">
-                  <h4>Suggestions :</h4>
+                  <h4>Sugerencias:</h4>
                   <ol>
                     {#each suggestions as suggestion}
                       <li>{suggestion}</li>
@@ -266,10 +266,10 @@
             </div>
           {:else if activeTab === 'optimize'}
             <div class="tab-pane">
-              <p>Obtenez une analyse de la complexité de votre SVG et des conseils d’optimisation par l’IA.</p>
+              <p>Obtené un análisis de la complejidad de tu SVG y consejos de optimización de la IA.</p>
 
               <div class="info-message" style="background: #e0f2fe; border-color: #0284c7; color: #0c4a6e;">
-                <p>ℹ️ <strong>Remarque :</strong> Cette fonction analyse votre SVG et affiche des conseils d’optimisation dans la console du navigateur. La modification directe du SVG par l’IA est expérimentale.</p>
+                <p>ℹ️ <strong>Nota:</strong> esta función analiza tu SVG y muestra consejos de optimización en la consola del navegador. La modificación directa del SVG por parte de la IA es experimental.</p>
               </div>
 
               <button
@@ -277,20 +277,20 @@
                 onclick={optimizeSVG}
                 disabled={isProcessing || !svgContent}
               >
-                {isProcessing ? 'Analyse…' : 'Analyser le SVG'}
+                {isProcessing ? 'Analizando…' : 'Analizar el SVG'}
               </button>
-              <p class="hint">Consultez la console du navigateur (F12) pour les recommandations détaillées.</p>
+              <p class="hint">Mirá la consola del navegador (F12) para ver las recomendaciones detalladas.</p>
             </div>
           {:else if activeTab === 'variations'}
             <div class="tab-pane">
-              <p>Générez des variantes créatives d’un dessin à partir d’une description.</p>
+              <p>Generá variantes creativas de un dibujo a partir de una descripción.</p>
               <button class="btn-primary" onclick={getVariations} disabled={isProcessing}>
-                {isProcessing ? 'Génération…' : 'Générer des variantes'}
+                {isProcessing ? 'Generando…' : 'Generar variantes'}
               </button>
 
               {#if variations.length > 0}
                 <div class="results">
-                  <h4>Variantes du dessin :</h4>
+                  <h4>Variantes del dibujo:</h4>
                   <ol>
                     {#each variations as variation}
                       <li>{variation}</li>

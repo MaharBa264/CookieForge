@@ -18,7 +18,7 @@ export function setTriangleWallThicknesses(
     values.length !== triangleCount ||
     values.some((value) => !Number.isFinite(value) || value <= 0)
   ) {
-    throw new Error('Wall-thickness metadata must contain one positive value per triangle.');
+    throw new Error('Los metadatos de espesor de pared deben contener un valor positivo por triángulo.');
   }
 
   geometry.userData[METADATA_KEY] = Object.freeze([...values]);
@@ -46,14 +46,14 @@ export function measureWallThicknessRange(
   values: ReadonlyArray<number>
 ): WallThicknessRange {
   if (values.length === 0) {
-    throw new Error('Cannot measure an empty wall-thickness collection.');
+    throw new Error('No se puede medir una colección vacía de espesores de pared.');
   }
 
   let min = Number.POSITIVE_INFINITY;
   let max = Number.NEGATIVE_INFINITY;
   for (const value of values) {
     if (!Number.isFinite(value) || value <= 0) {
-      throw new Error('Wall-thickness values must be positive and finite.');
+      throw new Error('Los valores de espesor de pared deben ser positivos y finitos.');
     }
     min = Math.min(min, value);
     max = Math.max(max, value);
@@ -75,13 +75,13 @@ export function wallThicknessColor(
   result = new THREE.Color()
 ): THREE.Color {
   if (!Number.isFinite(thickness) || thickness <= 0) {
-    throw new Error('Wall thickness must be positive and finite.');
+    throw new Error('El espesor de pared debe ser positivo y finito.');
   }
   if (!Number.isFinite(targetThickness) || targetThickness <= 0) {
-    throw new Error('Target wall thickness must be positive and finite.');
+    throw new Error('El espesor de pared objetivo debe ser positivo y finito.');
   }
   if (!Number.isFinite(maximumThickness) || maximumThickness < targetThickness) {
-    throw new Error('Maximum wall thickness must be finite and at least the target.');
+    throw new Error('El espesor de pared máximo debe ser finito y al menos igual al objetivo.');
   }
 
   if (thickness <= targetThickness) {
@@ -131,7 +131,7 @@ export function createWallThicknessColorAttribute(
   positions?: THREE.BufferAttribute | THREE.InterleavedBufferAttribute
 ): THREE.Float32BufferAttribute {
   if (positions && positions.count !== triangleThicknesses.length * 3) {
-    throw new Error('Non-indexed positions must contain three vertices per thickness value.');
+    throw new Error('Las posiciones sin índice deben contener tres vértices por valor de espesor.');
   }
   const colors = new Float32Array(triangleThicknesses.length * 9);
   const color = new THREE.Color();

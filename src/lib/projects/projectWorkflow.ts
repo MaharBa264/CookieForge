@@ -167,7 +167,7 @@ export function createProjectWorkflow(options: ProjectWorkflowOptions): ProjectW
     const ticket = begin('save');
     try {
       const doc = session.getDocument();
-      if (doc === null) throw new Error('Aucun document actif à sauvegarder.');
+      if (doc === null) throw new Error('No hay ningún documento activo para guardar.');
       // Parsing clones the whole persistent graph before entering the write queue.
       const snapshot = parseDesignDocument(doc);
       const encoded = encodeProject(snapshot);
@@ -306,7 +306,7 @@ export function createProjectWorkflow(options: ProjectWorkflowOptions): ProjectW
           if (!isCurrent(token)) return null;
           // A write accepted while waiting/reading also belongs before replacement.
           if (barrier !== writes) continue;
-          if (value === undefined) throw new Error('Projet introuvable.');
+          if (value === undefined) throw new Error('Proyecto no encontrado.');
           return { document: validate(value), barrier };
         }
         return null;
@@ -343,15 +343,15 @@ export function createProjectWorkflow(options: ProjectWorkflowOptions): ProjectW
             if (!isCurrent(token)) return null;
             if (barrier !== writes) continue;
             if (choice === 'copy') {
-              if (options.createId === undefined) throw new Error('Un générateur d’identifiant est requis pour copier.');
+              if (options.createId === undefined) throw new Error('Se requiere un generador de identificadores para copiar.');
               const id = options.createId();
-              if (id === document.id) throw new Error('La copie doit avoir un nouvel identifiant.');
+              if (id === document.id) throw new Error('La copia debe tener un identificador nuevo.');
               // Preserve valid source dates rather than inventing time from a clock.
               document = validate({ ...document, id });
               const copy = await read(() => storage.get(id));
               if (!isCurrent(token)) return null;
               if (barrier !== writes) continue;
-              if (copy !== undefined) throw new Error('L’identifiant de copie existe déjà.');
+              if (copy !== undefined) throw new Error('El identificador de la copia ya existe.');
             } else if (choice !== 'replace') return null;
           }
           return { document, barrier };
@@ -403,7 +403,7 @@ export function createProjectWorkflow(options: ProjectWorkflowOptions): ProjectW
       const ticket = begin('export');
       try {
         const doc = session.getDocument();
-        if (doc === null) throw new Error('Aucun document actif à exporter.');
+        if (doc === null) throw new Error('No hay ningún documento activo para exportar.');
         await (options.download ?? downloadProjectFile)(parseDesignDocument(doc));
         finish(ticket, capturedEpoch, 'export');
         return valid(capturedEpoch);

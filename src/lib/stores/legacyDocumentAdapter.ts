@@ -41,7 +41,7 @@ export function legacyParametersToDocument(value: unknown): LegacyDocumentParame
     if (!allowedKeys.has(key)) {
       throw new CutterGenerationError(
         'INVALID_PARAMS',
-        `The ${String(key)} parameter is not recognized.`,
+        `El parámetro ${String(key)} no es reconocido.`,
         { field: String(key) }
       );
     }

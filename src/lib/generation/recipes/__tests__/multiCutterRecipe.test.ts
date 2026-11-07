@@ -34,7 +34,7 @@ describe('multi-cutter recipe', () => {
     } finally { disposeObject3D(first.object); disposeObject3D(second.object); }
   }, 30000);
   it('refuses a small plate without returning a partial series', async () => {
-    await expect(generate(fixture(4, 2, 5, 100))).rejects.toThrow(/plate|plateau|layout|Grid/i);
+    await expect(generate(fixture(4, 2, 5, 100))).rejects.toThrow(/plataforma/i);
   }, 30000);
   it('preserves a connected island bridge in every generated copy', async () => {
     const base = fixture(2, 2, 5);

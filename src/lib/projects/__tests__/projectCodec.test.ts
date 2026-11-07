@@ -147,7 +147,7 @@ describe('codec projet portable V1', () => {
   });
 
   it('rejette le JSON invalide et toute enveloppe non objet', () => {
-    expectCodecError('{', '$', 'JSON invalide');
+    expectCodecError('{', '$', 'JSON inválido');
     for (const value of [null, [], 'projet', 1, true]) {
       expectCodecError(JSON.stringify(value), '$', 'objet');
     }
@@ -202,7 +202,7 @@ describe('codec projet portable V1', () => {
     expectCodecError(
       JSON.stringify({ format: PROJECT_FORMAT, version: 5, document: cutterDocument() }),
       'version',
-      'future'
+      'futura'
     );
     expectCodecError(
       JSON.stringify({
@@ -212,12 +212,12 @@ describe('codec projet portable V1', () => {
         futureMetadata: true
       }),
       'version',
-      'future'
+      'futura'
     );
     expectCodecError(
       JSON.stringify({ format: PROJECT_FORMAT, version: 0, document: cutterDocument() }),
       'version',
-      'inconnue'
+      'desconocida'
     );
   });
 

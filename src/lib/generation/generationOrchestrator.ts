@@ -40,13 +40,13 @@ export type GenerationOrchestratorErrorCode =
 function orchestratorErrorMessage(code: GenerationOrchestratorErrorCode): string {
   switch (code) {
     case 'DISPOSED':
-      return 'La génération ne peut plus être planifiée : l’orchestrateur est disposé.';
+      return 'La generación ya no se puede planificar: el orquestador fue liberado.';
     case 'INVALID_DOCUMENT':
-      return 'Le document de conception est invalide.';
+      return 'El documento de diseño es inválido.';
     case 'EMPTY_ARTIFACTS':
-      return 'La génération n’a produit aucun artefact.';
+      return 'La generación no produjo ningún resultado.';
     case 'ARTIFACT_DISPOSING':
-      return 'La génération a réutilisé un objet 3D dont la disposition est déjà engagée.';
+      return 'La generación reutilizó un objeto 3D cuya liberación ya está en curso.';
   }
 }
 

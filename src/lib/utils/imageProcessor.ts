@@ -8,18 +8,18 @@ export const MAX_RASTER_PIXELS = 16_000_000;
 export const MAX_RASTER_DIMENSION = 8192;
 
 function cancellationError(): DOMException {
-  return new DOMException('Image vectorization was cancelled.', 'AbortError');
+  return new DOMException('Se canceló la vectorización de la imagen.', 'AbortError');
 }
 
 export function validateRasterDimensions(width: number, height: number): void {
   if (!Number.isInteger(width) || !Number.isInteger(height) || width <= 0 || height <= 0) {
-    throw new Error('The raster image has invalid dimensions.');
+    throw new Error('La imagen de trama (raster) tiene dimensiones inválidas.');
   }
   if (width > MAX_RASTER_DIMENSION || height > MAX_RASTER_DIMENSION) {
-    throw new Error(`Raster dimensions must not exceed ${MAX_RASTER_DIMENSION} px per side.`);
+    throw new Error(`Las dimensiones de la imagen no deben superar los ${MAX_RASTER_DIMENSION} px por lado.`);
   }
   if (width * height > MAX_RASTER_PIXELS) {
-    throw new Error('Raster images are limited to 16 megapixels to protect memory and responsiveness.');
+    throw new Error('Las imágenes de trama están limitadas a 16 megapíxeles para proteger la memoria y la fluidez.');
   }
 }
 
@@ -33,7 +33,7 @@ function extractImageData(
   canvas.width = width;
   canvas.height = height;
   const context = canvas.getContext('2d', { willReadFrequently: true });
-  if (!context) throw new Error('Failed to create the raster decoding canvas.');
+  if (!context) throw new Error('No se pudo crear el lienzo para decodificar la imagen.');
   context.drawImage(source, 0, 0, width, height);
   return context.getImageData(0, 0, width, height);
 }
@@ -75,7 +75,7 @@ function decodeWithImageElement(file: File, signal?: AbortSignal): Promise<Image
     };
     image.onerror = () => {
       cleanup();
-      reject(new Error('Failed to decode the raster image.'));
+      reject(new Error('No se pudo decodificar la imagen.'));
     };
     signal?.addEventListener('abort', abort, { once: true });
     image.src = objectUrl;
@@ -108,7 +108,7 @@ export async function readFileAsText(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (event) => resolve(event.target?.result as string);
-    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.onerror = () => reject(new Error('No se pudo leer el archivo'));
     reader.readAsText(file);
   });
 }
@@ -118,7 +118,7 @@ export function cleanSVG(svgString: string): string {
   svgString = svgString.replace(/<\?xml[^?]*\?>/g, '');
   svgString = svgString.replace(/<!--[\s\S]*?-->/g, '');
   if (!svgString.includes('<svg')) {
-    throw new Error('Invalid SVG: No <svg> element found');
+    throw new Error('SVG inválido: no se encontró ningún elemento <svg>');
   }
   return svgString.trim();
 }

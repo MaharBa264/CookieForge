@@ -267,7 +267,7 @@ describe('stampRecipe', () => {
         {
           path: 'parameters',
           code: 'UNEXPECTED_VALIDATION_ERROR',
-          message: 'An unexpected error occurred while validating Stamp parameters.'
+          message: 'Ocurrió un error inesperado al validar los parámetros del sello.'
         }
       ]
     });
@@ -447,7 +447,7 @@ describe('stampRecipe', () => {
       code: 'INVALID_GEOMETRY',
       details: expect.objectContaining({
         errors: expect.arrayContaining([
-          'The printable object must contain a single connected shell.'
+          'El objeto imprimible debe contener una única cáscara conectada.'
         ])
       })
     });

@@ -12,12 +12,12 @@ function normalizedMime(value: string): ImageMime | null {
 
 /** MIME is authoritative when present. An image suffix never rescues a refused MIME. */
 export function validateImageFile(file: File): ImageMime {
-  if (file.size > MAX_IMAGE_BYTES) throw new Error('Image files must not exceed 10 MiB.');
+  if (file.size > MAX_IMAGE_BYTES) throw new Error('Los archivos de imagen no deben superar los 10 MiB.');
   const byExtension = extensionMime(file.name);
   const byMime = normalizedMime(file.type);
-  if (file.type && !byMime) throw new Error('Supported image formats: SVG, PNG, JPEG and WebP.');
+  if (file.type && !byMime) throw new Error('Formatos de imagen admitidos: SVG, PNG, JPEG y WebP.');
   const mime = byMime ?? byExtension;
-  if (!mime) throw new Error('Supported image formats: SVG, PNG, JPEG and WebP.');
-  if (byMime && byExtension && byMime !== byExtension) throw new Error('The image MIME type and file extension do not match.');
+  if (!mime) throw new Error('Formatos de imagen admitidos: SVG, PNG, JPEG y WebP.');
+  if (byMime && byExtension && byMime !== byExtension) throw new Error('El tipo MIME de la imagen y la extensión del archivo no coinciden.');
   return mime;
 }

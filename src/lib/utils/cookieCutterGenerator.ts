@@ -62,7 +62,7 @@ function assertWatertightGeometry(geometry: THREE.BufferGeometry): void {
   if (!positions || !index || index.count === 0 || index.count % 3 !== 0) {
     throw new CutterGenerationError(
       'INVALID_GEOMETRY',
-      'The generated cutter geometry is empty or incomplete.',
+      'La geometría del cortador generado está vacía o incompleta.',
       { field: 'geometry' }
     );
   }
@@ -86,7 +86,7 @@ function assertWatertightGeometry(geometry: THREE.BufferGeometry): void {
     if (edgeA.cross(edgeB).lengthSq() <= 1e-16) {
       throw new CutterGenerationError(
         'INVALID_GEOMETRY',
-        'The generated cutter contains a degenerate triangle.',
+        'El cortador generado contiene un triángulo degenerado.',
         { triangle: item / 3 }
       );
     }
@@ -103,7 +103,7 @@ function assertWatertightGeometry(geometry: THREE.BufferGeometry): void {
   if (invalidEdge) {
     throw new CutterGenerationError(
       'INVALID_GEOMETRY',
-      'The generated cutter surface is not watertight.',
+      'La superficie del cortador generado no es estanca.',
       { edge: invalidEdge[0], incidence: invalidEdge[1] }
     );
   }
@@ -117,7 +117,7 @@ function finalizeJoinedGeometry(
     if (!values) {
       throw new CutterGenerationError(
         'INVALID_GEOMETRY',
-        'A cutter segment is missing wall-thickness metadata.',
+        'A un segmento del cortador le faltan los metadatos de espesor de pared.',
         { field: 'wallThickness' }
       );
     }
@@ -135,7 +135,7 @@ function finalizeJoinedGeometry(
     if (!merged) {
       throw new CutterGenerationError(
         'INVALID_GEOMETRY',
-        'The cutter wall segments could not be merged.',
+        'No se pudieron unir los segmentos de pared del cortador.',
         { field: 'geometry' }
       );
     }
@@ -232,7 +232,7 @@ export function sourceDimension(
   if (!Number.isFinite(dimension) || dimension <= 0) {
     throw new CutterGenerationError(
       'INVALID_GEOMETRY',
-      'The artwork has no measurable planar dimension.',
+      'El dibujo no tiene ninguna dimensión plana medible.',
       { field: 'targetSize', sizeMode: mode }
     );
   }
@@ -320,7 +320,7 @@ async function buildFittedCutterGroup(
     if (!Number.isFinite(scale) || scale < SIZE_FIT_MIN_SCALE) {
       throw new CutterGenerationError(
         'INVALID_GEOMETRY',
-        'The requested physical size is too small for the selected wall and handle.',
+        'El tamaño físico pedido es demasiado pequeño para la pared y el asa elegidas.',
         { field: 'targetSize', targetSize: params.targetSize }
       );
     }
@@ -337,7 +337,7 @@ async function buildFittedCutterGroup(
     if (!Number.isFinite(measured) || measured <= 0) {
       throw new CutterGenerationError(
         'INVALID_GEOMETRY',
-        'The generated cutter has no measurable planar dimension.',
+        'El cortador generado no tiene ninguna dimensión plana medible.',
         { field: 'targetSize', measured }
       );
     }
@@ -347,7 +347,7 @@ async function buildFittedCutterGroup(
 
   throw new CutterGenerationError(
     'INVALID_GEOMETRY',
-    'The cutter could not converge to the requested physical size.',
+    'El cortador no pudo converger al tamaño físico pedido.',
     { field: 'targetSize', targetSize: params.targetSize, sizeMode: params.sizeMode }
   );
 }
@@ -362,7 +362,7 @@ function assertFitsBuildPlate(
   if (!Number.isFinite(size.x + size.y + size.z) || size.x <= 0 || size.y <= 0 || size.z <= 0) {
     throw new CutterGenerationError(
       'INVALID_GEOMETRY',
-      'The generated cutter has invalid dimensions.',
+      'El cortador generado tiene dimensiones inválidas.',
       { field: 'bounds' }
     );
   }
@@ -370,7 +370,7 @@ function assertFitsBuildPlate(
   if (size.x > params.buildPlateSize || size.z > params.buildPlateSize) {
     throw new CutterGenerationError(
       'INVALID_GEOMETRY',
-      'The cutter does not fit on the selected build plate. Reduce the target size or choose a larger plate.',
+      'El cortador no entra en la plataforma de impresión elegida. Reducí el tamaño objetivo o elegí una plataforma más grande.',
       {
         field: 'buildPlateSize',
         width: size.x,
@@ -408,7 +408,7 @@ export async function generateCookieCutter(
     if (Math.abs(centeredBounds.min.y) > 1e-5) {
       throw new CutterGenerationError(
         'INVALID_GEOMETRY',
-        'The cutter could not be placed on the build plane.',
+        'No se pudo ubicar el cortador en el plano de impresión.',
         { minY: centeredBounds.min.y }
       );
     }
@@ -431,7 +431,7 @@ export async function generateCookieCutter(
     if (error instanceof CutterGenerationError) throw error;
     throw new CutterGenerationError(
       'INVALID_GEOMETRY',
-      'The cutter geometry could not be generated safely.',
+      'No se pudo generar la geometría del cortador de forma segura.',
       { stage: 'generation' }
     );
   }

@@ -79,7 +79,7 @@ function selectedDimension(width: number, height: number, mode: SizeMode): numbe
   return Math.max(width, height);
 }
 
-function contourBounds(contours: ReadonlyArray<NormalizedContour>): Bounds2D {
+export function contourBounds(contours: ReadonlyArray<NormalizedContour>): Bounds2D {
   let minX = Number.POSITIVE_INFINITY;
   let minY = Number.POSITIVE_INFINITY;
   let maxX = Number.NEGATIVE_INFINITY;
@@ -97,7 +97,7 @@ function contourBounds(contours: ReadonlyArray<NormalizedContour>): Bounds2D {
   const width = maxX - minX;
   const height = maxY - minY;
   if (!Number.isFinite(width + height) || width <= 0 || height <= 0) {
-    generationError('INVALID_GEOMETRY', 'The stamp artwork has invalid dimensions.', {
+    generationError('INVALID_GEOMETRY', 'El dibujo del sello tiene dimensiones inválidas.', {
       field: 'targetSize'
     });
   }
@@ -124,7 +124,7 @@ function pointInPolygon(point: NormalizedPoint, polygon: NormalizedContour): boo
   return inside;
 }
 
-function contourDepths(contours: ReadonlyArray<NormalizedContour>): readonly number[] {
+export function contourDepths(contours: ReadonlyArray<NormalizedContour>): readonly number[] {
   return contours.map((contour, index) =>
     contours.reduce(
       (depth, candidate, candidateIndex) =>
@@ -134,7 +134,7 @@ function contourDepths(contours: ReadonlyArray<NormalizedContour>): readonly num
   );
 }
 
-function scaledContourPoints(
+export function scaledContourPoints(
   contour: NormalizedContour,
   bounds: Bounds2D,
   physicalScale: number
@@ -150,7 +150,7 @@ function scaledContourPoints(
   return normalized.map(({ x, y }) => [x, y]);
 }
 
-function createReliefRegion(
+export function createReliefRegion(
   contours: ReadonlyArray<NormalizedContour>,
   depths: readonly number[],
   bounds: Bounds2D,
@@ -180,7 +180,7 @@ function createReliefRegion(
   }
 
   if (regions.length === 0) {
-    generationError('NO_VALID_CONTOURS', 'The SVG contains no usable filled stamp region.', {
+    generationError('NO_VALID_CONTOURS', 'El SVG no contiene ninguna región de sello rellena utilizable.', {
       field: 'contours'
     });
   }
@@ -189,7 +189,7 @@ function createReliefRegion(
   geom2.validate(relief);
   return relief;
 }
-function createHandle(
+export function createHandle(
   style: HandleStyle,
   handleHeight: number,
   baseWidth: number,
@@ -292,7 +292,7 @@ function repairBooleanCapTriangles(solid: Geom3): Geom3 {
 
   if (boundaryEdges.length === 0) return solid;
   if (boundaryEdges.length > MAX_REPAIRABLE_TRIANGLE_COUNT * 3) {
-    throw new Error(`boolean repair refused ${boundaryEdges.length} unmatched edges`);
+    throw new Error(`la reparación booleana rechazó ${boundaryEdges.length} aristas sin pareja`);
   }
 
   const outgoing = new Map<string, DirectedEdge[]>();
@@ -303,7 +303,7 @@ function repairBooleanCapTriangles(solid: Geom3): Geom3 {
   }
   for (const [key, edges] of outgoing) {
     if (edges.length !== 1 || incoming.get(key) !== 1) {
-      throw new Error('boolean repair refused an ambiguous boundary');
+      throw new Error('la reparación booleana rechazó un borde ambiguo');
     }
   }
 
@@ -317,28 +317,28 @@ function repairBooleanCapTriangles(solid: Geom3): Geom3 {
     let edge = firstEdge;
     while (true) {
       if (!unused.delete(edge)) {
-        throw new Error('boolean repair refused a repeated boundary edge');
+        throw new Error('la reparación booleana rechazó una arista de borde repetida');
       }
       loop.push(edge.start);
       if (edge.endKey === firstEdge.startKey) break;
       const next = outgoing.get(edge.endKey)?.[0];
       if (!next || loop.length >= 3) {
-        throw new Error('boolean repair refused a non-triangular boundary');
+        throw new Error('la reparación booleana rechazó un borde no triangular');
       }
       edge = next;
     }
 
     if (loop.length !== 3) {
-      throw new Error('boolean repair refused a non-triangular boundary');
+      throw new Error('la reparación booleana rechazó un borde no triangular');
     }
     const topZ = loop[0][2];
     const isHorizontal = loop.every((vertex) => Math.abs(vertex[2] - topZ) <= Number.EPSILON);
     if (!isHorizontal || Math.abs(topZ - maximumZ) > Number.EPSILON) {
-      throw new Error('boolean repair refused a boundary outside the top cap');
+      throw new Error('la reparación booleana rechazó un borde fuera de la tapa superior');
     }
     const area = triangleArea(loop);
     if (!Number.isFinite(area) || area <= TRIANGLE_EPSILON || area > MAX_REPAIRABLE_TRIANGLE_AREA) {
-      throw new Error(`boolean repair refused a ${area} mm² triangle`);
+      throw new Error(`la reparación booleana rechazó un triángulo de ${area} mm²`);
     }
 
     repairs.push(poly3.create([loop[0], loop[2], loop[1]]));
@@ -352,7 +352,7 @@ function repairBooleanCapTriangles(solid: Geom3): Geom3 {
 /** Connect boolean T-junctions before snapping can move them off a shared edge.
  * Use public JSCAD operations only; never fill holes or apply the legacy cap repair.
  */
-function generalizeConnectedSolid(solid: Geom3): Geom3 {
+export function generalizeConnectedSolid(solid: Geom3): Geom3 {
   const canonical = geom3.create(geom3.toPolygons(solid).map(polygon => poly3.create(
     polygon.vertices.map(vertex => vertex.map(value =>
       Math.round(value * BOOLEAN_VERTEX_PRECISION) / BOOLEAN_VERTEX_PRECISION) as Vec3)
@@ -366,8 +366,8 @@ function generalizeConnectedSolid(solid: Geom3): Geom3 {
 /** Restore only known construction planes within JSCAD's own snap epsilon.
  * No faces are filled, removed or repaired; shared vertices retain identical Z.
  */
-function restoreRecessDepthPlanes(solid: Geom3, planes: readonly number[], epsilon: number): Geom3 {
-  if (!Number.isFinite(epsilon) || epsilon <= 0) throw new Error('Invalid depth-plane precision.');
+export function restoreRecessDepthPlanes(solid: Geom3, planes: readonly number[], epsilon: number): Geom3 {
+  if (!Number.isFinite(epsilon) || epsilon <= 0) throw new Error('Precisión de plano de profundidad inválida.');
   return geom3.create(geom3.toPolygons(solid).map(polygon => poly3.create(polygon.vertices.map(vertex => {
     const plane = planes.find(value => Math.abs(vertex[2] - value) <= epsilon);
     return [vertex[0], vertex[1], plane ?? vertex[2]] as Vec3;
@@ -377,7 +377,7 @@ function restoreRecessDepthPlanes(solid: Geom3, planes: readonly number[], epsil
 /** Successful legacy unions remain byte-stable. A rejected topology is rebuilt
  * from the same boolean solid, without extending the cap-hole repair contract.
  */
-function finalizeRaisedSolid(solid: Geom3, planes: readonly number[]): Geom3 {
+export function finalizeRaisedSolid(solid: Geom3, planes: readonly number[]): Geom3 {
   try {
     const legacy = repairBooleanCapTriangles(
       generalizeSolid({ snap: true, simplify: true, triangulate: true }, solid));
@@ -391,7 +391,7 @@ function finalizeRaisedSolid(solid: Geom3, planes: readonly number[]): Geom3 {
   }
 }
 
-function triangulateSolid(solid: Geom3): THREE.BufferGeometry {
+export function triangulateSolid(solid: Geom3): THREE.BufferGeometry {
   const positions: number[] = [];
   const first = new THREE.Vector3();
   const second = new THREE.Vector3();
@@ -428,7 +428,7 @@ function triangulateSolid(solid: Geom3): THREE.BufferGeometry {
   }
 
   if (positions.length === 0) {
-    generationError('INVALID_GEOMETRY', 'The stamp boolean result contains no triangles.', {
+    generationError('INVALID_GEOMETRY', 'El resultado booleano del sello no contiene triángulos.', {
       field: 'geometry'
     });
   }
@@ -451,15 +451,15 @@ export async function generateStamp(
 ): Promise<THREE.Group> {
   const params = validateCookieCutterParams(paramsValue);
   if (imprintMode !== 'raised' && imprintMode !== 'recessed') {
-    generationError('INVALID_PARAMS', 'Unknown stamp imprint mode.', { field: 'imprintMode' });
+    generationError('INVALID_PARAMS', 'Modo de impronta de sello desconocido.', { field: 'imprintMode' });
   }
   if (imprintMode === 'recessed' && params.stampDepth > STAMP_IMPRINT_LIMITS.maximumRecessDepthMm) {
-    generationError('INVALID_PARAMS', 'The recessed stamp depth must not exceed 3 mm; at least 1 mm of the 4 mm base must remain.', { field: 'stampDepth', value: params.stampDepth });
+    generationError('INVALID_PARAMS', 'La profundidad del sello hundido no debe superar los 3 mm; debe quedar al menos 1 mm de la base de 4 mm.', { field: 'stampDepth', value: params.stampDepth });
   }
   if (!params.stampBase) {
     generationError(
       'INVALID_PARAMS',
-      'A printable stamp requires a base connecting every relief region.',
+      'Un sello imprimible requiere una base que conecte todas las regiones de relieve.',
       { field: 'stampBase', value: false }
     );
   }
@@ -474,7 +474,7 @@ export async function generateStamp(
     if (!Number.isFinite(physicalScale) || physicalScale <= 0) {
       generationError(
         'INVALID_PARAMS',
-        'The requested stamp size is too small for its base padding.',
+        'El tamaño de sello pedido es demasiado pequeño para el margen de su base.',
         { field: 'targetSize', targetSize: params.targetSize }
       );
     }
@@ -484,7 +484,7 @@ export async function generateStamp(
     if (baseWidth > params.buildPlateSize || baseDepth > params.buildPlateSize) {
       generationError(
         'INVALID_GEOMETRY',
-        'The stamp does not fit on the selected build plate.',
+        'El sello no entra en la plataforma de impresión elegida.',
         {
           field: 'buildPlateSize',
           width: baseWidth,
@@ -530,7 +530,7 @@ export async function generateStamp(
       const report = validatePrintableObject(group, { requireSingleShell: true });
       if (!report.valid) {
         geometry.dispose(); material.dispose();
-        generationError('INVALID_GEOMETRY', 'The generated stamp is not one printable solid.', { field: 'geometry', errors: report.errors });
+        generationError('INVALID_GEOMETRY', 'El sello generado no es un único sólido imprimible.', { field: 'geometry', errors: report.errors });
       }
       return group;
     }
@@ -548,7 +548,7 @@ export async function generateStamp(
       const size = new THREE.Box3().setFromObject(group).getSize(new THREE.Vector3());
       if (!activeHandle && (Math.abs(size.x - baseWidth) > 0.001 || Math.abs(size.z - baseDepth) > 0.001)) {
         group.traverse(child => { if (child instanceof THREE.Mesh) { child.geometry.dispose(); (child.material as THREE.Material).dispose(); } });
-        throw new Error('Boolean snapping exceeds the dimensional precision.');
+        throw new Error('El ajuste booleano supera la precisión dimensional.');
       }
       group.userData.geometryRoute = 'boolean';
     } catch (error) {
@@ -573,11 +573,11 @@ export async function generateStamp(
     return group;
   } catch (error) {
     if (error instanceof CutterGenerationError) throw error;
-    const rawReason = error instanceof Error ? error.message : 'Unknown geometry error';
+    const rawReason = error instanceof Error ? error.message : 'Error de geometría desconocido';
     const reason = rawReason.length > 500 ? `${rawReason.slice(0, 500)}…` : rawReason;
     throw new CutterGenerationError(
       'INVALID_GEOMETRY',
-      `The stamp geometry could not be generated safely: ${reason}`,
+      `No se pudo generar la geometría del sello de forma segura: ${reason}`,
       {
         stage: 'stamp',
         reason

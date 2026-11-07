@@ -19,7 +19,7 @@ export async function readProjectFile(
   options: MigrationV0ToV1Options = {}
 ): Promise<DecodedProject> {
   if (file.size > MAX_PROJECT_FILE_BYTES) {
-    throw new RangeError('La taille du fichier projet dépasse la limite de 10 Mio.');
+    throw new RangeError('El tamaño del archivo de proyecto supera el límite de 10 MiB.');
   }
   return decodeProject(await file.text(), options);
 }

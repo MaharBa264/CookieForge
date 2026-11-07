@@ -20,27 +20,27 @@
       const parsed = parseMultiCutterDocument({ ...current, schemaVersion: 3, kind: 'multi-cutter',
         bridges: current.schemaVersion === 1 ? [] : current.bridges, layout: { copies, columns, spacingMm } });
       onUpdateSeries(parsed.layout); seriesError = null;
-    } catch (cause) { seriesError = cause instanceof Error ? cause.message : 'Réglages de série invalides.'; }
+    } catch (cause) { seriesError = cause instanceof Error ? cause.message : 'Ajustes de serie inválidos.'; }
   }
 </script>
 <section class="cutter-series" aria-labelledby="series-title">
   <h3 id="series-title">Série enregistrable</h3>
-  <p id="series-help">Copies séparées du même emporte-pièce, sans connexion entre elles. Dessin, paroi, poignée et ponts conservés. Réglez puis appliquez ; ouvrir ce panneau ne modifie rien.</p>
+  <p id="series-help">Copias separadas del mismo cortador, sin conexión entre sí. Se conservan el dibujo, la pared, el asa y los puentes. Réglez puis appliquez ; ouvrir ce panneau ne modifie rien.</p>
   {#if currentDocument?.kind === 'cutter' || currentDocument?.kind === 'multi-cutter'}
     <div class="series-fields">
-      <label for="series-copies">Copies (1–24)<input id="series-copies" type="number" min="1" max="24" step="1" bind:value={copies} aria-invalid={seriesError !== null} aria-describedby="series-help series-error" /></label>
-      <label for="series-columns">Colonnes<input id="series-columns" type="number" min="1" max={copies} step="1" bind:value={columns} aria-invalid={seriesError !== null} aria-describedby="series-help series-error" /></label>
-      <label for="series-spacing">Espacement (mm)<input id="series-spacing" type="number" min="0.5" max="40" step="0.5" bind:value={spacingMm} aria-invalid={seriesError !== null} aria-describedby="series-help series-error" /></label>
+      <label for="series-copies">Copias (1–24)<input id="series-copies" type="number" min="1" max="24" step="1" bind:value={copies} aria-invalid={seriesError !== null} aria-describedby="series-help series-error" /></label>
+      <label for="series-columns">Columnas<input id="series-columns" type="number" min="1" max={copies} step="1" bind:value={columns} aria-invalid={seriesError !== null} aria-describedby="series-help series-error" /></label>
+      <label for="series-spacing">Separación (mm)<input id="series-spacing" type="number" min="0.5" max="40" step="0.5" bind:value={spacingMm} aria-invalid={seriesError !== null} aria-describedby="series-help series-error" /></label>
     </div>
     <p>Lignes calculées : {Number.isFinite(copies / columns) ? Math.ceil(copies / columns) : '—'}. Plateau : {currentDocument.parameters.buildPlateSize} × {currentDocument.parameters.buildPlateSize} mm.</p>
     <p id="series-error" role={seriesError ? 'alert' : undefined}>{seriesError ?? ''}</p>
-    <button type="button" data-apply-series on:click={applySeries}>{currentDocument.kind === 'multi-cutter' ? 'Appliquer la série' : 'Créer la série'}</button>
+    <button type="button" data-apply-series on:click={applySeries}>{currentDocument.kind === 'multi-cutter' ? 'Aplicar la serie' : 'Crear la serie'}</button>
     {#if currentDocument.kind === 'multi-cutter'}
-      <p role="status" data-series-active>{currentDocument.layout.copies} copies actives · {currentDocument.layout.columns} colonnes · {currentDocument.layout.spacingMm} mm. Sauvegardez dans Projets locaux ; exportez la géométrie lorsque la génération est valide.</p>
-      <button type="button" data-single-cutter on:click={() => onSingleCutter?.()}>Revenir à l’emporte-pièce unique</button>
+      <p role="status" data-series-active>{currentDocument.layout.copies} copias activas · {currentDocument.layout.columns} columnas · {currentDocument.layout.spacingMm} mm. Guardá en Proyectos locales; exportá la geometría cuando la generación sea válida.</p>
+      <button type="button" data-single-cutter on:click={() => onSingleCutter?.()}>Volver al cortador único</button>
     {/if}
-    <p>Limite : 500 000 triangles. Plateau trop petit ou emporte-pièce incomplet : export bloqué, sans réparation automatique.</p>
-  {:else}<p role="status">Ouvrez ou créez un emporte-pièce pour préparer une série. Le tampon n’est pas pris en charge dans cette tranche.</p>{/if}
+    <p>Límite: 500 000 triángulos. Si la plataforma es muy chica o el cortador está incompleto, la exportación se bloquea, sin reparación automática.</p>
+  {:else}<p role="status">Abrí o creá un cortador para preparar una serie. El sello no está soportado en esta etapa.</p>{/if}
 </section>
 <style>
   .cutter-series { min-width: 0; padding: var(--spacing-4); border: 1px solid var(--border-default); border-radius: var(--radius-lg); background: var(--surface-card); color: var(--text-primary); }

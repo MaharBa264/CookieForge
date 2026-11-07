@@ -135,7 +135,7 @@ describe('batch planning helpers', () => {
       100
     );
     expect(result.fits).toBe(false);
-    expect(result.warnings[0]).toMatch(/requires/i);
+    expect(result.warnings[0]).toMatch(/requiere/i);
   });
 
   it('creates defensive duplicate parameter objects and bounds the count', () => {
@@ -143,6 +143,6 @@ describe('batch planning helpers', () => {
     const duplicates = duplicateItem(source, 2);
     expect(duplicates).toHaveLength(2);
     expect(duplicates[0].params).not.toBe(source.params);
-    expect(() => duplicateItem(source, 101)).toThrow(/between 0 and 100/i);
+    expect(() => duplicateItem(source, 101)).toThrow(/entre 0 y 100/i);
   });
 });

@@ -101,7 +101,7 @@ function childPath(parent: string, key: string): string {
 
 function requireRecord(value: unknown, path: string): UnknownRecord {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) {
-    invalid(path, 'doit être un objet.');
+    invalid(path, 'debe ser un objeto.');
   }
 
   return value as UnknownRecord;
@@ -116,16 +116,16 @@ function requireExactKeys(
 
   for (const key of expectedKeys) {
     if (!Object.prototype.hasOwnProperty.call(record, key)) {
-      invalid(childPath(path, key), 'est requis.');
+      invalid(childPath(path, key), 'es obligatorio.');
     }
   }
 
   for (const key of Reflect.ownKeys(record)) {
     if (typeof key !== 'string') {
-      invalid(path.length === 0 ? '$' : path, 'contient une propriété symbole inconnue.');
+      invalid(path.length === 0 ? '$' : path, 'contiene una propiedad de tipo símbolo desconocida.');
     }
     if (!expected.has(key)) {
-      invalid(childPath(path, key), "n'est pas un champ reconnu.");
+      invalid(childPath(path, key), "no es un campo reconocido.");
     }
   }
 }
@@ -139,7 +139,7 @@ function readNonEmptyString(
   const path = childPath(parentPath, key);
 
   if (typeof value !== 'string' || value.trim().length === 0) {
-    invalid(path, 'doit être une chaîne non vide.');
+    invalid(path, 'debe ser una cadena no vacía.');
   }
 
   return value;
@@ -152,7 +152,7 @@ function readBoolean(
 ): boolean {
   const value = record[key];
   if (typeof value !== 'boolean') {
-    invalid(childPath(parentPath, key), 'doit être un booléen.');
+    invalid(childPath(parentPath, key), 'debe ser un booleano.');
   }
   return value;
 }
@@ -164,7 +164,7 @@ function readFiniteNumber(
 ): number {
   const value = record[key];
   if (typeof value !== 'number' || !Number.isFinite(value)) {
-    invalid(childPath(parentPath, key), 'doit être un nombre fini.');
+    invalid(childPath(parentPath, key), 'debe ser un número finito.');
   }
   return value;
 }
@@ -226,7 +226,7 @@ function readIsoTimestamp(
 ): { value: string; epochMilliseconds: number } {
   const value = record[key];
   if (typeof value !== 'string' || !isValidIsoTimestamp(value)) {
-    invalid(key, 'doit être un horodatage ISO 8601 valide avec fuseau horaire.');
+    invalid(key, 'debe ser una marca de tiempo ISO 8601 válida con huso horario.');
   }
 
   return { value, epochMilliseconds: Date.parse(value) };
@@ -239,7 +239,7 @@ function readRasterMimeType(record: UnknownRecord): RasterMimeType {
     value !== 'image/jpeg' &&
     value !== 'image/webp'
   ) {
-    invalid('source.mimeType', 'doit être image/png, image/jpeg ou image/webp.');
+    invalid('source.mimeType', 'debe ser image/png, image/jpeg o image/webp.');
   }
   return value;
 }
@@ -273,7 +273,7 @@ function parseSource(value: unknown): DesignSource {
     };
   }
 
-  invalid('source.type', 'doit être svg ou raster.');
+  invalid('source.type', 'debe ser svg o raster.');
 }
 
 function parseSketch(value: unknown): SketchDocument {
@@ -282,7 +282,7 @@ function parseSketch(value: unknown): SketchDocument {
   const revision = readFiniteNumber(record, 'revision', 'sketch');
 
   if (!Number.isSafeInteger(revision) || revision < 0) {
-    invalid('sketch.revision', 'doit être un entier positif ou nul.');
+    invalid('sketch.revision', 'debe ser un entero positivo o cero.');
   }
 
   return {
@@ -314,7 +314,7 @@ function readParameterEnum<TValue extends string>(
   ) {
     invalid(
       childPath('parameters', key),
-      `doit être une des valeurs suivantes : ${allowedValues.join(', ')}.`
+      `debe ser uno de los siguientes valores: ${allowedValues.join(', ')}.`
     );
   }
   return value as TValue;
@@ -328,7 +328,7 @@ function requireParameterRange(
   if (value < limits.minimum || value > limits.maximum) {
     invalid(
       childPath('parameters', key),
-      `doit être compris entre ${limits.minimum} et ${limits.maximum}, bornes incluses.`
+      `debe estar entre ${limits.minimum} y ${limits.maximum}, ambos incluidos.`
     );
   }
 }
@@ -418,12 +418,12 @@ function parseParameters(
 function parseCutterParameters(value: unknown): CutterDesignParameters {
   const parameters = parseParameters(value);
   if (parameters.mode !== 'cutter') {
-    invalid('parameters.mode', 'doit être cutter lorsque kind vaut cutter.');
+    invalid('parameters.mode', 'debe ser cutter cuando kind es cutter.');
   }
   if (parameters.totalHeight < parameters.cuttingHeight) {
     invalid(
       'parameters.totalHeight',
-      'doit être supérieur ou égal à parameters.cuttingHeight pour un Cutter.'
+      'debe ser mayor o igual que parameters.cuttingHeight en un cortador.'
     );
   }
   if (
@@ -434,7 +434,7 @@ function parseCutterParameters(value: unknown): CutterDesignParameters {
   ) {
     invalid(
       'parameters.totalHeight',
-      'doit être supérieur ou égal à parameters.cuttingHeight + parameters.handleHeight lorsque la poignée est active.'
+      'debe ser mayor o igual que parameters.cuttingHeight + parameters.handleHeight cuando el asa está activa.'
     );
   }
   return parameters;
@@ -443,12 +443,12 @@ function parseCutterParameters(value: unknown): CutterDesignParameters {
 function parseStampParameters(value: unknown): StampDesignParameters {
   const parameters = parseParameters(value);
   if (parameters.mode !== 'stamp') {
-    invalid('parameters.mode', 'doit être stamp lorsque kind vaut stamp.');
+    invalid('parameters.mode', 'debe ser stamp cuando kind es stamp.');
   }
   if (!parameters.stampBase) {
     invalid(
       'parameters.stampBase',
-      'doit valoir true pour relier toutes les zones de relief en mode Stamp.'
+      'debe valer true para unir todas las zonas de relieve en modo Stamp.'
     );
   }
   return parameters;
@@ -456,7 +456,7 @@ function parseStampParameters(value: unknown): StampDesignParameters {
 
 
 function assertUnreachable(value: never): never {
-  invalid('kind', `kind non pris en charge: ${String(value)}.`);
+  invalid('kind', `el tipo (kind) no es compatible: ${String(value)}.`);
 }
 
 export function parseDesignDocumentV1(value: unknown): DesignDocumentV1 {
@@ -464,16 +464,16 @@ export function parseDesignDocumentV1(value: unknown): DesignDocumentV1 {
   requireExactKeys(record, '', DOCUMENT_KEYS);
 
   if (record.schemaVersion !== 1) {
-    invalid('schemaVersion', 'doit être exactement 1.');
+    invalid('schemaVersion', 'debe ser exactamente 1.');
   }
 
   const id = readNonEmptyString(record, 'id', '');
   const name = readNonEmptyString(record, 'name', '');
   if (!isDesignKind(record.kind)) {
-    invalid('kind', "n'est pas un type de design reconnu.");
+    invalid('kind', "no es un tipo de diseño reconocido.");
   }
   if (record.kind !== 'cutter' && record.kind !== 'stamp') {
-    invalid('kind', 'est un type de design reconnu mais pas encore implémenté.');
+    invalid('kind', 'es un tipo de diseño reconocido pero todavía no implementado.');
   }
   const kind = record.kind;
   const source = parseSource(record.source);
@@ -483,7 +483,7 @@ export function parseDesignDocumentV1(value: unknown): DesignDocumentV1 {
   const updatedAt = readIsoTimestamp(record, 'updatedAt');
 
   if (updatedAt.epochMilliseconds < createdAt.epochMilliseconds) {
-    invalid('updatedAt', 'doit être postérieur ou égal à createdAt.');
+    invalid('updatedAt', 'debe ser posterior o igual a createdAt.');
   }
 
   const base = {
@@ -531,9 +531,9 @@ function parseBridgePoint(value: unknown, path: string): Bridge['from'] {
 }
 
 function parseBridges(value: unknown, kind: DesignDocument['kind']): readonly Bridge[] {
-  if (!Array.isArray(value)) invalid('bridges', 'doit être un tableau.');
-  if (value.length > BRIDGE_LIMITS.maxCount) invalid('bridges', 'trop de ponts.');
-  if (kind !== 'cutter' && value.length > 0) invalid('bridges', 'réservé aux emporte-pièces.');
+  if (!Array.isArray(value)) invalid('bridges', 'debe ser un arreglo.');
+  if (value.length > BRIDGE_LIMITS.maxCount) invalid('bridges', 'demasiados puentes.');
+  if (kind !== 'cutter' && value.length > 0) invalid('bridges', 'reservado a los cortadores.');
   const ids = new Set<string>();
   return value.map((item: unknown, index: number) => {
     const path = `bridges.${index}`;
@@ -544,10 +544,10 @@ function parseBridges(value: unknown, kind: DesignDocument['kind']): readonly Br
     ids.add(id);
     const from = parseBridgePoint(record.from, `${path}.from`);
     const to = parseBridgePoint(record.to, `${path}.to`);
-    if (Math.hypot(from.x - to.x, from.y - to.y) < 0.001) invalid(`${path}.to`, 'les extrémités doivent être distinctes.');
+    if (Math.hypot(from.x - to.x, from.y - to.y) < 0.001) invalid(`${path}.to`, 'los extremos deben ser distintos.');
     const widthMm = readFiniteNumber(record, 'widthMm', path);
     if (widthMm < BRIDGE_LIMITS.minWidthMm || widthMm > BRIDGE_LIMITS.maxWidthMm) {
-      invalid(`${path}.widthMm`, 'largeur physique hors limites.');
+      invalid(`${path}.widthMm`, 'ancho físico fuera de los límites.');
     }
     return { id, from, to, widthMm };
   });
@@ -556,7 +556,7 @@ function parseBridges(value: unknown, kind: DesignDocument['kind']): readonly Br
 /** V2 is strict, reconstructs every value, and never mutates the input. */
 export function parseDesignDocumentV2(value: unknown): DesignDocumentV2 {
   const record = requireRecord(value, '$');
-  if (record.schemaVersion !== 2) invalid('schemaVersion', 'doit être exactement 2.');
+  if (record.schemaVersion !== 2) invalid('schemaVersion', 'debe ser exactamente 2.');
   requireExactKeys(record, '', V2_DOCUMENT_KEYS);
   const { bridges: rawBridges, ...legacyFields } = record;
   const base = parseDesignDocumentV1({ ...legacyFields, schemaVersion: 1 });
@@ -568,37 +568,37 @@ export function parseDesignDocumentV2(value: unknown): DesignDocumentV2 {
 /** Strict V3 input; reuse frozen V2 Cutter fields rather than loosening legacy parsers. */
 export function parseMultiCutterDocument(value: unknown): import('./designDocument').MultiCutterDocument {
   const record = requireRecord(value, '$');
-  if (record.schemaVersion !== 3) invalid('schemaVersion', 'doit être exactement 3.');
-  if (record.kind !== 'multi-cutter') invalid('kind', 'doit être multi-cutter en V3.');
+  if (record.schemaVersion !== 3) invalid('schemaVersion', 'debe ser exactamente 3.');
+  if (record.kind !== 'multi-cutter') invalid('kind', 'debe ser multi-cutter en V3.');
   requireExactKeys(record, '', [...V2_DOCUMENT_KEYS, 'layout']);
   const { layout: rawLayout, ...fields } = record;
   const base = parseDesignDocumentV2({ ...fields, schemaVersion: 2, kind: 'cutter' });
-  if (base.kind !== 'cutter') invalid('kind', 'Cutter requis.');
+  if (base.kind !== 'cutter') invalid('kind', 'Se requiere un cortador.');
   const layout = requireRecord(rawLayout, 'layout');
   requireExactKeys(layout, 'layout', ['copies', 'columns', 'spacingMm']);
   const copies = readFiniteNumber(layout, 'copies', 'layout');
   const columns = readFiniteNumber(layout, 'columns', 'layout');
   const spacingMm = readFiniteNumber(layout, 'spacingMm', 'layout');
-  if (!Number.isInteger(copies) || copies < 1 || copies > CUTTER_SERIES_LIMITS.maxCopies) invalid('layout.copies', 'entier de 1 à 24 requis.');
-  if (!Number.isInteger(columns) || columns < 1 || columns > copies) invalid('layout.columns', 'entier de 1 au nombre de copies requis.');
-  if (spacingMm < CUTTER_SERIES_LIMITS.minSpacingMm || spacingMm > CUTTER_SERIES_LIMITS.maxSpacingMm) invalid('layout.spacingMm', 'espacement de 0,5 à 40 mm requis.');
+  if (!Number.isInteger(copies) || copies < 1 || copies > CUTTER_SERIES_LIMITS.maxCopies) invalid('layout.copies', 'se requiere un entero de 1 a 24.');
+  if (!Number.isInteger(columns) || columns < 1 || columns > copies) invalid('layout.columns', 'se requiere un entero de 1 hasta la cantidad de copias.');
+  if (spacingMm < CUTTER_SERIES_LIMITS.minSpacingMm || spacingMm > CUTTER_SERIES_LIMITS.maxSpacingMm) invalid('layout.spacingMm', 'se requiere una separación de 0,5 a 40 mm.');
   return { ...base, schemaVersion: 3, kind: 'multi-cutter', layout: { copies, columns, spacingMm } };
 }
 
 /** Strict V4 stamp; all historical fields retain the exact V2 validation rules. */
 export function parseStampDocumentV4(value: unknown): import('./designDocument').StampDocumentV4 {
   const record = requireRecord(value, '$');
-  if (record.schemaVersion !== 4) invalid('schemaVersion', 'doit être exactement 4.');
-  if (record.kind !== 'stamp') invalid('kind', 'doit être stamp en V4.');
+  if (record.schemaVersion !== 4) invalid('schemaVersion', 'debe ser exactamente 4.');
+  if (record.kind !== 'stamp') invalid('kind', 'debe ser stamp en V4.');
   requireExactKeys(record, '', [...V2_DOCUMENT_KEYS, 'imprintMode']);
   const { imprintMode, ...fields } = record;
   if (imprintMode !== 'raised' && imprintMode !== 'recessed') {
-    invalid('imprintMode', 'doit être raised ou recessed.');
+    invalid('imprintMode', 'debe ser raised o recessed.');
   }
   const base = parseDesignDocumentV2({ ...fields, schemaVersion: 2 });
-  if (base.kind !== 'stamp') invalid('kind', 'Tampon requis.');
+  if (base.kind !== 'stamp') invalid('kind', 'Se requiere un sello.');
   if (imprintMode === 'recessed' && base.parameters.stampDepth > STAMP_IMPRINT_LIMITS.maximumRecessDepthMm) {
-    invalid('parameters.stampDepth', 'Le creux est limité à 3 mm pour conserver au moins 1 mm de la base de 4 mm. Réduisez explicitement la profondeur avant de choisir Creux.');
+    invalid('parameters.stampDepth', 'El hueco está limitado a 3 mm para conservar al menos 1 mm de la base de 4 mm. Reducí explícitamente la profundidad antes de elegir Hueco.');
   }
   return { ...base, schemaVersion: 4, bridges: [], imprintMode };
 }
@@ -610,5 +610,5 @@ export function parseDesignDocument(value: unknown): DesignDocument {
   if (record.schemaVersion === 2) return parseDesignDocumentV2(value);
   if (record.schemaVersion === 3) return parseMultiCutterDocument(value);
   if (record.schemaVersion === 4) return parseStampDocumentV4(value);
-  invalid('schemaVersion', 'version de document non prise en charge.');
+  invalid('schemaVersion', 'versión de documento no compatible.');
 }

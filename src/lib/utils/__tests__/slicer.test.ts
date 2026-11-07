@@ -64,8 +64,8 @@ describe('sliceMesh geometric preview', () => {
   it('rejects invalid or excessive preview layer counts', () => {
     const mesh = printableCube();
     expect(() => sliceMesh(mesh, { layerHeight: 0, minHeight: 0, maxHeight: 10 }))
-      .toThrow(/positive finite/i);
+      .toThrow(/finito positivo/i);
     expect(() => sliceMesh(mesh, { layerHeight: 0.001, minHeight: 0, maxHeight: 10 }))
-      .toThrow(/limited/i);
+      .toThrow(/limitada/i);
   });
 });

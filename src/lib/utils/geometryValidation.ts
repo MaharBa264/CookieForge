@@ -50,7 +50,7 @@ function edgeKey(first: string, second: string): string {
 }
 
 function meshLabel(mesh: THREE.Mesh, index: number): string {
-  return mesh.name ? `Mesh "${mesh.name}"` : `Mesh ${index + 1}`;
+  return mesh.name ? `Malla «${mesh.name}»` : `Malla ${index + 1}`;
 }
 
 function signedTetrahedronVolume(
@@ -139,13 +139,13 @@ export function validatePrintableObject(
     const index = geometry.getIndex();
 
     if (!position || position.itemSize < 3 || position.count < 3) {
-      errors.add(`${label} has no printable position attribute.`);
+      errors.add(`${label} no tiene atributo de posición imprimible.`);
       return;
     }
 
     const elementCount = index ? index.count : position.count;
     if (elementCount === 0 || elementCount % 3 !== 0) {
-      errors.add(`${label} does not contain a complete triangle list.`);
+      errors.add(`${label} no contiene una lista de triángulos completa.`);
       return;
     }
 
@@ -153,7 +153,7 @@ export function validatePrintableObject(
     triangles += meshTriangles;
 
     if (!normal || normal.itemSize < 3 || normal.count < position.count) {
-      errors.add(`${label} has no complete normal attribute.`);
+      errors.add(`${label} no tiene un atributo de normales completo.`);
     } else {
       for (let vertex = 0; vertex < normal.count; vertex += 1) {
         if (
@@ -161,14 +161,14 @@ export function validatePrintableObject(
           !Number.isFinite(normal.getY(vertex)) ||
           !Number.isFinite(normal.getZ(vertex))
         ) {
-          errors.add(`${label} contains a normal that is not finite.`);
+          errors.add(`${label} contiene una normal no finita.`);
           break;
         }
       }
     }
 
     if (!child.matrixWorld.elements.every(Number.isFinite)) {
-      errors.add(`${label} has a world transform that is not finite.`);
+      errors.add(`${label} tiene una transformación de mundo no finita.`);
       return;
     }
 
@@ -226,15 +226,15 @@ export function validatePrintableObject(
       }
     }
 
-    if (indexError) errors.add(`${label} contains an index outside the position range.`);
-    if (positionError) errors.add(`${label} contains a position that is not finite.`);
-    if (degenerateError) errors.add(`${label} contains a degenerate triangle.`);
+    if (indexError) errors.add(`${label} contiene un índice fuera del rango de posiciones.`);
+    if (positionError) errors.add(`${label} contiene una posición no finita.`);
+    if (degenerateError) errors.add(`${label} contiene un triángulo degenerado.`);
 
     const occurrences = Array.from(edgeOccurrences.values());
     const surfaceClosed =
       occurrences.length > 0 && occurrences.every((edge) => edge.length === 2);
     if (!surfaceClosed) {
-      errors.add(`${label} surface is not closed.`);
+      errors.add(`La superficie de ${label} no está cerrada.`);
     }
 
     const inconsistentOrientation = occurrences.some(
@@ -243,7 +243,7 @@ export function validatePrintableObject(
         !(edge[0].from === edge[1].to && edge[0].to === edge[1].from)
     );
     if (inconsistentOrientation) {
-      errors.add(`${label} has inconsistent triangle orientation.`);
+      errors.add(`${label} tiene una orientación de triángulos inconsistente.`);
     }
 
     const adjacency = Array.from(
@@ -268,33 +268,33 @@ export function validatePrintableObject(
         componentVolume <= MIN_VOLUME_EPSILON
       ) {
         errors.add(
-          `${label} shell ${componentIndex + 1} does not have outward-facing triangles with positive volume.`
+          `La cáscara ${componentIndex + 1} de ${label} no tiene triángulos orientados hacia afuera con volumen positivo.`
         );
       }
     }
   });
 
   if (meshes === 0 || triangles === 0) {
-    errors.add('The object contains no printable mesh or triangle.');
+    errors.add('El objeto no contiene ninguna malla ni triángulo imprimible.');
   }
 
   if (shells > 1) {
-    warnings.add(`The object contains ${shells} disconnected shells.`);
+    warnings.add(`El objeto contiene ${shells} cáscaras desconectadas.`);
   }
 
   if (options.requireSingleShell && shells !== 1) {
-    errors.add('The printable object must contain a single connected shell.');
+    errors.add('El objeto imprimible debe contener una única cáscara conectada.');
   }
 
   let reportBounds: GeometryBounds | null = null;
   if (bounds.isEmpty()) {
-    errors.add('The printable object bounds are empty or not finite.');
+    errors.add('Los límites del objeto imprimible están vacíos o no son finitos.');
   } else {
     const size = bounds.getSize(new THREE.Vector3());
     if (!finiteVector(bounds.min) || !finiteVector(bounds.max) || !finiteVector(size)) {
-      errors.add('The printable object bounds are empty or not finite.');
+      errors.add('Los límites del objeto imprimible están vacíos o no son finitos.');
     } else if (size.x <= 0 || size.y <= 0 || size.z <= 0) {
-      errors.add('The printable object bounds have a zero dimension.');
+      errors.add('Los límites del objeto imprimible tienen una dimensión nula.');
     } else {
       reportBounds = Object.freeze({
         min: Object.freeze({ x: bounds.min.x, y: bounds.min.y, z: bounds.min.z }),

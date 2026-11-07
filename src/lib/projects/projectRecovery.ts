@@ -55,7 +55,7 @@ interface Slot {
 }
 interface Timer { handle?: unknown; fired: boolean; }
 function failure(operation: ProjectRecoveryError['operation'], cause: unknown): ProjectRecoveryError {
-  let message = 'Recovery operation failed';
+  let message = 'Falló la operación de recuperación';
   try {
     const detail = cause instanceof Error ? cause.message : undefined;
     if (typeof detail === 'string') message = detail;
@@ -69,7 +69,7 @@ function failure(operation: ProjectRecoveryError['operation'], cause: unknown): 
  */
 export function createProjectRecovery(storage: ProjectRecoveryStorage, deps: ProjectRecoveryDependencies = {}): ProjectRecovery {
   const delay = deps.debounceMs ?? 750;
-  if (!Number.isFinite(delay) || delay < 0) throw new Error('Invalid recovery debounce');
+  if (!Number.isFinite(delay) || delay < 0) throw new Error('Retardo de recuperación inválido');
   const now = deps.now ?? (() => new Date());
   const createId = deps.createId ?? (() => globalThis.crypto.randomUUID());
   const schedule = deps.schedule ?? ((callback: () => void, ms: number) => setTimeout(callback, ms));
@@ -169,7 +169,7 @@ export function createProjectRecovery(storage: ProjectRecoveryStorage, deps: Pro
       status(); if (current()?.pending) startTimer(token); return;
     }
     try {
-      if (!Number.isSafeInteger(nextEpoch) || nextEpoch < 0) throw new Error('Invalid session epoch');
+      if (!Number.isSafeInteger(nextEpoch) || nextEpoch < 0) throw new Error('Época de sesión inválida');
       // Treat getters, UUID factory and clock as reentrant boundaries; no state adoption before validation.
       const detached = parseDesignDocument(document);
       if (closing || token !== operation) return;
