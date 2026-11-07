@@ -58,7 +58,7 @@
       sliceLayers = nextLayers;
       currentLayerIndex = 0;
     } catch (error) {
-      slicingError = error instanceof Error ? error.message : 'Échec de l’aperçu des couches.';
+      slicingError = error instanceof Error ? error.message : 'Falló la vista previa de capas.';
     } finally {
       isSlicing = false;
     }
@@ -98,7 +98,7 @@
 
 <div class="slice-preview">
   <div class="preview-header">
-    <h3>Aperçu des intersections de couches</h3>
+    <h3>Vista previa de los cortes por capas</h3>
     <button class="toggle-btn" on:click={() => showSliceView = !showSliceView}>
       {showSliceView ? '▼' : '▶'}
     </button>
@@ -108,21 +108,21 @@
     <div class="preview-content">
       {#if !mesh}
         <div class="no-model">
-          <p>Importez un modèle pour prévisualiser les couches</p>
+          <p>Importá un modelo para previsualizar las capas</p>
         </div>
       {:else if isSlicing}
         <div class="slicing-progress">
           <div class="spinner"></div>
-          <p>Calcul des couches…</p>
+          <p>Calculando las capas…</p>
         </div>
       {:else if slicingError}
         <div class="no-layers"><p>{slicingError}</p></div>
       {:else if sliceLayers.length > 0}
         <p class="preview-note">
-          Coupe géométrique uniquement : sans remplissage, supports, trajectoires d’extrusion ni G-code.
+          Solo corte geométrico: sin relleno, soportes, trayectorias de extrusión ni G-code.
         </p>
         {#if drawing}
-          <svg class="layer-drawing" viewBox={drawing.viewBox} aria-label="Intersections de la couche actuelle">
+          <svg class="layer-drawing" viewBox={drawing.viewBox} aria-label="Intersecciones de la capa actual">
             {#each drawing.paths as path}
               <path d={path} />
             {/each}
@@ -131,11 +131,11 @@
         <div class="layer-controls">
           <div class="layer-info">
             <div class="info-row">
-              <span class="label">Couche :</span>
+              <span class="label">Capa:</span>
               <span class="value">{currentLayerIndex + 1} / {sliceLayers.length}</span>
             </div>
             <div class="info-row">
-              <span class="label">Hauteur :</span>
+              <span class="label">Altura:</span>
               <span class="value">{currentLayer.height.toFixed(2)} mm</span>
             </div>
           </div>
@@ -167,7 +167,7 @@
             <button
               class="control-btn play-btn"
               on:click={toggleAutoPlay}
-              title={autoPlay ? 'Pause' : 'Lecture automatique'}
+              title={autoPlay ? 'Pause' : 'Reproducción automática'}
             >
               {autoPlay ? '⏸' : '▶'}
             </button>
@@ -176,7 +176,7 @@
               class="control-btn"
               on:click={nextLayer}
               disabled={currentLayerIndex === sliceLayers.length - 1}
-              title="Couche suivante"
+              title="Capa siguiente"
             >
               ⏭
             </button>
@@ -184,11 +184,11 @@
 
           <div class="layer-stats">
             <div class="stat-item">
-              <span class="stat-label">Contours:</span>
+              <span class="stat-label">Contornos:</span>
               <span class="stat-value">{currentLayer.contours.length}</span>
             </div>
             <div class="stat-item">
-              <span class="stat-label">Points:</span>
+              <span class="stat-label">Puntos:</span>
               <span class="stat-value">{currentLayer.contours.reduce((sum, contour) => sum + contour.length, 0)}</span>
             </div>
           </div>
@@ -196,7 +196,7 @@
 
         <div class="layer-settings">
           <label for="layerHeight">
-            Hauteur de couche : {layerHeight.toFixed(2)}mm
+            Altura de capa: {layerHeight.toFixed(2)}mm
           </label>
           <input
             id="layerHeight"
@@ -209,19 +209,19 @@
           />
           <div class="preset-buttons">
             <button class="preset-btn" on:click={() => { layerHeight = 0.1; performSlicing(); }}>
-              Fin (0,1 mm)
+              Fino (0,1 mm)
             </button>
             <button class="preset-btn" on:click={() => { layerHeight = 0.2; performSlicing(); }}>
               Normal (0,2 mm)
             </button>
             <button class="preset-btn" on:click={() => { layerHeight = 0.3; performSlicing(); }}>
-              Rapide (0,3 mm)
+              Rápido (0,3 mm)
             </button>
           </div>
         </div>
       {:else}
         <div class="no-layers">
-          <p>Aucune couche trouvée. Essayez d’ajuster les paramètres.</p>
+          <p>No se encontraron capas. Probá ajustar los parámetros.</p>
         </div>
       {/if}
     </div>

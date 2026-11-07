@@ -12,13 +12,13 @@ it.each(['svg', 'png', 'jpg', 'jpeg', 'webp'])('accepts a case-insensitive .%s e
   expect(validateImageFile(new File(['x'], `image.${extension.toUpperCase()}`))).toMatch(/^image\//);
 });
 it('does not mistake the entire extensionless filename for an extension', () => {
-  expect(() => validateImageFile(new File(['x'], 'png'))).toThrow(/supported/i);
+  expect(() => validateImageFile(new File(['x'], 'png'))).toThrow(/admitidos/i);
 });
 it.each(['application/pdf', 'application/octet-stream', 'image/gif', 'text/plain'])('never rescues refused MIME %s with an image extension', type => {
-  expect(() => validateImageFile(new File(['x'], 'deceptive.svg', { type }))).toThrow(/supported/i);
+  expect(() => validateImageFile(new File(['x'], 'deceptive.svg', { type }))).toThrow(/admitidos/i);
 });
 it('rejects supported but contradictory MIME/extension', () => {
-  expect(() => validateImageFile(new File(['x'], 'deceptive.svg', { type: 'image/png' }))).toThrow(/do not match/i);
+  expect(() => validateImageFile(new File(['x'], 'deceptive.svg', { type: 'image/png' }))).toThrow(/no coinciden/i);
 });
 it('accepts the exact 10 MiB boundary, rejects one byte above without conversion', async () => {
   expect(validateImageFile(new File([new Uint8Array(MAX_IMAGE_BYTES)], 'image.png', { type: 'image/png' }))).toBe('image/png');
@@ -53,17 +53,17 @@ it('preserves the real decoder dimension boundaries before canvas allocation', (
   expect(() => validateRasterDimensions(8193, 1)).toThrow(/8192/);
   expect(() => validateRasterDimensions(1, 8193)).toThrow(/8192/);
   expect(() => validateRasterDimensions(4000, 4000)).not.toThrow();
-  expect(() => validateRasterDimensions(4000, 4001)).toThrow(/16 megapixels/);
+  expect(() => validateRasterDimensions(4000, 4001)).toThrow(/16 megapíxeles/);
 });
 it('keeps decoder dimension safety errors without constructing any source', async () => {
-  processor.vectorize.mockRejectedValue(new Error('Raster dimensions must not exceed 8192 px per side.'));
+  processor.vectorize.mockRejectedValue(new Error('Las dimensiones de la imagen no deben superar los 8192 px por lado.'));
   await expect(importImage(new File(['x'], 'large.png'))).rejects.toThrow(/8192/);
-  processor.vectorize.mockRejectedValue(new Error('Raster images are limited to 16 megapixels'));
-  await expect(importImage(new File(['x'], 'large.png'))).rejects.toThrow(/16 megapixels/);
+  processor.vectorize.mockRejectedValue(new Error('Las imágenes de trama están limitadas a 16 megapíxeles'));
+  await expect(importImage(new File(['x'], 'large.png'))).rejects.toThrow(/16 megapíxeles/);
 });
 it('selects exactly one binary and prefers files to duplicated clipboard items', () => {
   const file = new File(['x'], 'image.png'); expect(selectSingleImage([])).toBeNull(); expect(selectSingleImage([file])).toBe(file);
-  expect(() => selectSingleImage([file, file])).toThrow(/one image/i);
+  expect(() => selectSingleImage([file, file])).toThrow(/una sola imagen/i);
   const item = { kind: 'file', getAsFile: vi.fn(() => file) };
   const data = { files: [file], items: [item] } as unknown as DataTransfer;
   expect(clipboardImageFiles(data)).toEqual([file]); expect(item.getAsFile).not.toHaveBeenCalled();

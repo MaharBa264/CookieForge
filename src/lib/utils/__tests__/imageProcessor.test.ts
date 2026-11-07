@@ -12,17 +12,17 @@ describe('raster input safety', () => {
   });
 
   it('rejects non-positive and non-integer dimensions', () => {
-    expect(() => validateRasterDimensions(0, 100)).toThrow(/invalid dimensions/i);
-    expect(() => validateRasterDimensions(100.5, 100)).toThrow(/invalid dimensions/i);
+    expect(() => validateRasterDimensions(0, 100)).toThrow(/dimensiones inválidas/i);
+    expect(() => validateRasterDimensions(100.5, 100)).toThrow(/dimensiones inválidas/i);
   });
 
   it('rejects an oversized side before allocating canvas pixels', () => {
-    expect(() => validateRasterDimensions(MAX_RASTER_DIMENSION + 1, 1)).toThrow(/per side/i);
+    expect(() => validateRasterDimensions(MAX_RASTER_DIMENSION + 1, 1)).toThrow(/por lado/i);
   });
 
   it('rejects images above the megapixel budget', () => {
     const side = Math.floor(Math.sqrt(MAX_RASTER_PIXELS)) + 1;
-    expect(() => validateRasterDimensions(side, side)).toThrow(/16 megapixels/i);
+    expect(() => validateRasterDimensions(side, side)).toThrow(/16 megapíxeles/i);
   });
 });
 
@@ -33,6 +33,6 @@ describe('cleanSVG', () => {
   });
 
   it('rejects text without an SVG root', () => {
-    expect(() => cleanSVG('<div>not svg</div>')).toThrow(/no <svg>/i);
+    expect(() => cleanSVG('<div>not svg</div>')).toThrow(/ningún elemento <svg>/i);
   });
 });

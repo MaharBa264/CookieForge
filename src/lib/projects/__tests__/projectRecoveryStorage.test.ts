@@ -39,7 +39,7 @@ describe('strict recovery envelope', () => {
     expect(() => parseProjectRecoveryEnvelope({ ...envelope(), [key]: value })).toThrow();
   });
   it('rejects extra and missing keys; diagnoses header before future keys', () => {
-    expect(() => parseProjectRecoveryEnvelope({ ...envelope(), extra: true })).toThrow(/keys/i);
+    expect(() => parseProjectRecoveryEnvelope({ ...envelope(), extra: true })).toThrow(/claves/i);
     const { savedAt: _unused, ...missing } = envelope();
     expect(() => parseProjectRecoveryEnvelope(missing)).toThrow();
     expect(() => parseProjectRecoveryEnvelope({ ...envelope(), version: 9, future: 1 })).toThrow(/version/i);
@@ -178,7 +178,7 @@ describe('native recovery opening', () => {
     const open = vi.fn(); vi.stubGlobal('indexedDB', { open });
     try {
       const native = new IndexedDbProjectRecoveryBackend(undefined);
-      await expect(native.getAll()).rejects.toThrow(/unavailable/i);
+      await expect(native.getAll()).rejects.toThrow(/no disponible/i);
       expect(open).not.toHaveBeenCalled();
     } finally { vi.unstubAllGlobals(); }
   });
@@ -187,7 +187,7 @@ describe('native recovery opening', () => {
     const open = vi.fn(() => { const r = {} as IDBOpenDBRequest; requests.push(r); return r; });
     const native = new IndexedDbProjectRecoveryBackend({ open } as unknown as IDBFactory);
     const first = native.getAll(); requests[0].onblocked?.({} as IDBVersionChangeEvent);
-    await expect(first).rejects.toThrow(/blocked/i);
+    await expect(first).rejects.toThrow(/bloquead/i);
     Object.assign(requests[0], { result: { close } }); requests[0].onsuccess?.({} as Event);
     expect(close).toHaveBeenCalledOnce();
     const second = native.getAll(); requests[1].onerror?.({} as Event);

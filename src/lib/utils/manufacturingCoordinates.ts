@@ -13,7 +13,7 @@ export function cloneForManufacturing(object: THREE.Object3D): THREE.Group {
   clone.matrix.copy(object.matrixWorld);
 
   const manufacturingRoot = new THREE.Group();
-  manufacturingRoot.name = 'Manufacturing Z-up export';
+  manufacturingRoot.name = 'Exportación de fabricación con Z hacia arriba';
   manufacturingRoot.rotation.x = Math.PI / 2;
   manufacturingRoot.add(clone);
   manufacturingRoot.updateMatrixWorld(true);

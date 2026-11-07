@@ -407,19 +407,19 @@ export function createSimpleBooleanShapes(): Record<string, { svg1: string; svg2
       svg1: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="40" cy="50" r="25" fill="black"/></svg>',
       svg2: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="60" cy="50" r="25" fill="black"/></svg>',
       operation: 'union',
-      description: 'Two circles merged together'
+      description: 'Dos círculos fusionados'
     },
     'subtract-circle': {
       svg1: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="25" y="25" width="50" height="50" fill="black"/></svg>',
       svg2: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="20" fill="black"/></svg>',
       operation: 'subtract',
-      description: 'Square with circular hole'
+      description: 'Cuadrado con agujero circular'
     },
     'intersect-shapes': {
       svg1: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="30" fill="black"/></svg>',
       svg2: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="30" y="30" width="40" height="40" fill="black"/></svg>',
       operation: 'intersect',
-      description: 'Circle and square intersection'
+      description: 'Intersección de círculo y cuadrado'
     }
   };
 }

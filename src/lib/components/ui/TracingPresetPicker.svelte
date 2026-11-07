@@ -3,20 +3,20 @@
   export let preset: TracingPresetId = DEFAULT_TRACING_PRESET;
   export let disabled = false;
 </script>
-<section aria-label="Réglages de vectorisation">
-  <label>Préréglage de vectorisation
-    <select aria-label="Préréglage de vectorisation" value={preset} on:change={event => preset = event.currentTarget.value as TracingPresetId} {disabled}>
+<section aria-label="Ajustes de vectorización">
+  <label>Perfil de vectorización
+    <select aria-label="Perfil de vectorización" value={preset} on:change={event => preset = event.currentTarget.value as TracingPresetId} {disabled}>
       {#each TRACING_PRESETS as option}<option value={option.id}>{option.label}</option>{/each}
     </select>
   </label>
   <div class="desktop-help">
     <p>{TRACING_PRESETS.find(option => option.id === preset)?.description}</p>
-    <p>Images raster uniquement. Le SVG importé reste inchangé. Le choix ne modifie pas le dessin existant sans action explicite.</p>
+    <p>Solo imágenes de trama (raster). El SVG importado no cambia. La elección no modifica el dibujo existente sin una acción explícita.</p>
   </div>
   <details class="mobile-help">
-    <summary>Comprendre ce préréglage</summary>
+    <summary>Entender este perfil</summary>
     <p>{TRACING_PRESETS.find(option => option.id === preset)?.description}</p>
-    <p>Images raster uniquement. Le SVG importé reste inchangé. Le choix ne modifie pas le dessin existant sans action explicite.</p>
+    <p>Solo imágenes de trama (raster). El SVG importado no cambia. La elección no modifica el dibujo existente sin una acción explícita.</p>
   </details>
 </section>
 <style>

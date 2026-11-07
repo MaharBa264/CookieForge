@@ -44,7 +44,7 @@ async function mountGeneratedCutter(): Promise<void> {
   document.body.appendChild(target);
   mountedApp = mount(App, { target });
   const button = [...document.querySelectorAll<HTMLButtonElement>('button')]
-    .find((candidate) => candidate.textContent?.includes('Essayer un cercle de test'));
+    .find((candidate) => candidate.textContent?.includes('Probar con un círculo de prueba'));
   expect(button).toBeDefined();
   button?.click();
   await vi.waitFor(() => {
@@ -55,7 +55,7 @@ async function mountGeneratedCutter(): Promise<void> {
 
 async function publishBatchFixture(): Promise<void> {
   const category = document.querySelector<HTMLButtonElement>(
-    'button[aria-label="Production en série"]'
+    'button[aria-label="Producción en serie"]'
   );
   expect(category).not.toBeNull();
   category?.click();
@@ -82,7 +82,7 @@ describe('App generation orchestration boundary', () => {
     document.body.appendChild(target);
     mountedApp = mount(App, { target });
     const button = [...document.querySelectorAll<HTMLButtonElement>('button')]
-      .find((candidate) => candidate.textContent?.includes('Essayer un cercle de test'));
+      .find((candidate) => candidate.textContent?.includes('Probar con un círculo de prueba'));
 
     expect(button).toBeDefined();
     button?.click();
@@ -100,7 +100,7 @@ describe('App generation orchestration boundary', () => {
     document.body.appendChild(target);
     mountedApp = mount(App, { target });
     const button = [...document.querySelectorAll<HTMLButtonElement>('button')]
-      .find((candidate) => candidate.textContent?.includes('Essayer un cercle de test'));
+      .find((candidate) => candidate.textContent?.includes('Probar con un círculo de prueba'));
 
     expect(button).toBeDefined();
     button?.click();

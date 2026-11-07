@@ -8,9 +8,9 @@
   import type { SizeMode } from '../../types/CookieCutter';
 
   const sizeModes: { value: SizeMode; label: string }[] = [
-    { value: 'longest', label: 'Côté le plus long' },
-    { value: 'width', label: 'Largeur' },
-    { value: 'height', label: 'Hauteur' }
+    { value: 'longest', label: 'Lado más largo' },
+    { value: 'width', label: 'Ancho' },
+    { value: 'height', label: 'Alto' }
   ];
 
   const describedBy = (field: string) =>
@@ -18,7 +18,7 @@
 </script>
 
 <div class="param-control">
-  <label for="targetSize">Dimension finale : {$params.targetSize.toFixed(0)} mm</label>
+  <label for="targetSize">Dimensión final: {$params.targetSize.toFixed(0)} mm</label>
   <input
     id="targetSize"
     data-field="targetSize"
@@ -58,7 +58,7 @@
 </div>
 
 <div class="param-control">
-  <label for="buildPlateSize">Plateau d’impression : {$params.buildPlateSize.toFixed(0)} mm</label>
+  <label for="buildPlateSize">Plataforma de impresión: {$params.buildPlateSize.toFixed(0)} mm</label>
   <input
     id="buildPlateSize"
     data-field="buildPlateSize"
@@ -67,12 +67,12 @@
     max="300"
     step="10"
     value={$params.buildPlateSize}
-    aria-valuetext={`${$params.buildPlateSize.toFixed(0)} millimètres`}
+    aria-valuetext={`${$params.buildPlateSize.toFixed(0)} milímetros`}
     aria-invalid={$parameterErrorField === 'buildPlateSize'}
     aria-describedby={describedBy('buildPlateSize')}
     on:input={(event) => updateParam('buildPlateSize', Number(event.currentTarget.value))}
   />
-  <p id="buildPlateSize-hint" class="param-hint">100–300 mm · Adaptez à la surface utile de votre imprimante.</p>
+  <p id="buildPlateSize-hint" class="param-hint">100–300 mm · Adaptalo a la superficie útil de tu impresora.</p>
   {#if $parameterErrorField === 'buildPlateSize' && $parameterError}
     <p id="buildPlateSize-error" class="param-error" role="alert">{$parameterError}</p>
   {/if}

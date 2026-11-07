@@ -60,7 +60,7 @@ export class BatchGenerationError extends Error {
 }
 
 function abortError(): DOMException {
-  return new DOMException('Batch generation was cancelled and rolled back.', 'AbortError');
+  return new DOMException('Se canceló la generación de la serie y se revirtió.', 'AbortError');
 }
 
 async function defaultGenerateItem(item: BatchItem): Promise<ModelObject> {
@@ -76,15 +76,15 @@ function validateBatchInput(
   layout: BatchLayout,
   buildPlateSize: number
 ): void {
-  if (items.length === 0) throw new Error('A batch requires at least one item.');
+  if (items.length === 0) throw new Error('Una serie requiere al menos un elemento.');
   if (!Number.isFinite(buildPlateSize) || buildPlateSize <= 0) {
-    throw new Error('Build plate size must be a positive finite number.');
+    throw new Error('El tamaño de la plataforma debe ser un número finito positivo.');
   }
   if (!Number.isFinite(layout.spacing) || layout.spacing < 0) {
-    throw new Error('Batch spacing must be a non-negative finite number.');
+    throw new Error('La separación de la serie debe ser un número finito no negativo.');
   }
   const ids = new Set(items.map((item) => item.id));
-  if (ids.size !== items.length) throw new Error('Batch item IDs must be unique.');
+  if (ids.size !== items.length) throw new Error('Los identificadores de los elementos de la serie deben ser únicos.');
 }
 
 function cleanup(entries: readonly GeneratedEntry[]): void {
@@ -118,7 +118,7 @@ function gridLayout(
   const totalWidth = columnWidths.reduce((sum, width) => sum + width, 0) + layout.spacing * (columns - 1);
   const totalDepth = rowDepths.reduce((sum, depth) => sum + depth, 0) + layout.spacing * (rows - 1);
   if (totalWidth > plate || totalDepth > plate) {
-    throw new Error(`Grid requires ${totalWidth.toFixed(1)} × ${totalDepth.toFixed(1)} mm on a ${plate} mm plate.`);
+    throw new Error(`La cuadrícula requiere ${totalWidth.toFixed(1)} × ${totalDepth.toFixed(1)} mm en una plataforma de ${plate} mm.`);
   }
 
   const xCenters: number[] = [];
@@ -152,7 +152,7 @@ function optimizedLayout(
 
   for (const entry of sorted) {
     if (entry.width > plate || entry.depth > plate) {
-      throw new Error(`Item “${entry.item.name}” exceeds the ${plate} mm build plate.`);
+      throw new Error(`El elemento «${entry.item.name}» supera la plataforma de ${plate} mm.`);
     }
     if (left > -plate / 2 && left + entry.width > plate / 2) {
       left = -plate / 2;
@@ -160,7 +160,7 @@ function optimizedLayout(
       rowDepth = 0;
     }
     if (bottom + entry.depth > plate / 2) {
-      throw new Error(`Optimized layout cannot place “${entry.item.name}” on the ${plate} mm plate.`);
+      throw new Error(`La disposición optimizada no puede ubicar «${entry.item.name}» en la plataforma de ${plate} mm.`);
     }
     result.push(positioned(entry, left + entry.width / 2, bottom + entry.depth / 2));
     left += entry.width + layout.spacing;
@@ -171,13 +171,13 @@ function optimizedLayout(
 
 function customLayout(entries: readonly GeneratedEntry[], plate: number): GeneratedEntry[] {
   return entries.map((entry) => {
-    if (!entry.item.position) throw new Error(`Item “${entry.item.name}” has no custom position.`);
+    if (!entry.item.position) throw new Error(`El elemento «${entry.item.name}» no tiene posición personalizada.`);
     const { x, y } = entry.item.position;
     if (
       Math.abs(x) + entry.width / 2 > plate / 2 ||
       Math.abs(y) + entry.depth / 2 > plate / 2
     ) {
-      throw new Error(`Item “${entry.item.name}” exceeds the build plate at its custom position.`);
+      throw new Error(`El elemento «${entry.item.name}» supera la plataforma en su posición personalizada.`);
     }
     return positioned(entry, x, y);
   });
@@ -229,7 +229,7 @@ export async function createBatch(
         id: item.id,
         name: item.name,
         stage: 'generation',
-        message: error instanceof Error ? error.message : 'Unknown generation error.'
+        message: error instanceof Error ? error.message : 'Error de generación desconocido.'
       });
     } finally {
       options.onProgress?.(index + 1, items.length, item);
@@ -239,7 +239,7 @@ export async function createBatch(
   if (failures.length > 0) {
     cleanup(generated);
     throw new BatchGenerationError(
-      `${failures.length} batch item(s) failed; no batch was created.`,
+      `Fallaron ${failures.length} elemento(s) de la serie; no se creó ninguna serie.`,
       failures,
       generated.length
     );
@@ -251,12 +251,12 @@ export async function createBatch(
   } catch (error) {
     cleanup(generated);
     throw new BatchGenerationError(
-      'Batch layout failed; every generated item was rolled back.',
+      'Falló la disposición de la serie; se revirtió cada elemento generado.',
       [{
         id: 'batch',
-        name: 'Batch layout',
+        name: 'Disposición de la serie',
         stage: 'layout',
-        message: error instanceof Error ? error.message : 'Unknown layout error.'
+        message: error instanceof Error ? error.message : 'Error de disposición desconocido.'
       }],
       generated.length
     );
@@ -298,12 +298,12 @@ export function checkBuildPlateFit(
     calculateLayout(estimates, layout, buildPlateSize);
     return {
       fits: true,
-      warnings: items.length > 20 ? ['Large batch may take longer to process.'] : []
+      warnings: items.length > 20 ? ['Una serie grande puede tardar más en procesarse.'] : []
     };
   } catch (error) {
     return {
       fits: false,
-      warnings: [error instanceof Error ? error.message : 'Estimated layout does not fit.']
+      warnings: [error instanceof Error ? error.message : 'La disposición estimada no entra.']
     };
   }
 }
@@ -320,12 +320,12 @@ export function estimateBatchFilament(items: readonly BatchItem[]): number {
 
 export function generateBatchSummary(result: BatchResult): string {
   return [
-    '=== Batch Geometry Summary ===',
-    `Generated: ${result.report.succeeded}`,
-    `Failed: ${result.report.failed}`,
-    `Layout: ${result.layout.type}`,
-    `Spacing: ${result.layout.spacing} mm`,
-    `Measured size: ${result.totalDimensions.width.toFixed(1)} × ${result.totalDimensions.height.toFixed(1)} mm`,
+    '=== Resumen de geometría de la serie ===',
+    `Generados: ${result.report.succeeded}`,
+    `Fallidos: ${result.report.failed}`,
+    `Disposición: ${result.layout.type}`,
+    `Separación: ${result.layout.spacing} mm`,
+    `Tamaño medido: ${result.totalDimensions.width.toFixed(1)} × ${result.totalDimensions.height.toFixed(1)} mm`,
     ...result.items.map((item, index) =>
       `${index + 1}. ${item.name} at (${item.position?.x.toFixed(1)}, ${item.position?.y.toFixed(1)}) mm`
     )
@@ -334,13 +334,13 @@ export function generateBatchSummary(result: BatchResult): string {
 
 export function duplicateItem(item: BatchItem, count: number): BatchItem[] {
   if (!Number.isInteger(count) || count < 0 || count > 100) {
-    throw new Error('Duplicate count must be an integer between 0 and 100.');
+    throw new Error('La cantidad de duplicados debe ser un entero entre 0 y 100.');
   }
   return Array.from({ length: count }, (_, index) => ({
     ...item,
     params: { ...item.params },
     id: `${item.id}_copy_${index}`,
-    name: `${item.name} (Copy ${index + 1})`,
+    name: `${item.name} (Copia ${index + 1})`,
     position: undefined
   }));
 }

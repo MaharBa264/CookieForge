@@ -213,13 +213,13 @@
   <div class="editor-content">
     <div class="preset-buttons">
       <button class="preset-btn" on:click={() => loadPreset('heart')}>
-        ❤️ Cœur
+        ❤️ Corazón
       </button>
       <button class="preset-btn" on:click={() => loadPreset('star')}>
         ⭐ Étoile
       </button>
       <button class="preset-btn" on:click={() => loadPreset('flower')}>
-        🌸 Fleur
+        🌸 Flor
       </button>
       <button class="preset-btn" on:click={() => loadPreset('custom')}>
         ⬜ Carré
@@ -241,22 +241,22 @@
     <div class="editor-controls">
       <label class="checkbox-control">
         <input type="checkbox" bind:checked={showControls} on:change={redraw} />
-        <span>Afficher les points de contrôle</span>
+        <span>Mostrar los puntos de control</span>
       </label>
 
       <div class="action-buttons">
         <button class="action-btn secondary" on:click={reset}>
-          Réinitialiser
+          Restablecer
         </button>
         <button class="action-btn primary" on:click={applyBezierShape}>
-          Appliquer la forme
+          Aplicar la forma
         </button>
       </div>
     </div>
 
     <div class="help-text">
-      <p>💡 Glissez les points d’ancrage bleus pour modifier le tracé</p>
-      <p>💡 Glissez les points de contrôle orange pour ajuster les courbes</p>
+      <p>💡 Arrastrá los puntos de anclaje azules para modificar el trazado</p>
+      <p>💡 Arrastrá los puntos de control naranjas para ajustar las curvas</p>
     </div>
   </div>
 </div>

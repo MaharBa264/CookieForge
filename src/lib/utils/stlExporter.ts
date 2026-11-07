@@ -21,7 +21,7 @@ export function serializeSTL(
 ): DataView | string {
   const sourceReport = validatePrintableObject(object);
   if (!sourceReport.valid) {
-    exportFailure(`STL export blocked: ${sourceReport.errors[0]}`, {
+    exportFailure(`Exportación STL bloqueada: ${sourceReport.errors[0]}`, {
       errors: sourceReport.errors,
       triangles: sourceReport.triangles,
       shells: sourceReport.shells,
@@ -33,7 +33,7 @@ export function serializeSTL(
   const manufacturingObject = cloneForManufacturing(object);
   const report = validatePrintableObject(manufacturingObject);
   if (!report.valid) {
-    exportFailure(`STL export blocked: ${report.errors[0]}`, {
+    exportFailure(`Exportación STL bloqueada: ${report.errors[0]}`, {
       errors: report.errors,
       triangles: report.triangles,
       shells: report.shells,
@@ -46,7 +46,7 @@ export function serializeSTL(
 
   if (binary) {
     if (!(output instanceof DataView)) {
-      exportFailure('The STL exporter returned an unexpected binary result.', {
+      exportFailure('El exportador STL devolvió un resultado binario inesperado.', {
         triangles: report.triangles
       });
     }
@@ -54,7 +54,7 @@ export function serializeSTL(
     const view = output;
     const expectedLength = 84 + report.triangles * 50;
     if (view.byteLength !== expectedLength || view.byteLength < 84) {
-      exportFailure('The binary STL size does not match its triangle count.', {
+      exportFailure('El tamaño del STL binario no coincide con su cantidad de triángulos.', {
         actualBytes: view.byteLength,
         expectedBytes: expectedLength,
         triangles: report.triangles
@@ -63,7 +63,7 @@ export function serializeSTL(
 
     const serializedTriangles = view.getUint32(80, true);
     if (serializedTriangles !== report.triangles) {
-      exportFailure('The binary STL header contains an invalid triangle count.', {
+      exportFailure('El encabezado del STL binario contiene una cantidad de triángulos inválida.', {
         actual: serializedTriangles,
         expected: report.triangles
       });
@@ -73,7 +73,7 @@ export function serializeSTL(
       const start = 84 + triangle * 50;
       for (let component = 0; component < 12; component += 1) {
         if (!Number.isFinite(view.getFloat32(start + component * 4, true))) {
-          exportFailure('The binary STL contains a non-finite value.', {
+          exportFailure('El STL binario contiene un valor no finito.', {
             triangle,
             component
           });
@@ -85,20 +85,20 @@ export function serializeSTL(
   }
 
   if (typeof output !== 'string') {
-    exportFailure('The STL exporter returned an unexpected text result.', {
+    exportFailure('El exportador STL devolvió un resultado de texto inesperado.', {
       triangles: report.triangles
     });
   }
 
   if (/NaN|Infinity/.test(output)) {
-    exportFailure('The ASCII STL contains a non-finite value.', {
+    exportFailure('El STL ASCII contiene un valor no finito.', {
       triangles: report.triangles
     });
   }
 
   const facetCount = output.match(/\bfacet normal\b/g)?.length ?? 0;
   if (facetCount !== report.triangles) {
-    exportFailure('The ASCII STL triangle count is inconsistent.', {
+    exportFailure('La cantidad de triángulos del STL ASCII es inconsistente.', {
       actual: facetCount,
       expected: report.triangles
     });

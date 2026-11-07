@@ -45,7 +45,7 @@ export function createDesignSessionStore(
 
   function mutate(command: (store: DesignDocumentStore) => void): void {
     if (active === null) {
-      throw new Error('Aucun document actif dans la session.');
+      throw new Error('No hay ningún documento activo en la sesión.');
     }
     command(active);
     const snapshot = get(active);
@@ -78,17 +78,17 @@ export function createDesignSessionStore(
       const owner = active;
       const current = get(internal);
       if (owner === null || current === null || epoch !== expectedEpoch) {
-        throw new Error('Historique obsolète : la session a changé.');
+        throw new Error('Historial desactualizado: la sesión cambió.');
       }
       // unknown may run getters/Proxy traps. Detach and validate everything before
       // touching the active store, then re-check both lifetime and snapshot identity.
       const snapshot = parseDesignDocument(value);
       if (epoch !== expectedEpoch || active !== owner || get(internal) !== current) {
-        throw new Error('La session a changé pendant la validation de l’historique.');
+        throw new Error('La sesión cambió durante la validación del historial.');
       }
       if (snapshot.id !== current.id || snapshot.createdAt !== current.createdAt
         || JSON.stringify(snapshot.source) !== JSON.stringify(current.source)) {
-        throw new Error('Le snapshot historique appartient à un autre document ou source.');
+        throw new Error('La instantánea del historial pertenece a otro documento u origen.');
       }
       // The validated snapshot has no user getters. replace preserves updatedAt
       // and sketch revision; subsequent edits use this very same active document.

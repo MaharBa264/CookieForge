@@ -70,9 +70,14 @@
     | 'materials'
     | 'preview'
     | 'batch'
+    | 'set'
     | 'export';
 
   let currentMesh: ModelObject | null = null;
+  // Juego cortador + sello: el panel entrega el grupo que debe mostrar el visor.
+  let setPreview: THREE.Group | null = null;
+  $: viewerMesh = activeCategory === 'set' && setPreview ? setPreview : currentMesh;
+  function handleSetPreview(group: THREE.Group | null): void { setPreview = group; }
   let fileName = '';
   let svgCache: string | null = null;
   let sourceRevision = 0;
@@ -158,7 +163,7 @@
     void unavailableReason; void externalExport; void sourceRevision;
     geometryExportAvailable = captureGeometryExport() !== null;
   }
-  $: geometryExportReason = geometryExportAvailable ? null : 'Générez le modèle actuel avant d’exporter sa géométrie.';
+  $: geometryExportReason = geometryExportAvailable ? null : 'Generá el modelo actual antes de exportar su geometría.';
   const pendingExternalDisposals = new Set<ModelObject>();
   const pendingBatchObjects = new Set<ModelObject>();
   const disposedExternalObjects = new WeakSet<THREE.Object3D>();
@@ -254,7 +259,7 @@
       : null;
 
     if (nextObject !== null && nextMesh === null) {
-      $error = 'Le résultat généré ne peut pas être affiché dans le viewer.';
+      $error = 'El resultado generado no se puede mostrar en el visor.';
     }
 
     if (
@@ -335,18 +340,18 @@
     confirmDiscard: async document => {
       const revision = sourceRevision;
       const epoch = session.getSessionEpoch();
-      const choice = await ask('Modifications non enregistrées', `Enregistrer les modifications de ${document.name} avant de continuer ?`, [
-        { id: 'cancel', label: 'Annuler' }, { id: 'save', label: 'Enregistrer et continuer' },
-        { id: 'discard', label: 'Ignorer les modifications', destructive: true }
+      const choice = await ask('Cambios sin guardar', `¿Guardar los cambios de ${document.name} antes de continuar?`, [
+        { id: 'cancel', label: 'Cancelar' }, { id: 'save', label: 'Guardar y continuar' },
+        { id: 'discard', label: 'Descartar los cambios', destructive: true }
       ]);
       if (!alive || revision !== sourceRevision || epoch !== session.getSessionEpoch()) return 'cancel';
       // An external batch has no representable document to save.
       return choice === 'save' && unavailableReason === null ? 'save' : choice === 'discard' ? 'discard' : 'cancel';
     },
     confirmCollision: async incoming => {
-      const choice = await ask('Projet déjà présent', `Importer ${incoming.name} comme copie ou remplacer le projet existant ?`, [
-        { id: 'cancel', label: 'Annuler' }, { id: 'copy', label: 'Importer une copie' },
-        { id: 'replace', label: 'Remplacer le projet', destructive: true }
+      const choice = await ask('El proyecto ya existe', `¿Importar ${incoming.name} como copia o reemplazar el proyecto existente?`, [
+        { id: 'cancel', label: 'Cancelar' }, { id: 'copy', label: 'Importar una copia' },
+        { id: 'replace', label: 'Reemplazar el proyecto', destructive: true }
       ]);
       return choice === 'copy' ? 'copy' : choice === 'replace' ? 'replace' : 'cancel';
     }
@@ -449,7 +454,7 @@
       const record = await projectRecoveryStorage.get(expected.draftId);
       if (!current() || recoveryWorkflowBusy()) return;
       if (!record || canonicalProjectRecoverySnapshot(record) !== snapshot) {
-        recoveryActionError = 'Ce brouillon de récupération a changé ou n’est plus disponible. Actualisez puis choisissez la version affichée.';
+        recoveryActionError = 'Este borrador de recuperación cambió o ya no está disponible. Actualizá y elegí la versión que se muestra.';
         await recovery.refresh(); return;
       }
       // Transfer the pre-read context to the workflow's final replacement guard.
@@ -461,7 +466,7 @@
       const accepted = await completion;
       if (owned() && accepted) activeCategory = 'params';
     } catch (cause) {
-      if (current()) recoveryActionError = `Impossible de reprendre le brouillon : ${cause instanceof Error ? cause.message : 'stockage indisponible'}. Actualisez puis réessayez.`;
+      if (current()) recoveryActionError = `No se pudo retomar el borrador: ${cause instanceof Error ? cause.message : 'almacenamiento no disponible'}. Actualizá y reintentá.`;
     } finally {
       if (owned()) recoveryBusy = false;
     }
@@ -475,8 +480,8 @@
     try {
       // Detached exact expected version, never reread/upgrade while prompting.
       const snapshot = JSON.parse(canonicalProjectRecoverySnapshot(expected)) as ProjectRecoveryEnvelope;
-      const choice = await ask('Supprimer ce brouillon de récupération ?', `Supprimer ${snapshot.document.name}, enregistré le ${snapshot.savedAt}, de ce navigateur ?`, [
-        { id: 'cancel', label: 'Annuler' }, { id: 'delete', label: 'Supprimer le brouillon', destructive: true }
+      const choice = await ask('¿Eliminar este borrador de recuperación?', `¿Eliminar ${snapshot.document.name}, guardado el ${snapshot.savedAt}, de este navegador?`, [
+        { id: 'cancel', label: 'Cancelar' }, { id: 'delete', label: 'Eliminar el borrador', destructive: true }
       ]);
       if (!current() || choice !== 'delete' || recoveryWorkflowBusy()) return;
       await projectRecoveryStorage.deleteExpected(snapshot);
@@ -488,7 +493,7 @@
       if (current()) document.querySelector<HTMLButtonElement>('button[data-recovery-refresh]')?.focus();
     } catch (cause) {
       if (current()) {
-        recoveryActionError = `Impossible de supprimer le brouillon : ${cause instanceof Error ? cause.message : 'stockage indisponible'}. Actualisez puis réessayez.`;
+        recoveryActionError = `No se pudo eliminar el borrador: ${cause instanceof Error ? cause.message : 'almacenamiento no disponible'}. Actualizá y reintentá.`;
         await recovery.refresh();
       }
     } finally {
@@ -527,7 +532,7 @@
     if (!isRestoredSnapshot && (historyStore.getLength() === 0 || historyKey !== key)) {
       historyStore.pushState({
         params: historyParams, svgData: document.sketch.svg,
-        document, sessionEpoch: session.getSessionEpoch(), description: 'Dessin modifié'
+        document, sessionEpoch: session.getSessionEpoch(), description: 'Dibujo modificado'
       });
     }
     historyKey = key;
@@ -553,7 +558,7 @@
       return alive && accepted;
     } catch (cause) {
       if (alive && revision === sourceRevision && epoch === session.getSessionEpoch()) {
-        $error = cause instanceof Error ? cause.message : 'Impossible de charger le dessin';
+        $error = cause instanceof Error ? cause.message : 'No se pudo cargar el dibujo';
         $isProcessing = false;
       }
       return false;
@@ -584,7 +589,7 @@
       const file = selectSingleImage(files);
       if (file) void handleFileUpload(new CustomEvent('upload', { detail: file }));
     } catch (cause) {
-      rejectImageImport(cause instanceof Error ? cause.message : 'Impossible de lire l’image du presse-papiers.');
+      rejectImageImport(cause instanceof Error ? cause.message : 'No se pudo leer la imagen del portapapeles.');
     }
   }
 
@@ -594,7 +599,7 @@
       const module = await import('./lib/components/ui/PhotoImportReview.svelte');
       if (alive) PhotoImportReview = module.default;
     } catch (cause) {
-      if (alive && photoDraft) photoReviewError = cause instanceof Error ? cause.message : 'Impossible de charger la préparation photo.';
+      if (alive && photoDraft) photoReviewError = cause instanceof Error ? cause.message : 'No se pudo cargar la preparación de la foto.';
     }
   }
 
@@ -633,14 +638,14 @@
       await tick();
       document.querySelector<HTMLElement>('button[aria-current="page"]')?.focus();
     } catch (cause) {
-      if (alive && draft.epoch === session.getSessionEpoch()) importError = cause instanceof Error ? cause.message : 'Impossible d’appliquer le contour photo.';
+      if (alive && draft.epoch === session.getSessionEpoch()) importError = cause instanceof Error ? cause.message : 'No se pudo aplicar el contorno de la foto.';
     }
   }
 
   async function cancelPhotoReview(): Promise<void> {
     cancelImageImport();
     await tick();
-    document.querySelector<HTMLElement>('select[aria-label="Vectorization preset"]')?.focus();
+    document.querySelector<HTMLElement>('select[aria-label="Perfil de vectorización"]')?.focus();
   }
 
   async function handleFileUpload(event: CustomEvent<File>) {
@@ -651,7 +656,7 @@
         importError = null;
         if (stagePhoto(file, 'import')) return;
       } catch (cause) {
-        importError = cause instanceof Error ? cause.message : 'Photo invalide.';
+        importError = cause instanceof Error ? cause.message : 'Foto inválida.';
         return;
       }
     }
@@ -673,7 +678,7 @@
       vectorizationController = null;
       await publishSvg(svg, file.name, $params, source, source.type === 'raster' ? file : undefined);
     } catch (cause) {
-      if (current()) importError = cause instanceof Error ? cause.message : 'Impossible de traiter le fichier';
+      if (current()) importError = cause instanceof Error ? cause.message : 'No se pudo procesar el archivo';
     } finally {
       if (vectorizationController === controller) {
         vectorizationController = null;
@@ -711,7 +716,7 @@
       retracingSnapshot = null;
       session.updateSketch(svg); // One undoable edit, never replace source or identity.
     } catch (cause) {
-      if (current()) importError = cause instanceof Error ? cause.message : 'Impossible de revectoriser l’image';
+      if (current()) importError = cause instanceof Error ? cause.message : 'No se pudo volver a vectorizar la imagen';
     } finally {
       if (vectorizationController === controller) {
         vectorizationController = null;
@@ -730,8 +735,8 @@
       exportToSTL(snapshot.mesh, filename, { binary: true });
       $error = null;
     } catch (exportError) {
-      console.error('Error exporting STL:', exportError);
-      $error = exportError instanceof Error ? exportError.message : 'Impossible d’exporter le STL';
+      console.error('Error al exportar el STL:', exportError);
+      $error = exportError instanceof Error ? exportError.message : 'No se pudo exportar el STL';
     }
   }
 
@@ -739,14 +744,14 @@
     const svg = typeof shape === 'string' ? shape : shape.svg;
     const fileBaseName = typeof shape === 'string'
       ? 'generated-shape'
-      : shape.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      : shape.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
     cancelImageImport();
     importError = null;
     try {
       void publishSvg(cleanSVG(svg), `${fileBaseName || 'library-shape'}.svg`);
     } catch (shapeError) {
-      $error = shapeError instanceof Error ? shapeError.message : 'Impossible de traiter la forme';
+      $error = shapeError instanceof Error ? shapeError.message : 'No se pudo procesar la forma';
       $isProcessing = false;
     }
   }
@@ -798,10 +803,10 @@
       importError = null;
       void publishSvg(nextSvg, `${design.metadata.name}.svg`, design.params);
     } catch (galleryError) {
-      console.error('Error loading design:', galleryError);
+      console.error('Error al cargar el diseño:', galleryError);
       $error = galleryError instanceof Error
         ? galleryError.message
-        : 'Impossible de charger le dessin';
+        : 'No se pudo cargar el dibujo';
       $isProcessing = false;
     }
   }
@@ -845,12 +850,12 @@
       if (!current()) return;
       externalExport = { mesh: batch, params: batchParams, current };
       fileName = 'batch-production.stl';
-      unavailableReason = 'Un aperçu de série ne peut pas être enregistré ou exporté comme projet V1. Créez ou ouvrez un projet compatible.';
+      unavailableReason = 'Una vista previa de serie no se puede guardar ni exportar como proyecto V1. Creá o abrí un proyecto compatible.';
       observeRecovery();
       $isProcessing = false;
       published = true;
     } catch (cause) {
-      if (current()) $error = cause instanceof Error ? cause.message : 'Impossible de créer la série.';
+      if (current()) $error = cause instanceof Error ? cause.message : 'No se pudo crear la serie.';
     } finally {
       pendingBatchObjects.delete(batch);
       if (!published || !current()) {
@@ -909,8 +914,8 @@
   }
   function requestNewDesign(): void { cancelImageImport(); importError = null; void workflow.startNew(); }
   async function confirmDelete(document: DesignDocument): Promise<boolean> {
-    return await ask('Supprimer le projet local', `Supprimer ${document.name} de ce navigateur ?`, [
-      { id: 'cancel', label: 'Annuler' }, { id: 'delete', label: 'Supprimer le projet', destructive: true }
+    return await ask('Eliminar el proyecto local', `¿Eliminar ${document.name} de este navegador?`, [
+      { id: 'cancel', label: 'Cancelar' }, { id: 'delete', label: 'Eliminar el proyecto', destructive: true }
     ]) === 'delete';
   }
   function changeViewport(value: ViewportPreferences): void {
@@ -923,7 +928,7 @@
     unsubscribeRecoveryWorkflow();
     unsubscribeRecoverySession();
     // Recovery owns only its separate storage; close after all accepted writes.
-    void recovery.dispose().then(() => projectRecoveryStorage.close()).catch(cause => console.error('Recovery cleanup failed:', cause));
+    void recovery.dispose().then(() => projectRecoveryStorage.close()).catch(cause => console.error('Falló la limpieza de la recuperación:', cause));
     confirmation?.resolve('cancel');
     confirmation = null;
     integration.dispose();
@@ -946,7 +951,7 @@
       for (const object of externalObjects) disposeExternalObject(object);
       await generationDisposal;
       await workflowDisposal;
-    })().catch(cause => console.error('Project cleanup failed:', cause));
+    })().catch(cause => console.error('Falló la limpieza del proyecto:', cause));
   });
 </script>
 
@@ -968,7 +973,7 @@
         <span class="logo-icon">🍪</span>
         <div class="logo-text">
           <h1>Cookie Cutter Designer</h1>
-          <p class="tagline">Créez des emporte-pièces imprimables en 3D</p>
+          <p class="tagline">Creá cortadores y sellos para galletas imprimibles en 3D</p>
         </div>
       </div>
       <div class="header-actions">
@@ -978,19 +983,19 @@
           <button
             class="btn btn-outline btn-sm"
             on:click={requestNewDesign}
-            title="Créer un nouveau dessin"
-            aria-label="Créer un nouveau dessin"
+            title="Crear un dibujo nuevo"
+            aria-label="Crear un dibujo nuevo"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M3 12h18M12 3v18"/>
             </svg>
-            <span class="new-design-label">Nouveau dessin</span>
+            <span class="new-design-label">Dibujo nuevo</span>
           </button>
         <button
           class="btn btn-outline btn-sm btn-icon"
           on:click={toggleDarkMode}
-          title={darkMode ? 'Activer le thème clair' : 'Activer le thème sombre'}
-          aria-label={darkMode ? 'Activer le thème clair' : 'Activer le thème sombre'}
+          title={darkMode ? 'Activar el tema claro' : 'Activar el tema oscuro'}
+          aria-label={darkMode ? 'Activar el tema claro' : 'Activar el tema oscuro'}
           aria-pressed={darkMode}
         >
           {#if darkMode}
@@ -1020,16 +1025,16 @@
     class:mobile-workshop-more={mobileWorkshop === 'more'}>
     <!-- Mini Sidebar with Category Icons -->
     <aside class="mini-sidebar">
-      <nav class="category-nav" aria-label="Outils de création">
+      <nav class="category-nav" aria-label="Herramientas de creación">
         <button class="category-btn" class:active={activeCategory === 'projects'}
-          on:click={() => activeCategory = 'projects'} aria-label="Projets locaux" title="Projets locaux"
-          aria-current={activeCategory === 'projects' ? 'page' : undefined}>📁<span class="nav-label">Projets locaux</span></button>
+          on:click={() => activeCategory = 'projects'} aria-label="Proyectos locales" title="Proyectos locales"
+          aria-current={activeCategory === 'projects' ? 'page' : undefined}>📁<span class="nav-label">Proyectos locales</span></button>
         <button
           class="category-btn"
           class:active={activeCategory === 'upload'}
           on:click={() => activeCategory = 'upload'}
-          title="Importer"
-          aria-label="Importer un dessin"
+          title="Importar"
+          aria-label="Importar un dibujo"
           aria-current={activeCategory === 'upload' ? 'page' : undefined}
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1037,7 +1042,7 @@
             <polyline points="17 8 12 3 7 8"/>
             <line x1="12" y1="3" x2="12" y2="15"/>
           </svg>
-          <span class="nav-label" aria-hidden="true">Importer</span>
+          <span class="nav-label" aria-hidden="true">Importar</span>
         </button>
 
         {#if $model}
@@ -1045,15 +1050,15 @@
             class="category-btn"
             class:active={activeCategory === 'params'}
             on:click={() => activeCategory = 'params'}
-            title="Réglages"
-            aria-label="Réglages"
+            title="Ajustes"
+            aria-label="Ajustes"
             aria-current={activeCategory === 'params' ? 'page' : undefined}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="3"/>
               <path d="M12 1v6m0 6v6"/>
             </svg>
-            <span class="nav-label" aria-hidden="true">Réglages</span>
+            <span class="nav-label" aria-hidden="true">Ajustes</span>
           </button>
         {/if}
 
@@ -1061,36 +1066,36 @@
           class="category-btn"
           class:active={activeCategory === 'shapes'}
           on:click={() => activeCategory = 'shapes'}
-          title="Bibliothèque de formes"
-          aria-label="Bibliothèque de formes"
+          title="Biblioteca de formas"
+          aria-label="Biblioteca de formas"
           aria-current={activeCategory === 'shapes' ? 'page' : undefined}
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
           </svg>
-          <span class="nav-label" aria-hidden="true">Bibliothèque de formes</span>
+          <span class="nav-label" aria-hidden="true">Biblioteca de formas</span>
         </button>
 
         <button
           class="category-btn"
           class:active={activeCategory === 'advanced'}
           on:click={() => activeCategory = 'advanced'}
-          title="Création avancée"
-          aria-label="Création avancée"
+          title="Creación avanzada"
+          aria-label="Creación avanzada"
           aria-current={activeCategory === 'advanced' ? 'page' : undefined}
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 2v20M2 12h20"/>
           </svg>
-          <span class="nav-label" aria-hidden="true">Création avancée</span>
+          <span class="nav-label" aria-hidden="true">Creación avanzada</span>
         </button>
 
         <button
           class="category-btn ai-btn"
           class:active={activeCategory === 'ai'}
           on:click={() => activeCategory = 'ai'}
-          title="Outils IA (Gemini)"
-          aria-label="Outils IA (Gemini)"
+          title="Herramientas de IA (Gemini)"
+          aria-label="Herramientas de IA (Gemini)"
           aria-current={activeCategory === 'ai' ? 'page' : undefined}
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1098,21 +1103,21 @@
             <circle cx="9" cy="16" r="1"/>
             <circle cx="15" cy="16" r="1"/>
           </svg>
-          <span class="nav-label" aria-hidden="true">Outils IA</span>
+          <span class="nav-label" aria-hidden="true">Herramientas de IA</span>
         </button>
 
         <button
           class="category-btn"
           class:active={activeCategory === 'gallery'}
           on:click={() => activeCategory = 'gallery'}
-          title="Galerie locale"
-          aria-label="Galerie locale"
+          title="Galería local"
+          aria-label="Galería local"
           aria-current={activeCategory === 'gallery' ? 'page' : undefined}
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
           </svg>
-          <span class="nav-label" aria-hidden="true">Galerie locale</span>
+          <span class="nav-label" aria-hidden="true">Galería local</span>
         </button>
 
         {#if $model}
@@ -1120,29 +1125,29 @@
             class="category-btn"
             class:active={activeCategory === 'materials'}
             on:click={() => activeCategory = 'materials'}
-            title="Matériaux"
-            aria-label="Matériaux et optimisation"
+            title="Materiales"
+            aria-label="Materiales y optimización"
             aria-current={activeCategory === 'materials' ? 'page' : undefined}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
             </svg>
-            <span class="nav-label" aria-hidden="true">Matériaux</span>
+            <span class="nav-label" aria-hidden="true">Materiales</span>
           </button>
 
           <button
             class="category-btn"
             class:active={activeCategory === 'preview'}
             on:click={() => activeCategory = 'preview'}
-            title="Aperçu"
-            aria-label="Aperçu d’impression"
+            title="Vista previa"
+            aria-label="Vista previa de impresión"
             aria-current={activeCategory === 'preview' ? 'page' : undefined}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
               <circle cx="12" cy="12" r="3"/>
             </svg>
-            <span class="nav-label" aria-hidden="true">Aperçu</span>
+            <span class="nav-label" aria-hidden="true">Vista previa</span>
           </button>
 
         {/if}
@@ -1152,13 +1157,29 @@
             class:active={activeCategory === 'batch'}
             on:click={() => activeCategory = 'batch'}
             title="Batch"
-            aria-label="Production en série"
+            aria-label="Producción en serie"
             aria-current={activeCategory === 'batch' ? 'page' : undefined}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M16 16h6v6M8 8H2V2"/>
             </svg>
-            <span class="nav-label" aria-hidden="true">Série</span>
+            <span class="nav-label" aria-hidden="true">Serie</span>
+          </button>
+        {/if}
+        {#if $session}
+          <button
+            class="category-btn"
+            class:active={activeCategory === 'set'}
+            on:click={() => activeCategory = 'set'}
+            title="Juego: cortador + sello"
+            aria-label="Juego: cortador y sello"
+            aria-current={activeCategory === 'set' ? 'page' : undefined}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="8" cy="12" r="5"/>
+              <rect x="13" y="7" width="9" height="10" rx="2"/>
+            </svg>
+            <span class="nav-label" aria-hidden="true">Juego</span>
           </button>
         {/if}
         {#if $model}
@@ -1167,8 +1188,8 @@
             class="category-btn"
             class:active={activeCategory === 'export'}
             on:click={() => activeCategory = 'export'}
-            title="Export"
-            aria-label="Exporter le dessin"
+            title="Exportar"
+            aria-label="Exportar el dibujo"
             aria-current={activeCategory === 'export' ? 'page' : undefined}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1176,7 +1197,7 @@
               <polyline points="7 10 12 15 17 10"/>
               <line x1="12" y1="15" x2="12" y2="3"/>
             </svg>
-            <span class="nav-label" aria-hidden="true">Export</span>
+            <span class="nav-label" aria-hidden="true">Exportar</span>
           </button>
         {/if}
       </nav>
@@ -1184,7 +1205,7 @@
 
     <!-- Content Panel -->
     <div class="content-panel">
-      {#if importError || $error}
+      {#if importError || ($error && activeCategory !== 'set')}
         <div class="alert alert-error" role="alert">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="10"/>
@@ -1192,34 +1213,35 @@
             <line x1="12" y1="16" x2="12.01" y2="16"/>
           </svg>
           <div>
-            <strong>Erreur</strong>
+            <strong>Error</strong>
             <p>{importError ?? $error}</p>
           </div>
         </div>
       {/if}
 
       {#if mobileCreateMenu}
-        <section class="mobile-create-menu" aria-label="Outils de création">
-          <h2>Créer un Cutter</h2>
-          <p>Choisissez une étape. Vous pourrez revenir aux réglages et à l’aperçu 3D à tout moment.</p>
-          <button type="button" on:click={() => selectMobileCategory('upload')}>Importer une image</button>
-          <button type="button" on:click={() => selectMobileCategory('shapes')}>Choisir une forme</button>
-          <button type="button" on:click={() => selectMobileCategory('advanced')}>Atelier 2D et ponts</button>
-          {#if batchAvailable}<button type="button" on:click={() => selectMobileCategory('batch')}>Série de Cutters</button>{/if}
-          <h3>Autres outils</h3>
-          <button type="button" on:click={() => selectMobileCategory('ai')}>Outils IA</button>
-          <button type="button" on:click={() => selectMobileCategory('gallery')}>Galerie</button>
+        <section class="mobile-create-menu" aria-label="Herramientas de creación">
+          <h2>Crear un cortador</h2>
+          <p>Elegí un paso. Podés volver a los ajustes y a la vista 3D en cualquier momento.</p>
+          <button type="button" on:click={() => selectMobileCategory('upload')}>Importar una imagen</button>
+          <button type="button" on:click={() => selectMobileCategory('shapes')}>Elegir una forma</button>
+          <button type="button" on:click={() => selectMobileCategory('advanced')}>Taller 2D y puentes</button>
+          {#if $session}<button type="button" on:click={() => selectMobileCategory('set')}>Juego: cortador + sello</button>{/if}
+          {#if batchAvailable}<button type="button" on:click={() => selectMobileCategory('batch')}>Serie de cortadores</button>{/if}
+          <h3>Otras herramientas</h3>
+          <button type="button" on:click={() => selectMobileCategory('ai')}>Herramientas de IA</button>
+          <button type="button" on:click={() => selectMobileCategory('gallery')}>Galería</button>
           {#if $model}
-            <button type="button" on:click={() => selectMobileCategory('materials')}>Matériaux et optimisation</button>
-            <button type="button" on:click={() => selectMobileCategory('preview')}>Préparation impression</button>
+            <button type="button" on:click={() => selectMobileCategory('materials')}>Materiales y optimización</button>
+            <button type="button" on:click={() => selectMobileCategory('preview')}>Preparación de impresión</button>
           {/if}
         </section>
       {/if}
       <div class="panel-content" class:mobile-start={!$session && activeCategory === 'upload' && photoDraft === null && !importPending} bind:this={panelContent}>
         {#if importPending}
           <div class="image-import-progress">
-            <p role="status" aria-live="polite">Importation de l’image… {TRACING_PRESETS.find(option => option.id === pendingPreset)?.label}</p>
-            <button type="button" class="btn" on:click={cancelImageImport}>Annuler l’importation</button>
+            <p role="status" aria-live="polite">Importando la imagen… {TRACING_PRESETS.find(option => option.id === pendingPreset)?.label}</p>
+            <button type="button" class="btn" on:click={cancelImageImport}>Cancelar la importación</button>
           </div>
         {/if}
         {#if activeCategory === 'upload' || activeCategory === 'advanced'}
@@ -1230,18 +1252,18 @@
               {#if PhotoImportReview}
                 <svelte:component this={PhotoImportReview} file={photoDraft.file} on:apply={event => void applyPreparedPhoto(event.detail)} on:cancel={cancelPhotoReview} />
               {:else}
-                <p role="status">Chargement de la préparation photo…</p>
-                {#if photoReviewError}<p role="alert">{photoReviewError}</p><button type="button" class="btn" on:click={loadPhotoReview}>Réessayer la préparation photo</button>{/if}
-                <button type="button" class="btn" on:click={cancelPhotoReview}>Annuler la préparation photo</button>
+                <p role="status">Cargando la preparación de la foto…</p>
+                {#if photoReviewError}<p role="alert">{photoReviewError}</p><button type="button" class="btn" on:click={loadPhotoReview}>Reintentar la preparación de la foto</button>{/if}
+                <button type="button" class="btn" on:click={cancelPhotoReview}>Cancelar la preparación de la foto</button>
               {/if}
             {/key}
           {/if}
           {#if $session?.source.type === 'raster'}
             {#if sessionRaster && sessionRaster.epoch === session.getSessionEpoch()}
-              <p>Revectoriser remplace les corrections du dessin ; Annuler permet de les retrouver.</p>
-              <button type="button" class="btn" disabled={importPending || photoDraft !== null} on:click={revectorizeCurrentImage}>Revectoriser l’image actuelle</button>
+              <p>Volver a vectorizar reemplaza las correcciones del dibujo; Deshacer permite recuperarlas.</p>
+              <button type="button" class="btn" disabled={importPending || photoDraft !== null} on:click={revectorizeCurrentImage}>Volver a vectorizar la imagen actual</button>
             {:else}
-              <p>Réimportez l’image originale pour changer de préréglage : les pixels raster ne sont pas sauvegardés dans le projet V1. Le dessin sauvegardé reste disponible.</p>
+              <p>Volvé a importar la imagen original para cambiar de perfil: los píxeles de la imagen no se guardan en el proyecto V1. El dibujo guardado sigue disponible.</p>
             {/if}
           {/if}
           </div>
@@ -1256,7 +1278,7 @@
                 on:shapes={() => selectMobileCategory('shapes')} on:projects={() => selectMobileCategory('projects')} />
             {:else}
               {#if startScreenError}
-                <p role="alert">Impossible de charger l’écran d’accueil : {startScreenError}</p>
+                <p role="alert">No se pudo cargar la pantalla de inicio: {startScreenError}</p>
               {/if}
               <FileUpload on:upload={handleFileUpload} on:reject={e => rejectImageImport(e.detail)} />
             {/if}
@@ -1269,7 +1291,7 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <circle cx="12" cy="12" r="10"/>
                 </svg>
-                Essayer un cercle de test
+                Probar con un círculo de prueba
               </button>
             </div>
           {/if}
@@ -1279,90 +1301,90 @@
           <ParameterPanel session={unavailableReason === null ? session : null} />
 
         {:else if activeCategory === 'params'}
-          <div class="feature-header"><h2>Réglages</h2><p>Importez une image ou choisissez une forme pour générer un Cutter et accéder à ses réglages.</p></div>
+          <div class="feature-header"><h2>Ajustes</h2><p>Importá una imagen o elegí una forma para generar un cortador y acceder a sus ajustes.</p></div>
 
         {:else if activeCategory === 'shapes'}
           <ShapeLibrary on:selectShape={(e) => handleShapeSelect(e.detail)} />
 
         {:else if activeCategory === 'advanced'}
           <header class="feature-header advanced-header">
-            <h2>Création avancée</h2>
-            <p>Créez ou combinez des formes avant de les appliquer au modèle 3D.</p>
+            <h2>Creación avanzada</h2>
+            <p>Creá o combiná formas antes de aplicarlas al modelo 3D.</p>
           </header>
-          <nav class="mobile-workshop-nav" aria-label="Atelier mobile">
-            <button type="button" aria-current={mobileWorkshop === 'sketch' ? 'page' : undefined} on:click={() => mobileWorkshop = 'sketch'}>Atelier 2D</button>
+          <nav class="mobile-workshop-nav" aria-label="Taller móvil">
+            <button type="button" aria-current={mobileWorkshop === 'sketch' ? 'page' : undefined} on:click={() => mobileWorkshop = 'sketch'}>Taller 2D</button>
             {#if unavailableReason === null && ($session?.kind === 'cutter' || $session?.kind === 'multi-cutter')}
-              <button type="button" aria-current={mobileWorkshop === 'bridges' ? 'page' : undefined} on:click={() => mobileWorkshop = 'bridges'}>Ponts</button>
+              <button type="button" aria-current={mobileWorkshop === 'bridges' ? 'page' : undefined} on:click={() => mobileWorkshop = 'bridges'}>Puentes</button>
             {/if}
-            <button type="button" aria-current={mobileWorkshop === 'more' ? 'page' : undefined} on:click={() => mobileWorkshop = 'more'}>Autres</button>
+            <button type="button" aria-current={mobileWorkshop === 'more' ? 'page' : undefined} on:click={() => mobileWorkshop = 'more'}>Otros</button>
           </nav>
           <div class="advanced-ai">
           {#await import('./lib/components/ui/AIImageProcessor.svelte')}
-            <div class="panel-loading" role="status">Chargement du traitement d’image…</div>
+            <div class="panel-loading" role="status">Cargando el procesamiento de imagen…</div>
           {:then component}
             <component.default captureOperationValidity={captureAIOperationValidity} onProcessedImage={handleContextualAIImage} />
           {:catch}
-            <div class="panel-load-error" role="alert">Impossible de charger le traitement d’image.</div>
+            <div class="panel-load-error" role="alert">No se pudo cargar el procesamiento de imagen.</div>
           {/await}
           </div>
           <HistoryPanel on:undo={handleUndo} on:redo={handleRedo} />
           <div class="advanced-sketch">
           {#await import('./lib/components/ui/SketchWorkspace.svelte')}
-            <div class="panel-loading" role="status">Chargement de l’atelier 2D…</div>
+            <div class="panel-loading" role="status">Cargando el taller 2D…</div>
           {:then component}
             {#if unavailableReason === null}
               {#key $session?.id}
                 <component.default {session} />
               {/key}
             {:else}
-              <p role="status">Ouvrez un projet pour modifier son dessin.</p>
+              <p role="status">Abrí un proyecto para modificar su dibujo.</p>
             {/if}
           {:catch}
-            <div class="panel-load-error" role="alert">Impossible de charger l’atelier 2D.</div>
+            <div class="panel-load-error" role="alert">No se pudo cargar el taller 2D.</div>
           {/await}
           </div>
           <div class="advanced-bridges">
           {#if unavailableReason === null && ($session?.kind === 'cutter' || $session?.kind === 'multi-cutter')}
             {#await import('./lib/components/ui/BridgeWorkspace.svelte')}
-              <div class="panel-loading" role="status">Chargement de l’éditeur de ponts…</div>
+              <div class="panel-loading" role="status">Cargando el editor de puentes…</div>
             {:then component}
               {#key $session?.id}<component.default {session} />{/key}
             {:catch}
-              <div class="panel-load-error" role="alert">Impossible de charger l’éditeur de ponts.</div>
+              <div class="panel-load-error" role="alert">No se pudo cargar el editor de puentes.</div>
             {/await}
           {/if}
           </div>
           <div class="advanced-extra">
           {#await import('./lib/components/ui/PatternGenerator.svelte')}
-            <div class="panel-loading" role="status">Chargement du générateur de motifs…</div>
+            <div class="panel-loading" role="status">Cargando el generador de patrones…</div>
           {:then component}
             <component.default on:patternCreated={(e) => handleShapeSelect(e.detail)} />
           {:catch}
-            <div class="panel-load-error" role="alert">Impossible de charger le générateur de motifs.</div>
+            <div class="panel-load-error" role="alert">No se pudo cargar el generador de patrones.</div>
           {/await}
           {#await import('./lib/components/ui/BooleanOperations.svelte')}
-            <div class="panel-loading" role="status">Chargement des opérations booléennes…</div>
+            <div class="panel-loading" role="status">Cargando las operaciones booleanas…</div>
           {:then component}
             <component.default on:shapeCreated={(e) => handleShapeSelect(e.detail)} />
           {:catch}
-            <div class="panel-load-error" role="alert">Impossible de charger les opérations booléennes.</div>
+            <div class="panel-load-error" role="alert">No se pudo cargar las operaciones booleanas.</div>
           {/await}
           </div>
 
         {:else if activeCategory === 'ai'}
           <header class="feature-header">
-            <h2>Outils IA</h2>
-            <p>Connectez Gemini pour obtenir de l’aide sur le dessin actuel.</p>
+            <h2>Herramientas de IA</h2>
+            <p>Conectá Gemini para recibir ayuda con el dibujo actual.</p>
           </header>
           {#await import('./lib/components/ui/GeminiAPIConfig.svelte')}
-            <div class="panel-loading" role="status">Chargement de la configuration Gemini…</div>
+            <div class="panel-loading" role="status">Cargando la configuración de Gemini…</div>
           {:then component}
             <component.default />
           {:catch}
-            <div class="panel-load-error" role="alert">Impossible de charger la configuration Gemini.</div>
+            <div class="panel-load-error" role="alert">No se pudo cargar la configuración de Gemini.</div>
           {/await}
           {#await import('./lib/components/ui/AIAssistant.svelte')}
-            <div class="panel-loading" role="status">Chargement de l’assistant IA…</div>
+            <div class="panel-loading" role="status">Cargando el asistente de IA…</div>
           {:then component}
             <component.default
               params={$params}
@@ -1371,12 +1393,12 @@
               onOptimizedSVG={handleContextualAISVG}
             />
           {:catch}
-            <div class="panel-load-error" role="alert">Impossible de charger l’assistant IA.</div>
+            <div class="panel-load-error" role="alert">No se pudo cargar el asistente de IA.</div>
           {/await}
 
         {:else if activeCategory === 'gallery'}
           {#await import('./lib/components/ui/CloudGallery.svelte')}
-            <div class="panel-loading" role="status">Chargement de la galerie locale…</div>
+            <div class="panel-loading" role="status">Cargando la galería local…</div>
           {:then component}
             <component.default
               currentSvg={svgCache}
@@ -1384,51 +1406,51 @@
               on:loadDesign={handleLoadFromGallery}
             />
           {:catch}
-            <div class="panel-load-error" role="alert">Impossible de charger la galerie locale.</div>
+            <div class="panel-load-error" role="alert">No se pudo cargar la galería local.</div>
           {/await}
 
         {:else if activeCategory === 'materials' && $model}
           {#await import('./lib/components/ui/MaterialManager.svelte')}
-            <div class="panel-loading" role="status">Chargement des matériaux…</div>
+            <div class="panel-loading" role="status">Cargando los materiales…</div>
           {:then component}
             <component.default on:materialChanged={handleMaterialChange} />
           {:catch}
-            <div class="panel-load-error" role="alert">Impossible de charger les matériaux.</div>
+            <div class="panel-load-error" role="alert">No se pudo cargar los materiales.</div>
           {/await}
           {#await import('./lib/components/ui/OptimizationPanel.svelte')}
-            <div class="panel-loading" role="status">Chargement des outils d’optimisation…</div>
+            <div class="panel-loading" role="status">Cargando las herramientas de optimización…</div>
           {:then component}
             <component.default on:applyFix={(e) => updateParams(e.detail)} />
           {:catch}
-            <div class="panel-load-error" role="alert">Impossible de charger les outils d’optimisation.</div>
+            <div class="panel-load-error" role="alert">No se pudo cargar las herramientas de optimización.</div>
           {/await}
           {#await import('./lib/components/ui/CollisionDetector.svelte')}
-            <div class="panel-loading" role="status">Chargement du détecteur de collisions…</div>
+            <div class="panel-loading" role="status">Cargando el detector de colisiones…</div>
           {:then component}
             <component.default mesh={currentMesh} buildPlateSize={$params.buildPlateSize} allowPositionFix={false} />
           {:catch}
-            <div class="panel-load-error" role="alert">Impossible de charger le détecteur de collisions.</div>
+            <div class="panel-load-error" role="alert">No se pudo cargar el detector de colisiones.</div>
           {/await}
 
         {:else if activeCategory === 'preview' && $model}
           {#await import('./lib/components/ui/SlicePreview.svelte')}
-            <div class="panel-loading" role="status">Chargement de l’aperçu des couches…</div>
+            <div class="panel-loading" role="status">Cargando la vista previa de capas…</div>
           {:then component}
             <component.default mesh={currentMesh} layerHeight={0.2} />
           {:catch}
-            <div class="panel-load-error" role="alert">Impossible de charger l’aperçu des couches.</div>
+            <div class="panel-load-error" role="alert">No se pudo cargar la vista previa de capas.</div>
           {/await}
           {#await import('./lib/components/ui/PrintabilityInfo.svelte')}
-            <div class="panel-loading" role="status">Chargement des informations d’impression…</div>
+            <div class="panel-loading" role="status">Cargando la información de impresión…</div>
           {:then component}
             <component.default />
           {:catch}
-            <div class="panel-load-error" role="alert">Impossible de charger les informations d’impression.</div>
+            <div class="panel-load-error" role="alert">No se pudo cargar la información de impresión.</div>
           {/await}
 
         {:else if activeCategory === 'batch' && batchAvailable}
           {#await import('./lib/components/ui/BatchMode.svelte')}
-            <div class="panel-loading" role="status">Chargement du mode série…</div>
+            <div class="panel-loading" role="status">Cargando el modo serie…</div>
           {:then component}
             <component.default
               currentSvg={svgCache}
@@ -1442,20 +1464,33 @@
               on:batchCreated={handleBatchCreated}
             />
           {:catch}
-            <div class="panel-load-error" role="alert">Impossible de charger le mode série.</div>
+            <div class="panel-load-error" role="alert">No se pudo cargar el modo serie.</div>
           {/await}
 
+        {:else if activeCategory === 'set' && $session}
+          {#await import('./lib/components/ui/CookieSetPanel.svelte')}
+            <div class="panel-loading" role="status">Cargando el generador del juego…</div>
+          {:then component}
+            <component.default
+              svg={$session.sketch.svg}
+              baseParams={$params}
+              fileBase={(fileName.replace(/\.[^/.]+$/, '') || 'galleta')}
+              onPreview={handleSetPreview}
+            />
+          {:catch}
+            <div class="panel-load-error" role="alert">No se pudo cargar el generador del juego.</div>
+          {/await}
         {:else if activeCategory === 'export' && $model}
           {#await import('./lib/components/ui/AdvancedExport.svelte')}
-            <div class="panel-loading" role="status">Chargement des outils d’export…</div>
+            <div class="panel-loading" role="status">Cargando las herramientas de exportación…</div>
           {:then component}
             <component.default mesh={currentMesh} filename={fileName} params={$params}
               captureExport={captureGeometryExport} unavailableReason={geometryExportReason} />
           {:catch}
-            <div class="panel-load-error" role="alert">Impossible de charger les outils d’export.</div>
+            <div class="panel-load-error" role="alert">No se pudo cargar las herramientas de exportación.</div>
           {/await}
         {:else if activeCategory === 'export'}
-          <div class="feature-header"><h2>Export</h2><p>Importez ou ouvrez un projet pour exporter son fichier. Si une série ne peut pas être générée, corrigez sa disposition dans Créer → Série de Cutters.</p></div>
+          <div class="feature-header"><h2>Exportar</h2><p>Importá o abrí un proyecto para exportar su archivo. Si una serie no se puede generar, corregí su disposición en Crear → Serie de cortadores.</p></div>
         {/if}
         {#if recoveryPanelVisible}
           <div class="recovery-area" class:mobile-recovery-away={activeCategory !== 'projects'}>
@@ -1473,23 +1508,23 @@
       {#if $isProcessing}
         <div class="loading-state">
           <div class="modern-spinner"></div>
-          <p class="loading-text">Génération du dessin en cours…</p>
+          <p class="loading-text">Generando el dibujo…</p>
         </div>
-      {:else if currentMesh}
+      {:else if viewerMesh}
         <ThreeViewer
-          mesh={currentMesh}
+          mesh={viewerMesh}
           buildPlateSize={$params.buildPlateSize}
           {viewport}
           onViewportChange={changeViewport}
           allowObjectDeletion={false}
         />
         {#if modelDimensions}
-          <div class="dimension-badge" aria-label="Dimensions du modèle final">
-            <strong>Dimensions finales</strong>
+          <div class="dimension-badge" aria-label="Dimensiones del modelo final">
+            <strong>Dimensiones finales</strong>
             <span>
               {modelDimensions.width.toFixed(1)} × {modelDimensions.depth.toFixed(1)} × {modelDimensions.height.toFixed(1)} mm
             </span>
-            <small>largeur × profondeur × hauteur</small>
+            <small>ancho × profundidad × alto</small>
           </div>
         {/if}
       {:else}
@@ -1501,18 +1536,18 @@
               <line x1="12" y1="22.08" x2="12" y2="12" />
             </svg>
           </div>
-          <h3>Aucun modèle chargé</h3>
-          <p>Importez un dessin ou choisissez une forme pour commencer.</p>
-          <button type="button" class="empty-create" on:click={openMobileCreate}>Choisir une méthode de création</button>
+          <h3>No hay ningún modelo cargado</h3>
+          <p>Importá un dibujo o elegí una forma para empezar.</p>
+          <button type="button" class="empty-create" on:click={openMobileCreate}>Elegir cómo crear</button>
         </div>
       {/if}
     </div>
-    <nav class="mobile-sections" aria-label="Sections mobiles">
-      <button type="button" aria-current={!mobileView3D && !mobileCreateMenu && activeCategory === 'projects' ? 'page' : undefined} on:click={() => selectMobileCategory('projects')}>Projet</button>
-      <button type="button" aria-current={!mobileView3D && (mobileCreateMenu || !['projects', 'params', 'export'].includes(activeCategory)) ? 'page' : undefined} on:click={openMobileCreate}>Créer</button>
-      <button type="button" aria-current={!mobileView3D && !mobileCreateMenu && activeCategory === 'params' ? 'page' : undefined} on:click={() => selectMobileCategory('params')}>Régler</button>
+    <nav class="mobile-sections" aria-label="Secciones móviles">
+      <button type="button" aria-current={!mobileView3D && !mobileCreateMenu && activeCategory === 'projects' ? 'page' : undefined} on:click={() => selectMobileCategory('projects')}>Proyecto</button>
+      <button type="button" aria-current={!mobileView3D && (mobileCreateMenu || !['projects', 'params', 'export'].includes(activeCategory)) ? 'page' : undefined} on:click={openMobileCreate}>Crear</button>
+      <button type="button" aria-current={!mobileView3D && !mobileCreateMenu && activeCategory === 'params' ? 'page' : undefined} on:click={() => selectMobileCategory('params')}>Ajustar</button>
       <button type="button" aria-current={mobileView3D ? 'page' : undefined} on:click={showMobile3D}>3D</button>
-      <button type="button" aria-current={!mobileView3D && !mobileCreateMenu && activeCategory === 'export' ? 'page' : undefined} on:click={() => selectMobileCategory('export')}>Export</button>
+      <button type="button" aria-current={!mobileView3D && !mobileCreateMenu && activeCategory === 'export' ? 'page' : undefined} on:click={() => selectMobileCategory('export')}>Exportar</button>
     </nav>
   </div>
 </main>

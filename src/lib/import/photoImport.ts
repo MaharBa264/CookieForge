@@ -33,12 +33,12 @@ export async function preparePhoto(file: File, requestedSettings: PhotoSettings 
   const settings = parsePhotoSettings(requestedSettings);
   const normalizedFile = file.type === mime ? file : new File([file], file.name, { type: mime, lastModified: file.lastModified });
   checkCancellation(signal);
-  if (typeof Worker !== 'function') throw new Error('Ce navigateur ne permet pas la préparation photo en Worker. Utilisez un navigateur récent.');
+  if (typeof Worker !== 'function') throw new Error('Este navegador no permite preparar fotos en un Worker. Usá un navegador reciente.');
   let worker: Worker;
   try {
     worker = new Worker(new URL('../../workers/photoProcessor.worker.ts', import.meta.url), { type: 'module' });
   } catch {
-    throw new Error('Impossible de démarrer le Worker photo. Rechargez la page ou utilisez un navigateur récent.');
+    throw new Error('No se pudo iniciar el Worker de fotos. Recargá la página o usá un navegador reciente.');
   }
   const result = await new Promise<PhotoTraceResult>((resolve, reject) => {
     let settled = false, timer: ReturnType<typeof setTimeout> | undefined;
@@ -61,19 +61,19 @@ export async function preparePhoto(file: File, requestedSettings: PhotoSettings 
       const response = event.data as Partial<PhotoWorkerResponse> | null;
       if (response?.type === 'success' && validResult(response.result)) finish(response.result);
       else if (response?.type === 'error' && typeof response.message === 'string') finish(new Error(response.message));
-      else finish(new Error('Le Worker photo a retourné un résultat invalide. Réessayez avec une autre photo.'));
+      else finish(new Error('El Worker de fotos devolvió un resultado inválido. Reintentá con otra foto.'));
     };
-    worker.onerror = () => finish(new Error('La préparation photo a échoué dans le Worker. Recadrez le sujet ou utilisez une autre photo.'));
-    worker.onmessageerror = () => finish(new Error('Impossible de lire la réponse du Worker photo. Réessayez.'));
+    worker.onerror = () => finish(new Error('Falló la preparación de la foto en el Worker. Recortá el sujeto o usá otra foto.'));
+    worker.onmessageerror = () => finish(new Error('No se pudo leer la respuesta del Worker de fotos. Reintentá.'));
     signal?.addEventListener('abort', abort, { once: true });
     // Covers cancellation during construction/listener registration without allocating an orphaned timeout.
     if (signal?.aborted) { abort(); return; }
-    timer = setTimeout(() => finish(new Error('Délai de préparation photo dépassé (30 s). Recadrez plus près ou utilisez une photo moins complexe.')), PHOTO_PREPARATION_TIMEOUT_MS);
+    timer = setTimeout(() => finish(new Error('Se superó el tiempo de preparación de la foto (30 s). Recortá más cerca o usá una foto menos compleja.')), PHOTO_PREPARATION_TIMEOUT_MS);
     try {
       const request: PhotoWorkerRequest = { type: 'prepare', file: normalizedFile, settings };
       worker.postMessage(request);
     } catch {
-      finish(new Error('Impossible de transmettre la photo au Worker. Réessayez avec un fichier PNG, JPEG ou WebP.'));
+      finish(new Error('No se pudo enviar la foto al Worker. Reintentá con un archivo PNG, JPEG o WebP.'));
     }
   });
   checkCancellation(signal);

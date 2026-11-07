@@ -54,13 +54,13 @@
       class:disabled={!$canUndo}
       on:click={handleUndo}
       disabled={!$canUndo}
-      title="Annuler (Ctrl+Z)"
+      title="Deshacer (Ctrl+Z)"
     >
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M3 7v6h6" />
         <path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13" />
       </svg>
-      <span class="btn-label">Annuler</span>
+      <span class="btn-label">Deshacer</span>
     </button>
 
     <button
@@ -68,20 +68,20 @@
       class:disabled={!$canRedo}
       on:click={handleRedo}
       disabled={!$canRedo}
-      title="Rétablir (Ctrl+Maj+Z)"
+      title="Rehacer (Ctrl+Mayús+Z)"
     >
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M21 7v6h-6" />
         <path d="M3 17a9 9 0 019-9 9 9 0 016 2.3l3 2.7" />
       </svg>
-      <span class="btn-label">Rétablir</span>
+      <span class="btn-label">Rehacer</span>
     </button>
 
     <button
       class="control-btn info-btn"
       on:click={() => showHistory = !showHistory}
-      title="Afficher l’historique"
-      aria-label={`Historique, ${historyLength} états`}
+      title="Mostrar el historial"
+      aria-label={`Historial, ${historyLength} estados`}
       aria-expanded={showHistory}
     >
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -94,7 +94,7 @@
 
   {#if showHistory && historyLength > 0}
     <div class="history-list">
-      <h4>Historique</h4>
+      <h4>Historial</h4>
       <div class="history-items">
         {#each $historyStore as state, index}
           <div

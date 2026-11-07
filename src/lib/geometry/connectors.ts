@@ -26,7 +26,7 @@ function closestPoint(point: NormalizedPoint, contour: NormalizedContour): { poi
 }
 /** Returns the nearest centreline endpoint for pointer/keyboard placement. */
 export function snapToContour(point: NormalizedPoint, contours: readonly NormalizedContour[]): NormalizedPoint {
-  if (!contours.length || !Number.isFinite(point.x) || !Number.isFinite(point.y)) invalid('No valid contour to snap to.');
+  if (!contours.length || !Number.isFinite(point.x) || !Number.isFinite(point.y)) invalid('No hay ningún contorno válido al cual imantar.');
   return contours.map(contour => closestPoint(point, contour)).sort((a, b) => a.distance - b.distance)[0].point;
 }
 function orientation(a: NormalizedPoint, b: NormalizedPoint, c: NormalizedPoint): number {
@@ -52,22 +52,22 @@ function segmentsCross(a: Bridge, b: Bridge): boolean {
 }
 /** Require a bridge to touch two distinct centreline loops; never guess a detached connection. */
 export function validateConnectorLayout(contours: readonly NormalizedContour[], bridges: readonly Bridge[], scale: number, wallWidthMm: number): void {
-  if (!Number.isFinite(scale) || scale <= 0 || !Number.isFinite(wallWidthMm) || wallWidthMm <= 0) invalid('Invalid physical scale or wall width.');
-  if (bridges.length > BRIDGE_LIMITS.maxCount) invalid('Too many bridges.');
+  if (!Number.isFinite(scale) || scale <= 0 || !Number.isFinite(wallWidthMm) || wallWidthMm <= 0) invalid('Escala física o ancho de pared inválidos.');
+  if (bridges.length > BRIDGE_LIMITS.maxCount) invalid('Demasiados puentes.');
   const names = new Set<string>();
   const tolerance = Math.max(0.001, Math.min(wallWidthMm, 1) / scale);
   for (const bridge of bridges) {
     if (typeof bridge.id !== 'string' || !bridge.id.trim() || names.has(bridge.id)
       || !Number.isFinite(bridge.widthMm) || bridge.widthMm < BRIDGE_LIMITS.minWidthMm || bridge.widthMm > BRIDGE_LIMITS.maxWidthMm
-      || ![bridge.from.x, bridge.from.y, bridge.to.x, bridge.to.y].every(n => Number.isFinite(n) && Math.abs(n) <= BRIDGE_LIMITS.maxCoordinate)) invalid('Invalid bridge parameters.');
+      || ![bridge.from.x, bridge.from.y, bridge.to.x, bridge.to.y].every(n => Number.isFinite(n) && Math.abs(n) <= BRIDGE_LIMITS.maxCoordinate)) invalid('Parámetros de puente inválidos.');
     names.add(bridge.id);
-    if (Math.hypot(bridge.from.x - bridge.to.x, bridge.from.y - bridge.to.y) * scale < bridge.widthMm * 1.5) invalid('Bridge is too short for its width.');
+    if (Math.hypot(bridge.from.x - bridge.to.x, bridge.from.y - bridge.to.y) * scale < bridge.widthMm * 1.5) invalid('El puente es demasiado corto para su ancho.');
     const first = contours.map((contour, i) => ({ i, distance: closestPoint(bridge.from, contour).distance })).sort((a, b) => a.distance - b.distance)[0];
     const second = contours.map((contour, i) => ({ i, distance: closestPoint(bridge.to, contour).distance })).sort((a, b) => a.distance - b.distance)[0];
-    if (!first || !second || first.i === second.i || first.distance > tolerance || second.distance > tolerance) invalid('Bridge ends must touch two distinct contour centrelines.');
+    if (!first || !second || first.i === second.i || first.distance > tolerance || second.distance > tolerance) invalid('Los extremos del puente deben tocar las líneas centrales de dos contornos distintos.');
   }
   for (let i = 0; i < bridges.length; i++) for (let j = i + 1; j < bridges.length; j++) {
-    if (segmentsCross(bridges[i], bridges[j])) invalid('Bridge centreline segments intersect.');
+    if (segmentsCross(bridges[i], bridges[j])) invalid('Los segmentos centrales de los puentes se cruzan.');
   }
 }
 function inside(point: NormalizedPoint, polygon: NormalizedContour): boolean {
@@ -87,7 +87,7 @@ function classify(loops: readonly NormalizedContour[]): readonly ConnectedRegion
     else {
       const nearest = parents.sort((a, b) => Math.abs(signedArea(a)) - Math.abs(signedArea(b)))[0];
       const owner = regions.find(region => region.outer === nearest);
-      if (!owner) invalid('Nested island topology is not supported.');
+      if (!owner) invalid('No se admite la topología de islas anidadas.');
       owner.holes.push(loop);
     }
   }
@@ -120,7 +120,7 @@ export async function createConnectedRegions(
     const scaled = contour.map(point => ({ x: point.x * scale, y: point.y * scale }));
     const outer = await offsetPath(scaled, wallWidthMm / 2, 'miter');
     const inner = await offsetPath(scaled, -wallWidthMm / 2, 'miter');
-    if (!outer.length || !inner.length) invalid('Wall offset collapses a contour.');
+    if (!outer.length || !inner.length) invalid('El desplazamiento de la pared colapsa un contorno.');
     const band = await differencePaths(outer, inner);
     for (const part of band) bands.push(part);
   }
@@ -129,9 +129,9 @@ export async function createConnectedRegions(
     ...bridges.map(bridge => ribbon(bridge, scale, bridge.widthMm + bridgeGrowthMm).map(point => ({ x: point.x * scale, y: point.y * scale })))
   ]);
   const regions = classify(merged);
-  if (regions.length === 0) invalid('No printable wall regions remain.');
+  if (regions.length === 0) invalid('No queda ninguna región de pared imprimible.');
   if (regions.length !== 1 && !options.allowDisconnected) {
-    throw new CutterGenerationError('INVALID_GEOMETRY', 'One or more cutter islands remain disconnected.', {
+    throw new CutterGenerationError('INVALID_GEOMETRY', 'Una o más islas del cortador quedan desconectadas.', {
       field: 'bridges', reason: 'disconnected-islands'
     });
   }

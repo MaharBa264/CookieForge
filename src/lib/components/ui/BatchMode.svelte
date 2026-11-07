@@ -53,7 +53,7 @@
 
     const newItem: BatchItem = {
       id: `item_${Date.now()}`,
-      name: `Dessin ${batchItems.length + 1}`,
+      name: `Dibujo ${batchItems.length + 1}`,
       svgData: currentSvg,
       params: { ...currentParams }
     };
@@ -66,7 +66,7 @@
 
     const baseItem: BatchItem = {
       id: `item_${Date.now()}`,
-      name: `Dessin`,
+      name: `Dibujo`,
       svgData: currentSvg,
       params: { ...currentParams }
     };
@@ -132,11 +132,11 @@
     } catch (error) {
       if (!current()) return;
       if (controller.signal.aborted) {
-        batchStatus = 'Annulé — aucune série partielle n’a été conservée.';
+        batchStatus = 'Cancelado: no se conservó ninguna serie parcial.';
       } else if (error instanceof BatchGenerationError) {
         batchStatus = error.failures.map((failure) => `${failure.name}: ${failure.message}`).join(' · ');
       } else {
-        batchStatus = error instanceof Error ? error.message : 'Échec de la génération de la série.';
+        batchStatus = error instanceof Error ? error.message : 'Falló la generación de la serie.';
       }
     } finally {
       // Release only this producer's local lock, even when its external context expired.
@@ -153,11 +153,11 @@
   <CutterSeriesControls {currentDocument} {onUpdateSeries} {onSingleCutter} />
 {/if}
 {#if onUpdateSeries}
-  <button type="button" class="legacy-switch" aria-expanded={showLegacy} on:click={() => showLegacy = !showLegacy}>{showLegacy ? 'Revenir à la série enregistrable' : 'Production libre historique — non enregistrable'}</button>
+  <button type="button" class="legacy-switch" aria-expanded={showLegacy} on:click={() => showLegacy = !showLegacy}>{showLegacy ? 'Volver a la serie guardable' : 'Producción libre clásica (no se puede guardar)'}</button>
 {/if}
 <div class="batch-mode" hidden={Boolean(onUpdateSeries) && !showLegacy}>
   <div class="panel-header">
-    <h3>🏭 Production en série</h3>
+    <h3>🏭 Producción en serie</h3>
     <button class="toggle-btn" on:click={() => showPanel = !showPanel}>
       {showPanel ? '▼' : '▶'}
     </button>
@@ -167,23 +167,23 @@
     <div class="panel-content">
       <div class="controls">
         <button class="btn" on:click={addCurrentDesign} disabled={!currentSvg}>
-          + Ajouter le dessin actuel
+          + Agregar el dibujo actual
         </button>
         <button class="btn" on:click={() => duplicateCurrent(5)} disabled={!currentSvg}>
-          + Ajouter 5 copies
+          + Agregar 5 copias
         </button>
       </div>
 
       <div class="layout-controls">
         <label>
-          <span>Disposition :</span>
+          <span>Disposición:</span>
           <select bind:value={layout.type}>
-            <option value="grid">Grille</option>
+            <option value="grid">Cuadrícula</option>
             <option value="optimized">Optimisée</option>
           </select>
         </label>
         <label>
-          <span>Espacement : {layout.spacing}mm</span>
+          <span>Separación: {layout.spacing}mm</span>
           <input type="range" bind:value={layout.spacing} min="10" max="40" />
         </label>
       </div>
@@ -206,7 +206,7 @@
       {#if batchStatus}<div class="batch-status">{batchStatus}</div>{/if}
 
       <button class="generate-btn" on:click={generateBatch} disabled={!processing && batchItems.length === 0}>
-        {processing ? `Annuler (${completedItems}/${batchItems.length})` : 'Générer la série complète'}
+        {processing ? `Cancelar (${completedItems}/${batchItems.length})` : 'Generar la serie completa'}
       </button>
     </div>
   {/if}

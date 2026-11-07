@@ -18,7 +18,7 @@ export function snapBridgeEndpoint(svg: string, point: NormalizedPoint): Normali
   }
   const span = Math.max(maxX - minX, maxY - minY);
   if (Math.hypot(point.x - snapped.x, point.y - snapped.y) > span * 0.05) {
-    throw new Error('Clique près d’un contour pour placer l’extrémité du pont.');
+    throw new Error('Hacé clic cerca de un contorno para ubicar el extremo del puente.');
   }
   return snapped;
 }
@@ -41,7 +41,7 @@ export async function commitBridgeEdit(
       const result = await generateCookieCutter(baseline.sketch.svg, baseline.parameters, bridges);
       try {
         const report = validatePrintableObject(result, { requireSingleShell: true });
-        if (!report.valid) throw new Error(`Pont non imprimable : ${report.errors.join('; ')}`);
+        if (!report.valid) throw new Error(`Puente no imprimible: ${report.errors.join('; ')}`);
       } finally { disposeObject3D(result); }
     } catch (cause) {
       if (!(cause instanceof CutterGenerationError) || cause.details?.reason !== 'disconnected-islands') throw cause;

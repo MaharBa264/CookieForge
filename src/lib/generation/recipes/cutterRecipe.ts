@@ -42,7 +42,7 @@ function reconstructCutterParameters(
     if (validated.mode !== 'cutter') {
       throw new CutterGenerationError(
         'INVALID_PARAMS',
-        'The mode parameter must be cutter for the Cutter recipe.',
+        'El parámetro mode debe ser cutter para la receta de cortador.',
         { field: 'mode', value: validated.mode }
       );
     }
@@ -74,7 +74,7 @@ function reconstructCutterParameters(
     return invalidResult({
       path: 'parameters',
       code: 'UNEXPECTED_VALIDATION_ERROR',
-      message: 'An unexpected error occurred while validating Cutter parameters.'
+      message: 'Ocurrió un error inesperado al validar los parámetros del cortador.'
     });
   }
 }
@@ -83,7 +83,7 @@ function assertRuntimeCutterKind(document: { readonly kind: string }): void {
   if (document.kind !== 'cutter') {
     throw new CutterGenerationError(
       'INVALID_PARAMS',
-      'The document kind must be cutter for the Cutter recipe.',
+      'El tipo de documento debe ser cutter para la receta de cortador.',
       { field: 'kind', value: document.kind }
     );
   }
@@ -111,7 +111,7 @@ export const cutterRecipe = Object.freeze({
       const firstIssue = validation.issues[0] ?? {
         path: 'parameters',
         code: 'INVALID_PARAMS',
-        message: 'The Cutter parameters are invalid.'
+        message: 'Los parámetros del cortador son inválidos.'
       };
       throw new CutterGenerationError('INVALID_PARAMS', firstIssue.message, {
         field: firstIssue.path,
@@ -132,7 +132,7 @@ export const cutterRecipe = Object.freeze({
       if (!report.valid || report.bounds === null) {
         throw new CutterGenerationError(
           'INVALID_GEOMETRY',
-          'The generated Cutter object is not valid printable geometry.',
+          'El cortador generado no es una geometría imprimible válida.',
           {
             field: 'geometry',
             errors: report.errors,

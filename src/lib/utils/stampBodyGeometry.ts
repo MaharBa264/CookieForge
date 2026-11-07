@@ -139,7 +139,7 @@ function capTriangles(outer: THREE.Vector2[], holes: THREE.Vector2[][]): readonl
       if (preservesCap(candidate, outer, holes)) return candidate;
     }
   }
-  throw new Error('The artwork has no safe boundary-preserving cap triangulation.');
+  throw new Error('El dibujo no admite una triangulación de tapa segura que preserve el borde.');
 }
 function area(points: Outline) { return points.reduce((sum, a, i) => { const b = points[(i + 1) % points.length]; return sum + a.x * b.y - b.x * a.y; }, 0) / 2; }
 function inside(point: Point, polygon: Outline) {
@@ -160,7 +160,7 @@ export function createPlanarStampBody(outlines: readonly Outline[], width: numbe
     const points = outline.map(p => new THREE.Vector2(Math.fround(p.x), Math.fround(p.y)));
     // Only identical consecutive Float32 vertices can disappear on STL conversion.
     const unique = points.filter((p, i) => !p.equals(points[(i + points.length - 1) % points.length]));
-    if (unique.length < 3) throw new Error('The artwork collapses at STL precision.');
+    if (unique.length < 3) throw new Error('El dibujo colapsa a la precisión del STL.');
     if (area(unique) < 0) unique.reverse();
     return unique;
   });

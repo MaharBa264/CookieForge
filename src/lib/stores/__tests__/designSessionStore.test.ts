@@ -192,7 +192,7 @@ describe('createDesignSessionStore', () => {
       () => session.updateParameters('cutter', { wallThickness: 2 }),
       () => session.changeKind('stamp')
     ];
-    for (const command of commands) expect(command).toThrow(/aucun document/i);
+    for (const command of commands) expect(command).toThrow(/ningún documento/i);
     expect(session.sessionEpoch).toBe(1);
     session.clear();
     expect(session.sessionEpoch).toBe(2);

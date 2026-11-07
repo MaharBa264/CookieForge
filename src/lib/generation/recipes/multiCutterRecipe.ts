@@ -50,13 +50,13 @@ export const multiCutterRecipe = Object.freeze({
       prototype = (await cutterRecipe.generate(single, context))[0].object;
       context.signal.throwIfAborted();
       const report = validatePrintableObject(prototype, { requireSingleShell: true });
-      if (!report.valid) throw new CutterGenerationError('INVALID_GEOMETRY', `Le Cutter source doit être complet et connecté : ${report.errors[0]}`);
+      if (!report.valid) throw new CutterGenerationError('INVALID_GEOMETRY', `El cortador de origen debe estar completo y conectado : ${report.errors[0]}`);
       if (report.triangles * input.layout.copies > CUTTER_SERIES_LIMITS.maxTriangles) {
-        throw new CutterGenerationError('INVALID_GEOMETRY', `La série dépasse la limite de ${CUTTER_SERIES_LIMITS.maxTriangles} triangles. Réduisez les copies ou simplifiez le dessin.`);
+        throw new CutterGenerationError('INVALID_GEOMETRY', `La serie supera el límite de ${CUTTER_SERIES_LIMITS.maxTriangles} triángulos. Reducí las copias o simplificá el dibujo.`);
       }
       const source = prototype;
       const items = Array.from({ length: input.layout.copies }, (_, index) => ({
-        id: `${input.id}:copy:${index + 1}`, name: `Copy ${index + 1}`, svgData: input.sketch.svg, params: { ...input.parameters }
+        id: `${input.id}:copy:${index + 1}`, name: `Copia ${index + 1}`, svgData: input.sketch.svg, params: { ...input.parameters }
       }));
       let batch: Awaited<ReturnType<typeof createBatch>>;
       try {
@@ -71,7 +71,7 @@ export const multiCutterRecipe = Object.freeze({
         });
       } catch (cause) {
         if (cause instanceof BatchGenerationError && cause.failures.some(failure => failure.stage === 'layout')) {
-          throw new CutterGenerationError('INVALID_GEOMETRY', `La série dépasse le plateau de ${input.parameters.buildPlateSize} mm. Réduisez les copies ou les colonnes, ou agrandissez le plateau.`, { field: 'layout', reason: 'series-plate-overflow' });
+          throw new CutterGenerationError('INVALID_GEOMETRY', `La serie supera la plataforma de ${input.parameters.buildPlateSize} mm. Reducí las copias o las columnas, o agrandá la plataforma.`, { field: 'layout', reason: 'series-plate-overflow' });
         }
         throw cause;
       }
@@ -79,7 +79,7 @@ export const multiCutterRecipe = Object.freeze({
       context.signal.throwIfAborted();
       const validation = validatePrintableObject(result);
       if (!validation.valid || validation.shells !== input.layout.copies || validation.bounds === null) {
-        throw new CutterGenerationError('INVALID_GEOMETRY', `Série invalide : ${validation.errors[0] ?? 'nombre de pièces inattendu'}`);
+        throw new CutterGenerationError('INVALID_GEOMETRY', `Serie inválida: ${validation.errors[0] ?? 'cantidad de piezas inesperada'}`);
       }
       const artifact: GeneratedArtifact<'multi-cutter'> = Object.freeze({
         id: `${input.id}:series:${context.revision}`, role: 'primary', object: result, validation,

@@ -61,8 +61,8 @@ describe('ponts manuels / fabrication', () => {
     const contours = extractClosedContours(ISLAND_SVG);
     const same = { ...ISLAND_BRIDGE, id: 'duplicate' };
     const reversed = { ...ISLAND_BRIDGE, id: 'reversed', from: ISLAND_BRIDGE.to, to: ISLAND_BRIDGE.from };
-    expect(() => validateConnectorLayout(contours, [ISLAND_BRIDGE, same], 0.75, 1)).toThrow(/intersect|overlap/i);
-    expect(() => validateConnectorLayout(contours, [ISLAND_BRIDGE, reversed], 0.75, 1)).toThrow(/intersect|overlap/i);
+    expect(() => validateConnectorLayout(contours, [ISLAND_BRIDGE, same], 0.75, 1)).toThrow(/se cruzan|intersect/i);
+    expect(() => validateConnectorLayout(contours, [ISLAND_BRIDGE, reversed], 0.75, 1)).toThrow(/se cruzan|intersect/i);
   });
 
   it('rejette un pont détaché et des segments qui se croisent, sans affaiblir les gardes', async () => {

@@ -20,9 +20,9 @@ export type PhotoRasterPlan = Readonly<{
 
 /** Crop first, then reduce; never enlarge, allocate the original-size canvas or select an object. */
 export function getPhotoRasterPlan(width: number, height: number, requestedCrop: PhotoSettings['crop']): PhotoRasterPlan {
-  if (!Number.isInteger(width) || !Number.isInteger(height) || width <= 0 || height <= 0) throw new Error('The raster image has invalid dimensions.');
-  if (width > 8192 || height > 8192) throw new Error('Raster dimensions must not exceed 8192 px per side.');
-  if (width * height > 16_000_000) throw new Error('Raster images are limited to 16 megapixels.');
+  if (!Number.isInteger(width) || !Number.isInteger(height) || width <= 0 || height <= 0) throw new Error('La imagen de trama (raster) tiene dimensiones inválidas.');
+  if (width > 8192 || height > 8192) throw new Error('Las dimensiones de la imagen no deben superar los 8192 px por lado.');
+  if (width * height > 16_000_000) throw new Error('Las imágenes de trama están limitadas a 16 megapíxeles.');
   const crop = parsePhotoCrop(requestedCrop);
   const x = Math.floor(crop.x * width), y = Math.floor(crop.y * height);
   // Outward rounding includes the entire explicitly requested crop, within one source pixel.
@@ -76,7 +76,7 @@ export function processPhotoPixels(source: PhotoPixels, requestedSettings: Photo
   const settings = parsePhotoSettings(requestedSettings);
   const plan = getPhotoRasterPlan(source.width, source.height, settings.crop);
   if (!(source.data instanceof Uint8ClampedArray) || source.data.length !== source.width * source.height * 4) {
-    throw new Error('Le buffer de pixels RGBA ne correspond pas aux dimensions de la photo.');
+    throw new Error('El búfer de píxeles RGBA no coincide con las dimensiones de la foto.');
   }
   const { width, height } = plan, count = width * height;
   const luminance = new Uint8Array(count), histogram = new Uint32Array(256);
@@ -130,17 +130,17 @@ export function processPhotoPixels(source: PhotoPixels, requestedSettings: Photo
   const warnings: string[] = [];
   let canApply = true;
   const block = (warning: string) => { warnings.push(warning); canApply = false; };
-  if (plan.source.width !== width || plan.source.height !== height) warnings.push(`Image réduite à ${width} × ${height} : de très petits détails peuvent disparaître. Recadrez plus près pour les conserver.`);
-  if (removedComponents) warnings.push(`${removedComponents} composant(s) supprimé(s) selon votre nettoyage ≤ ${settings.minComponentArea} pixels ; aucun trou n'a été comblé par ce nettoyage.`);
-  if (settings.fillHoles) warnings.push(`Silhouette extérieure — comblement des trous activé : ${filledHoles} trou(s) comblé(s) à votre demande. Désactivez cette option pour préserver les détails intérieurs.`);
-  if (max - min < 12) block('Contraste insuffisant ou photo uniforme : améliorez l’éclairage ou choisissez une autre photo.');
+  if (plan.source.width !== width || plan.source.height !== height) warnings.push(`Imagen reducida a ${width} × ${height}: pueden desaparecer detalles muy pequeños. Recortá más cerca para conservarlos.`);
+  if (removedComponents) warnings.push(`${removedComponents} componente(s) eliminado(s) según tu limpieza ≤ ${settings.minComponentArea} píxeles; esta limpieza no rellenó ningún agujero.`);
+  if (settings.fillHoles) warnings.push(`Silueta exterior: relleno de agujeros activado, ${filledHoles} agujero(s) rellenado(s) a pedido tuyo. Desactivá esta opción para conservar los detalles interiores.`);
+  if (max - min < 12) block('Contraste insuficiente o foto uniforme: mejorá la iluminación o elegí otra foto.');
   if (!foregroundPixels) block('Masque vide : ajustez le seuil, inversez le premier plan ou réduisez le nettoyage.');
-  else if (foregroundPixels === count) block('Tout le recadrage est au premier plan : ajustez le seuil ou inversez sombre/clair.');
-  if (components > 1) block(`${components} composants distincts : aucun objet n’a été choisi automatiquement. Recadrez le sujet ou choisissez explicitement un nettoyage adapté.`);
-  if (boundaryComponents) block('Le premier plan touche le bord du recadrage : contour possiblement coupé. Élargissez le recadrage, ajustez le seuil ou inversez sombre/clair.');
-  if (diagonalContacts) block('Contacts diagonaux ambigus : ajustez le seuil ou utilisez une photo mieux contrastée pour obtenir des contours séparables.');
+  else if (foregroundPixels === count) block('Todo el recorte es primer plano: ajustá el umbral o invertí oscuro/claro.');
+  if (components > 1) block(`${components} componentes distintos: no se eligió ningún objeto automáticamente. Recortá el sujeto o elegí explícitamente una limpieza adecuada.`);
+  if (boundaryComponents) block('El primer plano toca el borde del recorte: el contorno podría quedar cortado. Ampliá el recorte, ajustá el umbral o invertí oscuro/claro.');
+  if (diagonalContacts) block('Contactos diagonales ambiguos: ajustá el umbral o usá una foto con mejor contraste para obtener contornos separables.');
   const traceable = components > 0 && components <= MAX_PHOTO_COMPONENTS && holes <= MAX_PHOTO_HOLES && boundaryEdges <= MAX_PHOTO_BOUNDARY_EDGES;
-  if (!traceable && components > 0) block(`Masque trop complexe ou bruité pour un traçage sûr (limites : ${MAX_PHOTO_COMPONENTS} composants, ${MAX_PHOTO_HOLES} trous, ${MAX_PHOTO_BOUNDARY_EDGES} arêtes). Recadrez, ajustez le seuil ou choisissez un nettoyage explicite.`);
+  if (!traceable && components > 0) block(`Máscara demasiado compleja o ruidosa para un trazado seguro (límites: ${MAX_PHOTO_COMPONENTS} componentes, ${MAX_PHOTO_HOLES} agujeros, ${MAX_PHOTO_BOUNDARY_EDGES} aristas). Recadrez, ajustez le seuil ou choisissez un nettoyage explicite.`);
   const data = new Uint8ClampedArray(count * 4);
   for (let i = 0; i < count; i++) { const gray = mask[i] ? 0 : 255; data.set([gray, gray, gray, 255], i * 4); }
   return { imageData: { width, height, data }, mask, traceable, diagnostics: { width, height, threshold, components, holes, removedComponents, filledHoles, warnings, canApply } };

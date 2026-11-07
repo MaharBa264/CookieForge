@@ -15,16 +15,16 @@ export class ProjectRecoveryValidationError extends Error {
 }
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 function requireUuid(value: unknown): asserts value is string {
-  if (typeof value !== 'string' || !UUID.test(value)) throw new ProjectRecoveryValidationError('draftId', 'UUID required');
+  if (typeof value !== 'string' || !UUID.test(value)) throw new ProjectRecoveryValidationError('draftId', 'Se requiere un UUID');
 }
 function requireTimestamp(value: unknown): asserts value is string {
   const match = typeof value === 'string' && /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(?:Z|[+-](\d{2}):(\d{2}))$/.exec(value);
-  if (!match || !Number.isFinite(Date.parse(value as string))) throw new ProjectRecoveryValidationError('savedAt', 'ISO datetime required');
+  if (!match || !Number.isFinite(Date.parse(value as string))) throw new ProjectRecoveryValidationError('savedAt', 'Se requiere una fecha y hora ISO');
   const [, y, m, d, h, min, s, oh, om] = match;
   const year = Number(y), month = Number(m), day = Number(d);
   const days = new Date(0); days.setUTCFullYear(year, month, 0);
   if (month < 1 || month > 12 || day < 1 || day > days.getUTCDate() || Number(h) > 23 || Number(min) > 59 || Number(s) > 59 || Number(oh ?? 0) > 23 || Number(om ?? 0) > 59) {
-    throw new ProjectRecoveryValidationError('savedAt', 'Invalid calendar datetime');
+    throw new ProjectRecoveryValidationError('savedAt', 'Fecha y hora de calendario inválidas');
   }
 }
 function freezeGraph<T>(value: T): T {
@@ -36,19 +36,19 @@ function freezeGraph<T>(value: T): T {
 }
 /** Header-first, fail-closed, reconstructed and deeply frozen. Never freezes caller input. */
 export function parseProjectRecoveryEnvelope(value: unknown): ProjectRecoveryEnvelope {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new ProjectRecoveryValidationError('$', 'Object required');
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new ProjectRecoveryValidationError('$', 'Se requiere un objeto');
   const record = value as Record<string, unknown>;
-  if (record.format !== 'cookie-cutter-designer-recovery') throw new ProjectRecoveryValidationError('format', 'Unsupported format');
-  if (record.version !== 1) throw new ProjectRecoveryValidationError('version', 'Unsupported version');
+  if (record.format !== 'cookie-cutter-designer-recovery') throw new ProjectRecoveryValidationError('format', 'Formato no compatible');
+  if (record.version !== 1) throw new ProjectRecoveryValidationError('version', 'Versión no compatible');
   const keys = ['format', 'version', 'draftId', 'savedAt', 'document'];
   if (Reflect.ownKeys(record).length !== keys.length || keys.some((key) => !Object.prototype.hasOwnProperty.call(record, key)) || Reflect.ownKeys(record).some((key) => typeof key !== 'string' || !keys.includes(key))) {
-    throw new ProjectRecoveryValidationError('$', 'Exact envelope keys required');
+    throw new ProjectRecoveryValidationError('$', 'Se requieren exactamente las claves de la envoltura');
   }
   const draftId = record.draftId, savedAt = record.savedAt;
   requireUuid(draftId); requireTimestamp(savedAt);
   let document: DesignDocument;
   try { document = parseDesignDocument(record.document); }
-  catch (cause) { throw new ProjectRecoveryValidationError('document', 'Invalid DesignDocument', cause); }
+  catch (cause) { throw new ProjectRecoveryValidationError('document', 'DesignDocument inválido', cause); }
   return freezeGraph({ format: 'cookie-cutter-designer-recovery', version: 1, draftId, savedAt, document });
 }
 /** Parser fixes property order throughout the graph, so comparison is independent of input key order. */
@@ -81,7 +81,7 @@ async function operation<T>(op: ProjectRecoveryStorageOperation, action: () => P
   try { return await action(); }
   catch (cause) {
     if (cause instanceof ProjectRecoveryStorageError && cause.operation === op) throw cause;
-    throw new ProjectRecoveryStorageError(op, cause instanceof Error ? cause.message : 'Storage failure', cause);
+    throw new ProjectRecoveryStorageError(op, cause instanceof Error ? cause.message : 'Falla de almacenamiento', cause);
   }
 }
 export function createProjectRecoveryStorage(backend: ProjectRecoveryBackend): ProjectRecoveryStorage {
@@ -101,7 +101,7 @@ export function createProjectRecoveryStorage(backend: ProjectRecoveryBackend): P
     }),
     deleteExpected: (value) => operation('deleteExpected', async () => {
       const record = parseProjectRecoveryEnvelope(value);
-      if (!await backend.deleteExpected(record)) throw new ProjectRecoveryStorageError('deleteExpected', 'Recovery snapshot changed or missing', undefined, 'conflict');
+      if (!await backend.deleteExpected(record)) throw new ProjectRecoveryStorageError('deleteExpected', 'La instantánea de recuperación cambió o no existe', undefined, 'conflict');
     }),
     close: () => operation('close', async () => { await backend.close?.(); })
   };
@@ -116,16 +116,16 @@ function transaction<T>(database: IDBDatabase, mode: IDBTransactionMode, start: 
     let tx: IDBTransaction | undefined, ready = false, value: T, failed = false;
     const fail = (cause: unknown): void => {
       if (failed) return;
-      failed = true; reject(cause ?? new Error('IndexedDB transaction failed'));
+      failed = true; reject(cause ?? new Error('Falló la transacción de IndexedDB'));
       try { tx?.abort(); } catch { /* Preserve original cause. */ }
     };
     try {
       tx = database.transaction(PROJECT_RECOVERY_STORE_NAME, mode);
       tx.onerror = () => fail(tx?.error);
-      tx.onabort = () => fail(tx?.error ?? new Error('IndexedDB transaction aborted'));
+      tx.onabort = () => fail(tx?.error ?? new Error('Se abortó la transacción de IndexedDB'));
       tx.oncomplete = () => {
         if (failed) return;
-        if (!ready) { fail(new Error('IndexedDB transaction completed without result')); return; }
+        if (!ready) { fail(new Error('La transacción de IndexedDB terminó sin resultado')); return; }
         resolve(value);
       };
       start(tx.objectStore(PROJECT_RECOVERY_STORE_NAME), (result) => { value = result; ready = true; }, fail);
@@ -145,13 +145,13 @@ export class IndexedDbProjectRecoveryBackend implements ProjectRecoveryBackend {
   private database(): Promise<IDBDatabase> {
     if (this.#opening) return this.#opening;
     const opening = new Promise<IDBDatabase>((resolve, reject) => {
-      if (!this.indexedDB) { reject(new Error('IndexedDB unavailable')); return; }
+      if (!this.indexedDB) { reject(new Error('IndexedDB no disponible')); return; }
       let req: IDBOpenDBRequest, settled = false;
-      const fail = (cause: unknown): void => { if (!settled) { settled = true; reject(cause ?? new Error('IndexedDB open failed')); } };
+      const fail = (cause: unknown): void => { if (!settled) { settled = true; reject(cause ?? new Error('Falló la apertura de IndexedDB')); } };
       try { req = this.indexedDB.open(PROJECT_RECOVERY_DATABASE_NAME, PROJECT_RECOVERY_DATABASE_VERSION); }
       catch (cause) { fail(cause); return; }
       req.onerror = () => fail(req.error);
-      req.onblocked = () => fail(new Error('IndexedDB open blocked'));
+      req.onblocked = () => fail(new Error('La apertura de IndexedDB está bloqueada'));
       req.onupgradeneeded = () => {
         try {
           if (!req.result.objectStoreNames.contains(PROJECT_RECOVERY_STORE_NAME)) req.result.createObjectStore(PROJECT_RECOVERY_STORE_NAME, { keyPath: 'draftId' });
