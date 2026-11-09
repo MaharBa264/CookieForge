@@ -1,3 +1,4 @@
+import { generateUuid } from '../../utils/uuid';
 import type { DesignDocument, DesignSource } from '../designDocument';
 import { DEFAULT_CUTTER_PARAMETERS_V1 } from '../designParameters';
 import {
@@ -188,11 +189,11 @@ function parseMetadata(value: unknown): LegacyMetadata {
 }
 
 function createDefaultId(): string {
-  const crypto = globalThis.crypto;
-  if (typeof crypto?.randomUUID !== 'function') {
-    invalid('id', 'no se puede generar: crypto.randomUUID no está disponible.');
+  try {
+    return generateUuid();
+  } catch {
+    return invalid('id', 'no se puede generar: la API de criptografía no está disponible.');
   }
-  return crypto.randomUUID();
 }
 
 function createMigrationId(createId: () => string): string {

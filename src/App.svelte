@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { generateUuid } from './lib/utils/uuid';
   import { onDestroy, onMount, tick } from 'svelte';
   import FileUpload from './lib/components/ui/FileUpload.svelte';
   import TracingPresetPicker from './lib/components/ui/TracingPresetPicker.svelte';
@@ -326,7 +327,7 @@
   }
   const workflow = createProjectWorkflow({
     session, storage: projectStorage, assertRepresentable,
-    createId: () => crypto.randomUUID(),
+    createId: () => generateUuid(),
     captureTransitionValidity: () => {
       // A competing project transition owns the source immediately, not only
       // after its asynchronous read/dirty confirmation has completed.

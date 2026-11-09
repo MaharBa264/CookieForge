@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { generateUuid } from '../../utils/uuid';
   import { onDestroy } from 'svelte';
   import type { Bridge, DesignDocument } from '../../domain/designDocument';
   import type { DesignSessionStore } from '../../stores/designSessionStore';
@@ -59,7 +60,7 @@
       const first = start;
       start = null; adding = false;
       if (first.baseline !== session.getDocument() || first.epoch !== session.getSessionEpoch()) return;
-      const bridge: Bridge = { id: crypto.randomUUID(), from: first.point, to: point, widthMm };
+      const bridge: Bridge = { id: generateUuid(), from: first.point, to: point, widthMm };
       void publish(first.baseline, first.epoch, [...bridges, bridge]);
     } catch (cause) { message = cause instanceof Error ? cause.message : 'Elegí un contorno.'; }
   }

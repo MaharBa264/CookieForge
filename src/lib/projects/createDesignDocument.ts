@@ -1,3 +1,4 @@
+import { generateUuid } from '../utils/uuid';
 import type { DesignDocumentV1, DesignSource } from '../domain/designDocument';
 import type { ImplementedDesignKind } from '../domain/designKind';
 import { createDefaultCutterParameters, createDefaultStampParameters } from '../domain/designParameters';
@@ -19,7 +20,7 @@ export function createDesignDocument(
   options: CreateDesignDocumentOptions = {}
 ): DesignDocumentV1 {
   const timestamp = (options.now ?? (() => new Date().toISOString()))();
-  const id = (options.createId ?? (() => crypto.randomUUID()))();
+  const id = (options.createId ?? generateUuid)();
   return parseDesignDocumentV1({
     schemaVersion: 1,
     id,

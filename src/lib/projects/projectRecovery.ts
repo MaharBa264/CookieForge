@@ -1,3 +1,4 @@
+import { generateUuid } from '../utils/uuid';
 import type { Readable, Subscriber, Unsubscriber } from 'svelte/store';
 import type { DesignDocument } from '../domain/designDocument';
 import { parseDesignDocument } from '../domain/documentValidation';
@@ -71,7 +72,7 @@ export function createProjectRecovery(storage: ProjectRecoveryStorage, deps: Pro
   const delay = deps.debounceMs ?? 750;
   if (!Number.isFinite(delay) || delay < 0) throw new Error('Retardo de recuperación inválido');
   const now = deps.now ?? (() => new Date());
-  const createId = deps.createId ?? (() => globalThis.crypto.randomUUID());
+  const createId = deps.createId ?? generateUuid;
   const schedule = deps.schedule ?? ((callback: () => void, ms: number) => setTimeout(callback, ms));
   const cancel = deps.cancel ?? ((handle: unknown) => clearTimeout(handle as ReturnType<typeof setTimeout>));
   let closing = false, operation = 0, epoch: number | null = null, listSequence = 0;
