@@ -4,7 +4,7 @@ import { STAMP_IMPRINT_LIMITS } from '../domain/stampImprint';
 import { keepInkOnly } from '../import/inkOnlySvg';
 import type { CookieCutterParams } from '../types/CookieCutter';
 import {
-  extractClosedContours,
+  extractClosedContoursAdaptive,
   signedArea,
   type NormalizedContour
 } from './contourExtraction';
@@ -383,7 +383,7 @@ function loopsOf(region: Geom2): Loop[] {
 }
 
 /** Distancia máxima (mm) a la recta vecina para considerar un vértice redundante. */
-const COLLINEAR_TOLERANCE_MM = 1e-4;
+const COLLINEAR_TOLERANCE_MM = 2e-3;
 
 /**
  * Quita vértices alineados con sus vecinos. Generan triángulos de área nula al triangular
@@ -573,6 +573,23 @@ function buildPieceSolid(spec: PieceSpec): LayeredSolidBuilder {
   return builder;
 }
 
+/**
+ * Sello suelto (base rectangular + relieve) armado por capas. Lo usa el generador de sellos
+ * cuando la imagen es tan detallada que las booleanas 3D no son viables.
+ */
+export async function buildLayeredStamp(
+  reliefOutlines: ReadonlyArray<ReadonlyArray<{ x: number; y: number }>>,
+  baseWidth: number,
+  baseDepth: number,
+  params: CookieCutterParams,
+  imprint: CookieSetImprint
+): Promise<THREE.Group> {
+  const relief = await cleanLoops(reliefOutlines.map((outline) => outline.map(({ x, y }) => ({ x, y }))));
+  const outer = [rectangleLoop(baseWidth, baseDepth, 0, 0)];
+  const builder = buildPieceSolid({ outer, cavity: null, relief, params, imprint });
+  return groupFromBuilder(builder, 'stamp', STAMP_COLOR, 'el sello', true);
+}
+
 function assertImprintDepth(params: CookieCutterParams, imprint: CookieSetImprint): void {
   if (imprint === 'recessed' && params.stampDepth > STAMP_IMPRINT_LIMITS.maximumRecessDepthMm) {
     fail(
@@ -654,21 +671,7 @@ export async function generateCookieSet(
   assertImprintDepth(params, options.imprint);
 
   // Un JPG/PNG vectorizado trae capas blancas (fondo y detalles) que no son geometría.
-  // Los trazados de imágenes con mucho detalle superan el límite de puntos con 48 segmentos
-  // por curva; se reintenta con menos segmentos (el vectorizador ya entrega tramos muy cortos).
-  const inkSvg = keepInkOnly(svgString);
-  let extracted: ReadonlyArray<NormalizedContour> | null = null;
-  for (const segments of [48, 24, 12, 6, 3, 2]) {
-    try {
-      extracted = extractClosedContours(inkSvg, segments);
-      break;
-    } catch (error) {
-      if (!(error instanceof CutterGenerationError) || error.code !== 'CONTOUR_TOO_COMPLEX' || segments === 2) {
-        throw error;
-      }
-    }
-  }
-  if (!extracted) fail('NO_VALID_CONTOURS', 'La imagen no tiene contornos utilizables.', { field: 'contours' });
+  const extracted = extractClosedContoursAdaptive(keepInkOnly(svgString), 48);
   const extractedBounds = pointsBounds(extracted);
   const simplifyTolerance =
     Math.max(extractedBounds.width, extractedBounds.height) * SIMPLIFY_RELATIVE_TOLERANCE;

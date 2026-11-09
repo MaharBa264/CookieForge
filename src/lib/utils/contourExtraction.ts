@@ -138,6 +138,30 @@ function assertComplexity(field: string, actual: number, max: number): void {
 }
 
 /**
+ * Igual que `extractClosedContours`, pero si el trazado supera el límite de puntos reintenta
+ * con menos segmentos por curva. Las imágenes muy detalladas (miles de curvas cortas, como una
+ * ilustración vectorizada) no caben con 48 segmentos por curva, y el vectorizador ya entrega
+ * tramos suficientemente cortos como para que 2 segmentos conserven la forma.
+ */
+export function extractClosedContoursAdaptive(
+  svgString: string,
+  preferredSegments = 48
+): ReadonlyArray<NormalizedContour> {
+  const candidates = [preferredSegments, 24, 12, 6, 3, 2].filter(
+    (segments, index, all) => segments <= preferredSegments && all.indexOf(segments) === index
+  );
+  for (let index = 0; index < candidates.length; index += 1) {
+    try {
+      return extractClosedContours(svgString, candidates[index]);
+    } catch (error) {
+      const retryable = error instanceof CutterGenerationError && error.code === 'CONTOUR_TOO_COMPLEX';
+      if (!retryable || index === candidates.length - 1) throw error;
+    }
+  }
+  return extractClosedContours(svgString, 2);
+}
+
+/**
  * Parse an SVG and return only finite, non-degenerate closed contours.
  * Winding is intentionally preserved for later containment classification.
  */

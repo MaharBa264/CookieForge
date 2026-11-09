@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import type { CookieCutterParams, HandleStyle, SizeMode } from '../types/CookieCutter';
 import {
-  extractClosedContours,
+  extractClosedContoursAdaptive,
   signedArea,
   type NormalizedContour,
   type NormalizedPoint
@@ -13,6 +13,7 @@ import {
   validateCookieCutterParams
 } from './generationValidation';
 import { validatePrintableObject } from './geometryValidation';
+import { evenOddRegionPaths } from './pathOperations';
 import type { StampImprintMode } from '../domain/designDocument';
 import { STAMP_IMPRINT_LIMITS } from '../domain/stampImprint';
 import { createPlanarStampBody } from './stampBodyGeometry';
@@ -444,6 +445,10 @@ export function triangulateSolid(solid: Geom3): THREE.BufferGeometry {
 }
 
 /** Legacy two-argument calls keep the raised route; V4 cavities subtract from the front only. */
+/** Umbrales a partir de los cuales el sello se arma por capas en lugar de con booleanas 3D. */
+const LAYERED_ROUTE_MIN_CONTOURS = 24;
+const LAYERED_ROUTE_MIN_POINTS = 3000;
+
 export async function generateStamp(
   svgString: string,
   paramsValue: Readonly<CookieCutterParams>,
@@ -465,7 +470,7 @@ export async function generateStamp(
   }
 
   try {
-    const contours = extractClosedContours(svgString, 48);
+    const contours = extractClosedContoursAdaptive(svgString, 48);
     const bounds = contourBounds(contours);
     const padding = Math.min(5, params.targetSize * 0.1);
     const sourceTarget = selectedDimension(bounds.width, bounds.height, params.sizeMode);
@@ -492,6 +497,29 @@ export async function generateStamp(
           max: params.buildPlateSize
         }
       );
+    }
+
+    // Con imágenes muy detalladas (ilustraciones vectorizadas) las operaciones booleanas 3D
+    // tardan minutos y fallan; se construye el sólido por capas, que es exacto y rápido.
+    const totalContourPoints = contours.reduce((sum, contour) => sum + contour.length, 0);
+    if (contours.length > LAYERED_ROUTE_MIN_CONTOURS || totalContourPoints > LAYERED_ROUTE_MIN_POINTS) {
+      const { buildLayeredStamp } = await import('./cookieSetGenerator');
+      const reliefOutlines = await evenOddRegionPaths(
+        contours.map((contour) => scaledContourPoints(contour, bounds, physicalScale).map(([x, y]) => ({ x, y })))
+      );
+      const layered = await buildLayeredStamp(reliefOutlines, baseWidth, baseDepth, params, imprintMode);
+      const layeredSize = new THREE.Box3().setFromObject(layered).getSize(new THREE.Vector3());
+      layered.userData.geometryRoute = 'layered';
+      layered.userData.params = { ...params };
+      layered.userData.contourCount = contours.length;
+      layered.userData.dimensions = Object.freeze({
+        width: layeredSize.x,
+        depth: layeredSize.z,
+        height: layeredSize.y,
+        targetSize: params.targetSize,
+        sizeMode: params.sizeMode
+      });
+      return layered;
     }
 
     const reliefRegion = createReliefRegion(

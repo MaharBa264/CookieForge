@@ -305,6 +305,26 @@ export async function unionPaths(
   return normalizeOutputPaths(result);
 }
 
+/**
+ * Región definida por la regla par-impar: una zona está rellena si está dentro de un número
+ * impar de contornos. Equivale a «regiones de profundidad par menos sus huecos» y no depende
+ * del sentido de giro de cada contorno.
+ */
+export async function evenOddRegionPaths(
+  paths: ReadonlyArray<ReadonlyArray<Readonly<Point2D>>>
+): Promise<ReadonlyArray<NormalizedContour>> {
+  if (paths.length === 0) return Object.freeze([]);
+
+  const { api, lib } = await initClipper();
+  const result = lib.clipToPaths({
+    clipType: api.ClipType.Union,
+    subjectFillType: api.PolyFillType.EvenOdd,
+    subjectInputs: [{ data: svgToClipperPaths(paths), closed: true }]
+  });
+
+  return normalizeOutputPaths(result);
+}
+
 export async function differencePaths(
   subjectPaths: ReadonlyArray<ReadonlyArray<Readonly<Point2D>>>,
   clipPaths: ReadonlyArray<ReadonlyArray<Readonly<Point2D>>>

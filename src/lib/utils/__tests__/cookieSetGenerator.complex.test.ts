@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { DEFAULT_PARAMS } from '../../types/CookieCutter';
 import { disposeObject3D } from '../disposeThree';
 import { generateCookieSet } from '../cookieSetGenerator';
+import { generateStamp } from '../stampGenerator';
 import { validatePrintableObject } from '../geometryValidation';
 import { installSvgLoaderDomParserAdapter } from './svgDomTestSupport';
 
@@ -42,5 +43,25 @@ describe('juego cortador + sello con una imagen muy detallada', () => {
         disposeObject3D(result.plate);
       }
     }, 120000);
+  }
+});
+
+describe('sello suelto con una imagen muy detallada', () => {
+  for (const imprint of ['raised', 'recessed'] as const) {
+    for (const enableHandle of [false, true]) {
+      it(`genera un sello imprimible (${imprint}, ${enableHandle ? 'con' : 'sin'} mango)`, async () => {
+        const stamp = await generateStamp(
+          svg,
+          { ...DEFAULT_PARAMS, targetSize: 75, stampDepth: 2, enableHandle, handleStyle: 'round' as const },
+          imprint
+        );
+        try {
+          expect(validatePrintableObject(stamp, { requireSingleShell: true }).valid).toBe(true);
+          expect(stamp.userData.geometryRoute).toBe('layered');
+        } finally {
+          disposeObject3D(stamp);
+        }
+      }, 120000);
+    }
   }
 });
