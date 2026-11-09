@@ -209,7 +209,7 @@ export function createProjectSessionIntegration(
     try {
       const candidate = legacyParametersToDocument(value);
       if (!currentSession() || document !== session.getDocument()) {
-        throw new Error('La session a changé pendant la validation des paramètres.');
+        throw new Error('La sesión cambió durante la validación de los parámetros.');
       }
       // Equality also ignores queued restoration notifications without clearing
       // the useful error from the rejected UI edit that caused that restoration.
@@ -221,13 +221,13 @@ export function createProjectSessionIntegration(
       } else {
         if (candidate.kind !== document.kind) session.changeKind(candidate.kind);
         if (!currentSession()) {
-          throw new Error('La session a changé pendant la modification des paramètres.');
+          throw new Error('La sesión cambió durante la modificación de los parámetros.');
         }
         if (candidate.kind === 'cutter') session.updateParameters('cutter', candidate.parameters);
         else session.updateParameters('stamp', candidate.parameters);
       }
       if (!currentSession()) {
-        throw new Error('La session a changé pendant la modification des paramètres.');
+        throw new Error('La sesión cambió durante la modificación de los parámetros.');
       }
       succeeded = true;
     } catch (error) {

@@ -40,13 +40,13 @@ export type GenerationOrchestratorErrorCode =
 function orchestratorErrorMessage(code: GenerationOrchestratorErrorCode): string {
   switch (code) {
     case 'DISPOSED':
-      return 'La génération ne peut plus être planifiée : l’orchestrateur est disposé.';
+      return 'La generación ya no se puede planificar: el orquestador fue liberado.';
     case 'INVALID_DOCUMENT':
-      return 'Le document de conception est invalide.';
+      return 'El documento de diseño es inválido.';
     case 'EMPTY_ARTIFACTS':
-      return 'La génération n’a produit aucun artefact.';
+      return 'La generación no produjo ningún resultado.';
     case 'ARTIFACT_DISPOSING':
-      return 'La génération a réutilisé un objet 3D dont la disposition est déjà engagée.';
+      return 'La generación reutilizó un objeto 3D cuya liberación ya está en curso.';
   }
 }
 
@@ -157,14 +157,14 @@ function createResult<K extends 'cutter' | 'stamp' | 'multi-cutter'>(
 }
 
 function publicError(revision: number, error: unknown): PublicGenerationError {
-  let message = 'La génération a échoué.';
+  let message = 'La generación falló.';
   let code: string | undefined;
 
   if (error instanceof GenerationOrchestratorError) {
     message = error.message;
     code = error.code;
   } else if (error instanceof RecipeRegistryError) {
-    message = 'La recette de génération demandée est indisponible.';
+    message = 'La receta de generación solicitada no está disponible.';
     code = error.code;
   } else if (error instanceof CutterGenerationError) {
     message = error.message;

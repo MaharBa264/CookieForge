@@ -21,18 +21,18 @@ const MAX_PREVIEW_LAYERS = 2000;
 
 function validateOptions(options: SlicingOptions): void {
   if (!Number.isFinite(options.layerHeight) || options.layerHeight <= 0) {
-    throw new Error('Preview layer height must be a positive finite number.');
+    throw new Error('La altura de capa de la vista previa debe ser un número finito positivo.');
   }
   if (
     !Number.isFinite(options.minHeight) ||
     !Number.isFinite(options.maxHeight) ||
     options.maxHeight <= options.minHeight
   ) {
-    throw new Error('Preview bounds must define a positive finite height range.');
+    throw new Error('Los límites de la vista previa deben definir un rango de altura finito positivo.');
   }
   const count = Math.ceil((options.maxHeight - options.minHeight) / options.layerHeight);
   if (count > MAX_PREVIEW_LAYERS) {
-    throw new Error(`Layer preview is limited to ${MAX_PREVIEW_LAYERS} layers.`);
+    throw new Error(`La vista previa de capas está limitada a ${MAX_PREVIEW_LAYERS} capas.`);
   }
 }
 

@@ -13,7 +13,7 @@ function setup() {
 it('advertises all supported MIME types/extensions without multiple selection', () => {
   const { input, zone } = setup();
   expect(input.accept).toContain('image/webp'); expect(input.accept).toContain('.jpeg'); expect(input.multiple).toBe(false);
-  expect(zone.getAttribute('aria-label')).toBe('Importer une image');
+  expect(zone.getAttribute('aria-label')).toBe('Importar una imagen');
 });
 it('passes invalid types through to owner validation, never a browser alert', () => {
   const { input, upload } = setup(); const file = new File(['x'], 'image.png', { type: 'application/pdf' });
@@ -31,7 +31,7 @@ it('drop forwards one file and explicitly rejects multiple files', async () => {
   const { zone, upload, reject } = setup(); const file = new File(['x'], 'image.webp', { type: 'image/webp' });
   function drop(files: File[]) { const event = new Event('drop', { cancelable: true }); Object.defineProperty(event, 'dataTransfer', { value: { files } }); zone.dispatchEvent(event); expect(event.defaultPrevented).toBe(true); }
   drop([file]); expect(upload.mock.calls[0][0].detail).toBe(file);
-  drop([file, file]); await tick(); expect(upload).toHaveBeenCalledTimes(1); expect(reject.mock.calls[0][0].detail).toMatch(/one image/i);
+  drop([file, file]); await tick(); expect(upload).toHaveBeenCalledTimes(1); expect(reject.mock.calls[0][0].detail).toMatch(/una sola imagen/i);
 });
 it.each(['Enter', ' '])('keyboard %s opens the existing picker', async key => {
   const { zone, input } = setup(); await tick(); const click = vi.spyOn(input, 'click').mockImplementation(() => {});

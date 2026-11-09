@@ -25,24 +25,24 @@ export function analyzeParameters(params: CookieCutterParams): OptimizationRepor
     issues.push({
       severity: 'error',
       category: 'strength',
-      message: 'Wall thickness is too thin',
-      suggestion: 'Walls below 0.8mm may break easily or fail to print',
+      message: 'El espesor de pared es demasiado fino',
+      suggestion: 'Las paredes de menos de 0,8 mm pueden romperse fácilmente o no imprimirse',
       autoFix: { wallThickness: 0.8 }
     });
   } else if (params.wallThickness < 1.0) {
     issues.push({
       severity: 'warning',
       category: 'strength',
-      message: 'Wall thickness is on the thin side',
-      suggestion: 'Consider increasing to 1.0-1.2mm for better durability',
+      message: 'El espesor de pared es algo fino',
+      suggestion: 'Considerá subir a 1,0-1,2 mm para mayor durabilidad',
       autoFix: { wallThickness: 1.0 }
     });
   } else if (params.wallThickness > 2.0) {
     issues.push({
       severity: 'warning',
       category: 'efficiency',
-      message: 'Wall thickness is quite thick',
-      suggestion: 'Thinner walls (1.0-1.5mm) use less material and print faster',
+      message: 'El espesor de pared es bastante grueso',
+      suggestion: 'Las paredes más finas (1,0-1,5 mm) usan menos material y se imprimen más rápido',
       autoFix: { wallThickness: 1.2 }
     });
   }
@@ -52,16 +52,16 @@ export function analyzeParameters(params: CookieCutterParams): OptimizationRepor
     issues.push({
       severity: 'warning',
       category: 'printability',
-      message: 'Cutting height is very short',
-      suggestion: 'Short cutters may not cut through thick dough effectively',
+      message: 'La altura de corte es muy baja',
+      suggestion: 'Los cortadores bajos pueden no cortar bien la masa gruesa',
       autoFix: { cuttingHeight: 12 }
     });
   } else if (params.cuttingHeight > 20) {
     issues.push({
       severity: 'info',
       category: 'efficiency',
-      message: 'Cutting height is quite tall',
-      suggestion: 'Taller cutters use more material and take longer to print',
+      message: 'La altura de corte es bastante alta',
+      suggestion: 'Los cortadores más altos usan más material y tardan más en imprimirse',
       autoFix: { cuttingHeight: 15 }
     });
   }
@@ -71,8 +71,8 @@ export function analyzeParameters(params: CookieCutterParams): OptimizationRepor
     issues.push({
       severity: 'warning',
       category: 'printability',
-      message: 'Taper angle is too steep',
-      suggestion: 'Steep angles may cause overhangs that need supports',
+      message: 'El ángulo de conicidad es demasiado pronunciado',
+      suggestion: 'Los ángulos pronunciados pueden crear voladizos que necesitan soportes',
       autoFix: { taperAngle: 10 }
     });
   }
@@ -82,8 +82,8 @@ export function analyzeParameters(params: CookieCutterParams): OptimizationRepor
     issues.push({
       severity: 'warning',
       category: 'quality',
-      message: 'Handle is disproportionately tall',
-      suggestion: 'Handle should be proportional to cutter height',
+      message: 'El asa es desproporcionadamente alta',
+      suggestion: 'El asa debería ser proporcional a la altura del cortador',
       autoFix: { handleHeight: Math.round(params.cuttingHeight * 0.6) }
     });
   }
@@ -94,16 +94,16 @@ export function analyzeParameters(params: CookieCutterParams): OptimizationRepor
       issues.push({
         severity: 'warning',
         category: 'quality',
-        message: 'Stamp depth is very shallow',
-        suggestion: 'Shallow relief may not show well on cookies',
+        message: 'La profundidad del sello es muy baja',
+        suggestion: 'Un relieve poco profundo puede no verse bien en las galletas',
         autoFix: { stampDepth: 2.5 }
       });
     } else if (params.stampDepth > 4.0) {
       issues.push({
         severity: 'warning',
         category: 'printability',
-        message: 'Stamp depth is very deep',
-        suggestion: 'Deep relief may be hard to remove from dough',
+        message: 'La profundidad del sello es muy alta',
+        suggestion: 'Un relieve profundo puede ser difícil de despegar de la masa',
         autoFix: { stampDepth: 3.0 }
       });
     }
@@ -114,8 +114,8 @@ export function analyzeParameters(params: CookieCutterParams): OptimizationRepor
     issues.push({
       severity: 'error',
       category: 'printability',
-      message: 'Design may not fit on build plate',
-      suggestion: 'Reduce final size or increase build plate size',
+      message: 'Es posible que el diseño no entre en la plataforma',
+      suggestion: 'Reducí el tamaño final o aumentá el tamaño de la plataforma',
       autoFix: { targetSize: params.buildPlateSize }
     });
   }

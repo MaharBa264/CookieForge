@@ -50,22 +50,22 @@ export async function importProject(file: File): Promise<ProjectData> {
 
         // Validate project structure
         if (!project.version || !project.svgData || !project.parameters) {
-          throw new Error('Invalid project file format');
+          throw new Error('Formato de archivo de proyecto inválido');
         }
 
         // Check version compatibility
         if (project.version !== PROJECT_VERSION) {
-          console.warn(`Project version ${project.version} may not be fully compatible with current version ${PROJECT_VERSION}`);
+          console.warn(`La versión de proyecto ${project.version} podría no ser totalmente compatible con la versión actual ${PROJECT_VERSION}`);
         }
 
         resolve(project);
       } catch (error) {
-        reject(new Error(`Failed to parse project file: ${error}`));
+        reject(new Error(`No se pudo interpretar el archivo de proyecto: ${error}`));
       }
     };
 
     reader.onerror = () => {
-      reject(new Error('Failed to read project file'));
+      reject(new Error('No se pudo leer el archivo de proyecto'));
     };
 
     reader.readAsText(file);
@@ -95,7 +95,7 @@ export function loadProjectsFromStorage(): ProjectData[] {
           projects.push(JSON.parse(data));
         }
       } catch (error) {
-        console.error(`Failed to load project from key ${key}:`, error);
+        console.error(`No se pudo cargar el proyecto de la clave ${key}:`, error);
       }
     }
   }

@@ -28,7 +28,7 @@ export class ImageWorkerError extends Error {
   }
 }
 
-function cancellationError(message = 'Image vectorization was cancelled.'): DOMException {
+function cancellationError(message = 'Se canceló la vectorización de la imagen.'): DOMException {
   return new DOMException(message, 'AbortError');
 }
 
@@ -81,7 +81,7 @@ export class ImageWorkerClient {
     this.worker = null;
     for (const [requestId, pending] of this.pending) {
       this.cleanup(requestId, pending);
-      pending.reject(cancellationError('Image worker was terminated.'));
+      pending.reject(cancellationError('Se terminó el Worker de imágenes.'));
     }
     this.pending.clear();
   }
@@ -91,7 +91,7 @@ export class ImageWorkerClient {
     const worker = this.createWorker();
     worker.onmessage = (event) => this.handleMessage(event.data);
     worker.onerror = (event) => {
-      const message = event.message || 'The image worker stopped unexpectedly.';
+      const message = event.message || 'El Worker de imágenes se detuvo inesperadamente.';
       this.failAll(new ImageWorkerError('WORKER_FAILED', message));
       worker.terminate();
       if (this.worker === worker) this.worker = null;

@@ -111,7 +111,7 @@ describe('serializeSTL', () => {
     );
 
     expect(error.details?.errors).toEqual(
-      expect.arrayContaining([expect.stringMatching(/not finite|degenerate/i)])
+      expect.arrayContaining([expect.stringMatching(/no finit|degenerado/i)])
     );
   });
 });

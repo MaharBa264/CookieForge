@@ -57,12 +57,12 @@
 
   async function generateImage() {
     if (!apiKey) {
-      error = 'Configurez d’abord votre clé API Gemini';
+      error = 'Primero configurá tu clave de API de Gemini';
       return;
     }
 
     if (!prompt || prompt.trim() === '') {
-      error = 'Décrivez l’emporte-pièce souhaité';
+      error = 'Describí el cortador que querés';
       return;
     }
 
@@ -102,14 +102,14 @@
       else dispatch('imageGenerated', svgString);
       if (!local()) return;
 
-      error = '✅ Image générée et vectorisée avec succès !';
+      error = '✅ ¡Imagen generada y vectorizada con éxito!';
       successTimer = setTimeout(() => {
         if (local() && error.startsWith('✅')) error = '';
       }, 5000);
     } catch (err) {
       if (!current()) { if (local()) releasePreview(); return; }
-      error = err instanceof Error ? err.message : 'Impossible de générer l’image';
-      console.error('Image generation error:', err);
+      error = err instanceof Error ? err.message : 'No se pudo generar la imagen';
+      console.error('Error al generar la imagen:', err);
     } finally {
       if (controller === operationController) controller = null;
       if (local()) isGenerating = false;
@@ -134,12 +134,12 @@
   ];
 
   const exampleLabels: Record<string, string> = {
-    'Christmas tree with star on top': 'Sapin de Noël avec une étoile',
-    'Cute cat sitting': 'Joli chat assis',
-    'Simple heart shape': 'Cœur simple',
-    'Snowflake with 6 points': 'Flocon de neige à 6 branches',
-    'Smiling sun': 'Soleil souriant',
-    'Moon and stars': 'Lune et étoiles',
+    'Christmas tree with star on top': 'Pino de Navidad con una estrella',
+    'Cute cat sitting': 'Lindo gato sentado',
+    'Simple heart shape': 'Corazón simple',
+    'Snowflake with 6 points': 'Copo de nieve de 6 puntas',
+    'Smiling sun': 'Sol sonriente',
+    'Moon and stars': 'Luna y estrellas',
   };
 
   function useExample(example: string) {
@@ -149,23 +149,23 @@
 
 <div class="image-generator">
   <div class="header">
-    <h3>🎨 Générateur d’images IA</h3>
-    <p class="subtitle">Créez des emporte-pièces avec l’IA</p>
+    <h3>🎨 Generador de imágenes con IA</h3>
+    <p class="subtitle">Creá cortadores con IA</p>
   </div>
 
   {#if !apiKey}
     <div class="warning-box">
       <p><strong>⚠️ Clé API requise</strong></p>
-      <p>Configurez votre clé API Gemini dans les paramètres pour utiliser cette fonction.</p>
+      <p>Configurá tu clave de API de Gemini en los ajustes para usar esta función.</p>
     </div>
   {:else}
     <div class="content">
       <div class="input-section">
-        <label for="prompt">Décrivez votre emporte-pièce :</label>
+        <label for="prompt">Describí tu cortador:</label>
         <textarea
           id="prompt"
           bind:value={prompt}
-          placeholder="Exemple : un joli dinosaure aux contours simples"
+          placeholder="Ejemplo: un lindo dinosaurio de contornos simples"
           rows="3"
           disabled={isGenerating}
         ></textarea>
@@ -180,20 +180,20 @@
               <span class="spinner"></span>
               Génération…
             {:else}
-              ✨ Générer une image
+              ✨ Generar una imagen
             {/if}
           </button>
 
           {#if prompt}
             <button class="btn-secondary" onclick={clearPrompt} disabled={isGenerating}>
-              Effacer
+              Borrar
             </button>
           {/if}
         </div>
       </div>
 
       <div class="examples">
-        <p class="examples-title">Exemples rapides :</p>
+        <p class="examples-title">Ejemplos rápidos:</p>
         <div class="example-chips">
           {#each examples as example}
             <button class="chip" onclick={() => useExample(example)} disabled={isGenerating}>
@@ -206,8 +206,8 @@
       {#if generatedImageUrl}
         <div class="preview">
           <p class="preview-title">Image générée :</p>
-          <img src={generatedImageUrl} alt="Dessin d’emporte-pièce généré par l’IA" />
-          <p class="hint">L’image a été vectorisée automatiquement et chargée comme dessin !</p>
+          <img src={generatedImageUrl} alt="Dibujo de cortador generado por la IA" />
+          <p class="hint">¡La imagen se vectorizó automáticamente y se cargó como dibujo!</p>
         </div>
       {/if}
 
@@ -218,12 +218,12 @@
       {/if}
 
       <div class="info-box">
-        <p><strong>Fonctionnement :</strong></p>
+        <p><strong>Cómo funciona:</strong></p>
         <ol>
-          <li>Décrivez le dessin souhaité (les formes simples donnent de meilleurs résultats)</li>
-          <li>L’IA génère une silhouette en noir et blanc</li>
-          <li>L’image est automatiquement convertie en tracés SVG</li>
-          <li>Votre emporte-pièce 3D est créé !</li>
+          <li>Describí el dibujo que querés (las formas simples dan mejores resultados)</li>
+          <li>La IA genera una silueta en blanco y negro</li>
+          <li>La imagen se convierte automáticamente en trazados SVG</li>
+          <li>¡Tu cortador 3D está creado!</li>
         </ol>
       </div>
     </div>

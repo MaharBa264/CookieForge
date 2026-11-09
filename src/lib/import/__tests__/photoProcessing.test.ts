@@ -23,7 +23,7 @@ describe('photo segmentation: explicit choices, no blur or hidden object selecti
     expect(at(result.mask, 6, 6)).toBe(0); expect(at(result.mask, 16, 16)).toBe(1);
     expect(at(result.mask, 3, 3)).toBe(1); expect(at(result.mask, 2, 3)).toBe(0);
     expect(result.diagnostics).toMatchObject({ width: 20, height: 20, threshold: 0, components: 2, holes: 1, removedComponents: 0, filledHoles: 0, canApply: false });
-    expect(result.diagnostics.warnings.join(' ')).toMatch(/composants|components/i);
+    expect(result.diagnostics.warnings.join(' ')).toMatch(/componentes/i);
     expect(source.data).toEqual(before);
     expect(new Set(result.imageData.data)).toEqual(new Set([0, 255]));
   });
@@ -31,13 +31,13 @@ describe('photo segmentation: explicit choices, no blur or hidden object selecti
     const result = processPhotoPixels(ringAndIsland(), { ...DEFAULT_PHOTO_SETTINGS, minComponentArea: 1 });
     expect(at(result.mask, 16, 16)).toBe(0); expect(at(result.mask, 6, 6)).toBe(0);
     expect(result.diagnostics).toMatchObject({ components: 1, holes: 1, removedComponents: 1, canApply: true });
-    expect(result.diagnostics.warnings.join(' ')).toMatch(/supprim|removed/i);
+    expect(result.diagnostics.warnings.join(' ')).toMatch(/eliminado/i);
   });
   it('fills enclosed background only with explicit fillHoles, and reports the destructive choice', () => {
     const result = processPhotoPixels(ringAndIsland(), { ...DEFAULT_PHOTO_SETTINGS, minComponentArea: 1, fillHoles: true });
     expect(at(result.mask, 6, 6)).toBe(1); expect(at(result.mask, 0, 0)).toBe(0);
     expect(result.diagnostics).toMatchObject({ components: 1, holes: 0, filledHoles: 1, canApply: true });
-    expect(result.diagnostics.warnings.join(' ')).toMatch(/trous|holes/i);
+    expect(result.diagnostics.warnings.join(' ')).toMatch(/agujero/i);
     expect(processPhotoPixels(ringAndIsland(), DEFAULT_PHOTO_SETTINGS).diagnostics.holes).toBe(1);
   });
   it('composites transparent black onto white before thresholding, and always emits opaque pixels', () => {
@@ -80,12 +80,12 @@ describe('photo segmentation: explicit choices, no blur or hidden object selecti
     expect(processPhotoPixels(low, DEFAULT_PHOTO_SETTINGS).diagnostics.canApply).toBe(false);
     const empty = processPhotoPixels(ringAndIsland(), { ...DEFAULT_PHOTO_SETTINGS, foreground: 'light', threshold: 255 });
     expect(empty.diagnostics).toMatchObject({ components: 0, canApply: false });
-    expect(empty.diagnostics.warnings.join(' ')).toMatch(/vide|empty/i);
+    expect(empty.diagnostics.warnings.join(' ')).toMatch(/vac[ií]a|empty/i);
     const clipped = processPhotoPixels(pixels(20, 20, (x, y) => x < 10 && y > 3 && y < 16 ? [0, 0, 0, 255] : [255, 255, 255, 255]), DEFAULT_PHOTO_SETTINGS);
     expect(clipped.diagnostics.canApply).toBe(false); expect(clipped.diagnostics.warnings.join(' ')).toMatch(/bord|edge/i);
     const noisy = processPhotoPixels(pixels(100, 100, (x, y) => x % 2 && y % 2 ? [0, 0, 0, 255] : [255, 255, 255, 255]), DEFAULT_PHOTO_SETTINGS);
     expect(noisy.diagnostics.components).toBe(2500); expect(noisy.traceable).toBe(false); expect(noisy.diagnostics.canApply).toBe(false);
-    expect(noisy.diagnostics.warnings.join(' ')).toMatch(/complex|bruit|nois/i);
+    expect(noisy.diagnostics.warnings.join(' ')).toMatch(/componentes|compleja|ruidosa/i);
     expect(noisy.diagnostics.removedComponents).toBe(0);
   });
   it('flags reduction, while enforcing both processing caps after the crop', () => {
@@ -100,9 +100,9 @@ describe('photo segmentation: explicit choices, no blur or hidden object selecti
   it('validates original dimensions before crop/downsampling, and validates pixel buffer length', () => {
     expect(() => getPhotoRasterPlan(8192, 1, DEFAULT_PHOTO_SETTINGS.crop)).not.toThrow();
     expect(() => getPhotoRasterPlan(8193, 1, DEFAULT_PHOTO_SETTINGS.crop)).toThrow(/8192/);
-    expect(() => getPhotoRasterPlan(4000, 4001, { x: 0, y: 0, width: 0.01, height: 0.01 })).toThrow(/16 megapixels/);
-    expect(() => getPhotoRasterPlan(0, 1, DEFAULT_PHOTO_SETTINGS.crop)).toThrow(/dimensions/i);
-    expect(() => processPhotoPixels({ width: 2, height: 2, data: new Uint8ClampedArray(3) }, DEFAULT_PHOTO_SETTINGS)).toThrow(/pixels|buffer/i);
+    expect(() => getPhotoRasterPlan(4000, 4001, { x: 0, y: 0, width: 0.01, height: 0.01 })).toThrow(/16 megapíxeles/);
+    expect(() => getPhotoRasterPlan(0, 1, DEFAULT_PHOTO_SETTINGS.crop)).toThrow(/dimensiones/i);
+    expect(() => processPhotoPixels({ width: 2, height: 2, data: new Uint8ClampedArray(3) }, DEFAULT_PHOTO_SETTINGS)).toThrow(/píxeles|búfer/i);
   });
 });
 

@@ -42,7 +42,7 @@ function reconstructStampParameters(
     if (validated.mode !== 'stamp') {
       throw new CutterGenerationError(
         'INVALID_PARAMS',
-        'The mode parameter must be stamp for the Stamp recipe.',
+        'El parámetro mode debe ser stamp para la receta de sello.',
         { field: 'mode', value: validated.mode }
       );
     }
@@ -74,7 +74,7 @@ function reconstructStampParameters(
     return invalidResult({
       path: 'parameters',
       code: 'UNEXPECTED_VALIDATION_ERROR',
-      message: 'An unexpected error occurred while validating Stamp parameters.'
+      message: 'Ocurrió un error inesperado al validar los parámetros del sello.'
     });
   }
 }
@@ -83,7 +83,7 @@ function assertRuntimeStampKind(document: { readonly kind: string }): void {
   if (document.kind !== 'stamp') {
     throw new CutterGenerationError(
       'INVALID_PARAMS',
-      'The document kind must be stamp for the Stamp recipe.',
+      'El tipo de documento debe ser stamp para la receta de sello.',
       { field: 'kind', value: document.kind }
     );
   }
@@ -111,7 +111,7 @@ export const stampRecipe = Object.freeze({
       const firstIssue = validation.issues[0] ?? {
         path: 'parameters',
         code: 'INVALID_PARAMS',
-        message: 'The Stamp parameters are invalid.'
+        message: 'Los parámetros del sello son inválidos.'
       };
       throw new CutterGenerationError('INVALID_PARAMS', firstIssue.message, {
         field: firstIssue.path,
@@ -133,7 +133,7 @@ export const stampRecipe = Object.freeze({
       if (!report.valid || report.bounds === null) {
         throw new CutterGenerationError(
           'INVALID_GEOMETRY',
-          'The generated Stamp object is not valid single-shell printable geometry.',
+          'El sello generado no es una geometría imprimible válida de una sola cáscara.',
           {
             field: 'geometry',
             errors: report.errors,

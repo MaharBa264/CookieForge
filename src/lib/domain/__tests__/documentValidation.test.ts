@@ -118,7 +118,7 @@ describe('parseDesignDocumentV1', () => {
       const input = validCutterDocument();
       input.kind = kind;
 
-      expectValidationPath(input, 'kind', 'reconnu mais pas encore implémenté');
+      expectValidationPath(input, 'kind', 'reconocido pero todavía no implementado');
     }
   );
 

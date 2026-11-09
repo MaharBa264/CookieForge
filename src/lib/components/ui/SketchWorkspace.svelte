@@ -26,7 +26,7 @@
     cancel(); message = '';
     const baseline = session.getDocument(); if (!baseline) return;
     try { commitSketch(session, baseline, session.getSessionEpoch(), editSketch(baseline.sketch.svg, command)); }
-    catch (cause) { message = cause instanceof Error ? cause.message : 'Impossible de modifier ce tracé.'; }
+    catch (cause) { message = cause instanceof Error ? cause.message : 'No se pudo modificar este trazado.'; }
   }
   function begin(event: PointerEvent, index: number): void {
     if (event.button !== 0 || !document || path?.reason) return;
@@ -57,22 +57,22 @@
 </script>
 
 <svelte:window on:keydown={event => { if (event.key === 'Escape') cancel(); }} on:blur={cancel} />
-<section class="sketch-workspace" aria-label="Atelier de dessin 2D">
-  <h2>Atelier de dessin 2D</h2>
-  <p>Modifiez le projet actuel sans changer la source d’origine. Glissez un point, utilisez les flèches ou saisissez des coordonnées. Échap annule le déplacement.</p>
+<section class="sketch-workspace" aria-label="Taller de dibujo 2D">
+  <h2>Taller de dibujo 2D</h2>
+  <p>Modificá el proyecto actual sin cambiar el origen. Arrastrá un punto, usá las flechas o ingresá coordenadas. Esc cancela el desplazement.</p>
   {#if model && document}
-    <label>Contour
+    <label>Contorno
       <select bind:value={pathIndex} on:change={() => { cancel(); pointIndex = 0; }}>
         {#each model.paths as candidate, index}<option value={index}>Tracé {index + 1}{candidate.reason ? ' — conservé (lecture seule)' : ''}</option>{/each}
       </select>
     </label>
-    <svg bind:this={canvas} class="canvas" viewBox={model.viewBox} role="group" aria-label="Dessin actuel et points modifiables"
+    <svg bind:this={canvas} class="canvas" viewBox={model.viewBox} role="group" aria-label="Dibujo actual y puntos editables"
       on:pointermove={move} on:pointerup={finish} on:pointercancel={cancel} on:lostpointercapture={cancel}>
       <image href={'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg)} x={box[0]} y={box[1]} width={box[2]} height={box[3]} />
       {#if path && !path.reason}
         {#each path.points as point, index}
           <circle cx={point.x} cy={point.y} r={hitRadius} class="point-hit"
-            role="button" tabindex="0" aria-label={`${point.control ? 'Contrôle' : 'Ancrage'} ${index + 1}`}
+            role="button" tabindex="0" aria-label={`${point.control ? 'Control' : 'Anclaje'} ${index + 1}`}
             on:focus={() => pointIndex = index} on:keydown={event => key(event, index)} on:pointerdown={event => begin(event, index)} />
           <circle cx={point.x} cy={point.y} r={radius} class:control={point.control} class:selected={pointIndex === index}
             aria-hidden="true" pointer-events="none" />
@@ -80,25 +80,25 @@
       {/if}
     </svg>
     {#if path?.reason}<p role="status">{path.reason}</p>{/if}
-    {#if !model.paths.length}<p role="status">Aucun tracé modifiable. Les primitives SVG sont conservées ; cet atelier ne les convertit pas.</p>{/if}
+    {#if !model.paths.length}<p role="status">No hay trazados editables. Las primitivas SVG se conservan; este taller no las convierte.</p>{/if}
     {#each model.notices as notice}<p class="notice">{notice}</p>{/each}
     {#if selected && path && !path.reason}
-      <label>Point <select bind:value={pointIndex} on:change={cancel}>{#each path.points as point, index}<option value={index}>{point.control ? 'Contrôle' : 'Ancrage'} {index + 1}</option>{/each}</select></label>
+      <label>Point <select bind:value={pointIndex} on:change={cancel}>{#each path.points as point, index}<option value={index}>{point.control ? 'Control' : 'Anclaje'} {index + 1}</option>{/each}</select></label>
       <div class="coordinates">
         <label>X <input type="number" step="any" bind:value={x} /></label>
         <label>Y <input type="number" step="any" bind:value={y} /></label>
-        <button on:click={() => apply({ type: 'move', path: pathIndex, point: pointIndex, x, y })}>Déplacer le point</button>
+        <button on:click={() => apply({ type: 'move', path: pathIndex, point: pointIndex, x, y })}>Mover el punto</button>
       </div>
     {/if}
     <div class="tools">
-      <button disabled={!topology || !selected} on:click={() => apply({ type: 'add', path: pathIndex, point: pointIndex })}>Ajouter un point médian</button>
-      <button disabled={!topology || !selected || (path?.points.length ?? 0) <= 3} on:click={() => { apply({ type: 'delete', path: pathIndex, point: pointIndex }); pointIndex = 0; }}>Supprimer le point</button>
-      <button disabled={!topology || !!path?.closed} on:click={() => apply({ type: 'close', path: pathIndex })}>Fermer le contour</button>
-      <button disabled={!path || !!path.reason} on:click={() => apply({ type: 'mirror', path: pathIndex })}>Refléter le tracé</button>
-      <button disabled={!path || !!path.reason} on:click={() => apply({ type: 'rotate', path: pathIndex })}>Tourner le tracé de 90°</button>
+      <button disabled={!topology || !selected} on:click={() => apply({ type: 'add', path: pathIndex, point: pointIndex })}>Agregar un punto medio</button>
+      <button disabled={!topology || !selected || (path?.points.length ?? 0) <= 3} on:click={() => { apply({ type: 'delete', path: pathIndex, point: pointIndex }); pointIndex = 0; }}>Eliminar el punto</button>
+      <button disabled={!topology || !!path?.closed} on:click={() => apply({ type: 'close', path: pathIndex })}>Cerrar el contorno</button>
+      <button disabled={!path || !!path.reason} on:click={() => apply({ type: 'mirror', path: pathIndex })}>Reflejar el trazo</button>
+      <button disabled={!path || !!path.reason} on:click={() => apply({ type: 'rotate', path: pathIndex })}>Rotar el trazo 90°</button>
     </div>
-    <p class="notice">Ajout, suppression et fermeture : contours linéaires uniques seulement. Symétrie et rotation : autour du centre du viewBox. Les courbes conservent leurs points de contrôle ; les éléments SVG non pris en charge restent inchangés.</p>
-  {:else}<p>Importez ou ouvrez un projet pour modifier son dessin.</p>{/if}
+    <p class="notice">Agregar, eliminar y cerrar: solo para contornos lineales simples. Simetría y rotación: alrededor del centro del viewBox. Las curvas conservan sus puntos de control; los elementos SVG no soportados quedan sin cambios.</p>
+  {:else}<p>Importá o abrí un proyecto para modificar su dibujo.</p>{/if}
   {#if message}<p role="alert">{message}</p>{/if}
 </section>
 

@@ -72,7 +72,7 @@ describe('strict V4 stamp persistence', () => {
 
   it('reports future headers before unknown keys and rejects divergent envelopes', () => {
     rejectsAt({ ...stamp(), schemaVersion: 5, futureField: true }, 'schemaVersion');
-    expect(() => decodeProject(JSON.stringify({ format: PROJECT_FORMAT, version: 5, futureField: true, document: stamp() }))).toThrow(/future/);
+    expect(() => decodeProject(JSON.stringify({ format: PROJECT_FORMAT, version: 5, futureField: true, document: stamp() }))).toThrow(/futura/);
     for (const version of [1, 2, 3]) {
       expect(() => decodeProject(JSON.stringify({ format: PROJECT_FORMAT, version, document: stamp() }))).toThrowError(ProjectCodecError);
       expect(() => decodeProject(JSON.stringify({ format: PROJECT_FORMAT, version, document: stamp() }))).toThrow(/document.schemaVersion/);

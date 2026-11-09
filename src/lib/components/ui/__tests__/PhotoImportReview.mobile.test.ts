@@ -22,6 +22,6 @@ it('opens photo preparation at its heading, before the preview and settings, not
   expect(document.activeElement).toBe(heading);
   await vi.waitFor(() => expect(preparePhoto).toHaveBeenCalledTimes(1));
   await vi.waitFor(() => expect(document.querySelector('img[alt="Contour préparé"]')).not.toBeNull());
-  expect(document.querySelector('.previews img[alt="Original à recadrer"]')).not.toBeNull();
+  expect(document.querySelector('.previews img[alt="Original para recortar"]')).not.toBeNull();
   expect(document.querySelector<HTMLButtonElement>('.photo-review .actions .btn-primary')?.disabled).toBe(false);
 });

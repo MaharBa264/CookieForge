@@ -24,10 +24,10 @@ function parsePath(element: Element): SketchPath {
   for (let parent: Element | null = element; parent; parent = parent.parentElement) {
     if (parent.hasAttribute('transform') || parent.hasAttribute('style') || parent.localName === 'defs'
       || (parent.localName === 'svg' && parent !== element.ownerDocument.documentElement)) {
-      return locked('Transforms, styles and referenced geometry are preserved; point editing is unavailable.');
+      return locked('Se conservan las transformaciones, los estilos y la geometría referenciada; la edición de puntos no está disponible.');
     }
   }
-  if (element.ownerDocument.querySelector('style') || element.hasAttribute('class')) return locked('Stylesheet-dependent geometry is preserved (read-only).');
+  if (element.ownerDocument.querySelector('style') || element.hasAttribute('class')) return locked('La geometría que depende de hojas de estilo se conserva (solo lectura).');
   const d = element.getAttribute('d') ?? '';
   const tokenPattern = /[a-zA-Z]|[-+]?(?:\d*\.\d+|\d+\.?\d*)(?:[eE][-+]?\d+)?/g;
   const tokens = d.match(tokenPattern) ?? [];
@@ -38,14 +38,14 @@ function parsePath(element: Element): SketchPath {
   while (index < tokens.length) {
     if (/^[a-zA-Z]$/.test(tokens[index])) command = tokens[index++];
     const upper = command.toUpperCase();
-    if (!(upper in counts)) return locked('Only M/L/C/Q/Z paths are editable. Other commands are preserved without conversion.');
+    if (!(upper in counts)) return locked('Solo se pueden editar los trazados M/L/C/Q/Z. Los demás comandos se conservan sin convertir.');
     if (!segments.length && upper !== 'M') return locked('Path must start with M.');
     const count = counts[upper];
     if (upper === 'Z') {
       segments.push({ command: upper, values: [] }); x = startX; y = startY; command = ''; continue;
     }
     const values = tokens.slice(index, index + count).map(Number);
-    if (values.length !== count || values.some(value => !Number.isFinite(value))) return locked('Invalid coordinates preserved.');
+    if (values.length !== count || values.some(value => !Number.isFinite(value))) return locked('Coordenadas inválidas conservadas.');
     index += count;
     for (let offset = 0; offset < count; offset += 2) {
       if (command !== upper) { values[offset] += x; values[offset + 1] += y; }
@@ -64,37 +64,37 @@ export function inspectSketch(svg: string): { paths: SketchPath[]; viewBox: stri
   const box = (root.getAttribute('viewBox') ?? '').trim().split(/[\s,]+/).map(Number);
   const validBox = box.length === 4 && box.every(Number.isFinite) && box[2] > 0 && box[3] > 0;
   const paths = Array.from(doc.querySelectorAll('path')).map(parsePath);
-  if (!validBox) for (const path of paths) path.reason = 'A valid viewBox is required for point editing; SVG preserved.';
+  if (!validBox) for (const path of paths) path.reason = 'Se requiere un viewBox válido para editar puntos; el SVG se conserva.';
   const notices = [...new Set(paths.flatMap(path => path.reason ? [path.reason] : []))];
-  if (doc.querySelector('circle,ellipse,rect,polygon,polyline,line,text,use,image')) notices.push('Other SVG shapes remain intact; this workshop edits paths only.');
+  if (doc.querySelector('circle,ellipse,rect,polygon,polyline,line,text,use,image')) notices.push('Las demás formas SVG quedan intactas; este taller solo edita trazados.');
   return { paths, viewBox: validBox ? box.join(' ') : '0 0 100 100', notices };
 }
 
 export function editSketch(svg: string, command: SketchCommand): string {
   const model = inspectSketch(svg); const path = model.paths[command.path];
-  if (!path || path.reason) throw new Error(path?.reason ?? 'Select an editable path.');
+  if (!path || path.reason) throw new Error(path?.reason ?? 'Seleccioná un trazado editable.');
   const segments = path.segments;
   const point = 'point' in command ? path.points[command.point] : undefined;
-  if ('point' in command && !point) throw new Error('Select a point.');
+  if ('point' in command && !point) throw new Error('Seleccioná un punto.');
   if (command.type === 'move' && point) {
-    if (!Number.isFinite(command.x) || !Number.isFinite(command.y)) throw new Error('Coordinates must be finite.');
+    if (!Number.isFinite(command.x) || !Number.isFinite(command.y)) throw new Error('Las coordenadas deben ser finitas.');
     if (point.x === command.x && point.y === command.y) return svg;
     segments[point.segment].values[point.offset] = command.x;
     segments[point.segment].values[point.offset + 1] = command.y;
   } else if (command.type === 'add' || command.type === 'delete' || command.type === 'close') {
     // Topology commands are restricted to a single linear contour; no implicit
     // deletion of Bézier handles or neighbouring holes/subpaths.
-    if (!path.linear || segments.filter(s => s.command === 'M').length !== 1) throw new Error('Add/delete/close require a single linear contour. Curves and subpaths are preserved.');
+    if (!path.linear || segments.filter(s => s.command === 'M').length !== 1) throw new Error('Agregar, eliminar y cerrar requieren un único contorno lineal. Las curvas y los subtrazados se conservan.');
     if (command.type === 'close') {
       if (path.closed) return svg;
-      if (path.points.length < 3) throw new Error('A contour needs at least three points.');
+      if (path.points.length < 3) throw new Error('Un contorno necesita al menos tres puntos.');
       segments.push({ command: 'Z', values: [] });
     } else if (point && command.type === 'delete') {
-      if (path.points.length <= 3) throw new Error('Keep at least three points.');
+      if (path.points.length <= 3) throw new Error('Conservá al menos tres puntos.');
       segments.splice(point.segment, 1); segments[0].command = 'M';
     } else if (point && command.type === 'add') {
       const next = path.points[command.point + 1] ?? (path.closed ? path.points[0] : undefined);
-      if (!next) throw new Error('Select a point before a segment, not the open endpoint.');
+      if (!next) throw new Error('Seleccioná un punto anterior a un segmento, no el extremo abierto.');
       segments.splice(point.segment + 1, 0, { command: 'L', values: [(point.x + next.x) / 2, (point.y + next.y) / 2] });
     }
   } else if (command.type === 'mirror' || command.type === 'rotate') {

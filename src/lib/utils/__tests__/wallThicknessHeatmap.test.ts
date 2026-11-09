@@ -29,9 +29,9 @@ describe('wallThicknessHeatmap', () => {
     setTriangleWallThicknesses(geometry, [1.25]);
 
     expect(getTriangleWallThicknesses(geometry)).toEqual([1.25]);
-    expect(() => setTriangleWallThicknesses(geometry, [])).toThrow(/one positive value/i);
+    expect(() => setTriangleWallThicknesses(geometry, [])).toThrow(/un valor positivo/i);
     expect(() => setTriangleWallThicknesses(geometry, [Number.NaN])).toThrow(
-      /one positive value/i
+      /un valor positivo/i
     );
   });
 

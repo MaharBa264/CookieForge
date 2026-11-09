@@ -1,3 +1,4 @@
+import { generateUuid } from '../../utils/uuid';
 import type { DesignDocument, DesignSource } from '../designDocument';
 import { DEFAULT_CUTTER_PARAMETERS_V1 } from '../designParameters';
 import {
@@ -76,7 +77,7 @@ function hasOwn(record: UnknownRecord, key: string): boolean {
 
 function requireRecord(value: unknown, path: string): UnknownRecord {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) {
-    invalid(path, 'doit être un objet legacy.');
+    invalid(path, 'debe ser un objeto heredado (legacy).');
   }
   return value as UnknownRecord;
 }
@@ -91,16 +92,16 @@ function requireExactKeys(
 
   for (const key of requiredKeys) {
     if (!hasOwn(record, key)) {
-      invalid(childPath(path, key), 'est requis.');
+      invalid(childPath(path, key), 'es obligatorio.');
     }
   }
 
   for (const key of Reflect.ownKeys(record)) {
     if (typeof key !== 'string') {
-      invalid(path.length === 0 ? '$' : path, 'contient une propriété symbole inconnue.');
+      invalid(path.length === 0 ? '$' : path, 'contiene una propiedad de tipo símbolo desconocida.');
     }
     if (!allowedKeys.has(key)) {
-      invalid(childPath(path, key), "n'est pas un champ legacy reconnu.");
+      invalid(childPath(path, key), "no es un campo heredado (legacy) reconocido.");
     }
   }
 }
@@ -117,7 +118,7 @@ function readString(
     typeof value !== 'string' ||
     (requireNonEmpty && value.trim().length === 0)
   ) {
-    invalid(path, requireNonEmpty ? 'doit être une chaîne non vide.' : 'doit être une chaîne.');
+    invalid(path, requireNonEmpty ? 'debe ser una cadena no vacía.' : 'debe ser una cadena.');
   }
   return value;
 }
@@ -143,7 +144,7 @@ function normalizeParameters(value: unknown): UnknownRecord {
     requireExactKeys(parameters, 'parameters', PRE_MM_PARAMETER_KEYS);
     const scale = parameters.scale;
     if (typeof scale !== 'number' || !Number.isFinite(scale) || scale <= 0) {
-      invalid('parameters.scale', 'doit être un nombre fini strictement positif.');
+      invalid('parameters.scale', 'debe ser un número finito estrictamente positivo.');
     }
 
     const normalized = copyKnownKeys(
@@ -171,7 +172,7 @@ function parseMetadata(value: unknown): LegacyMetadata {
   if (hasOwn(metadata, 'fileType')) {
     const candidate = metadata.fileType;
     if (candidate !== 'svg' && candidate !== 'png' && candidate !== 'jpg') {
-      invalid('metadata.fileType', 'doit être svg, png ou jpg.');
+      invalid('metadata.fileType', 'debe ser svg, png o jpg.');
     }
     fileType = candidate;
   }
@@ -188,17 +189,17 @@ function parseMetadata(value: unknown): LegacyMetadata {
 }
 
 function createDefaultId(): string {
-  const crypto = globalThis.crypto;
-  if (typeof crypto?.randomUUID !== 'function') {
-    invalid('id', 'ne peut pas être généré : crypto.randomUUID est indisponible.');
+  try {
+    return generateUuid();
+  } catch {
+    return invalid('id', 'no se puede generar: la API de criptografía no está disponible.');
   }
-  return crypto.randomUUID();
 }
 
 function createMigrationId(createId: () => string): string {
   const id: unknown = createId();
   if (typeof id !== 'string' || id.trim().length === 0) {
-    invalid('id', 'doit être une chaîne non vide.');
+    invalid('id', 'debe ser una cadena no vacía.');
   }
   return id;
 }
@@ -240,7 +241,7 @@ export function migrateV0ToV1(
 
   const version = readString(legacy, 'version', '', true);
   if (version !== '1.0.0') {
-    invalid('version', 'doit être exactement 1.0.0 pour cette migration.');
+    invalid('version', 'debe ser exactamente 1.0.0 para esta migración.');
   }
 
   const name = readString(legacy, 'name', '', true);
@@ -250,7 +251,7 @@ export function migrateV0ToV1(
   const parameters = normalizeParameters(legacy.parameters);
   const mode = parameters.mode;
   if (mode !== 'cutter' && mode !== 'stamp') {
-    invalid('parameters.mode', 'doit être cutter ou stamp.');
+    invalid('parameters.mode', 'debe ser cutter o stamp.');
   }
 
   if (hasOwn(legacy, 'thumbnail')) {
@@ -263,12 +264,12 @@ export function migrateV0ToV1(
   const warnings: string[] = [];
   if (hasOwn(legacy, 'thumbnail')) {
     warnings.push(
-      'thumbnail: aperçu dérivé non représentable dans DesignDocumentV1, abandonné pendant la migration.'
+      'thumbnail: la vista previa derivada no se puede representar en DesignDocumentV1; se descartó durante la migración.'
     );
   }
   if (metadata?.hasNotes === true) {
     warnings.push(
-      'metadata.notes: notes legacy non représentables dans DesignDocumentV1, abandonnées pendant la migration.'
+      'metadata.notes: las notas heredadas no se pueden representar en DesignDocumentV1; se descartaron durante la migración.'
     );
   }
 

@@ -39,7 +39,7 @@ export async function callGemini(
   } = config;
 
   if (!apiKey || apiKey.trim() === '') {
-    throw new Error('Gemini API key is required');
+    throw new Error('Se requiere la clave de API de Gemini');
   }
 
   try {
@@ -105,14 +105,14 @@ export async function callGemini(
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(
-        errorData.error?.message || `API request failed: ${response.status}`
+        errorData.error?.message || `Falló la solicitud a la API: ${response.status}`
       );
     }
 
     const data = await response.json();
 
     if (!data.candidates || data.candidates.length === 0) {
-      throw new Error('No response generated from Gemini');
+      throw new Error('Gemini no generó ninguna respuesta');
     }
 
     const text = data.candidates[0]?.content?.parts?.[0]?.text || '';
@@ -123,9 +123,9 @@ export async function callGemini(
     };
   } catch (error) {
     if (error instanceof Error) {
-      throw new Error(`Gemini API Error: ${error.message}`);
+      throw new Error(`Error de la API de Gemini: ${error.message}`);
     }
-    throw new Error('Unknown error occurred while calling Gemini API');
+    throw new Error('Ocurrió un error desconocido al llamar a la API de Gemini');
   }
 }
 
@@ -200,13 +200,13 @@ Keep response concise and actionable (max 200 words).`;
 
     // For now, return the original SVG since we can't reliably generate new SVG
     // But we could show the analysis to the user in the future
-    console.log('SVG Optimization Analysis:', data);
+    console.log('Análisis de optimización del SVG:', data);
 
     // Return original SVG (no changes) - this is safer than risking broken SVG
     return svgContent;
   } catch (e) {
     // If analysis fails, just return original
-    console.warn('SVG analysis failed, returning original:', e);
+    console.warn('Falló el análisis del SVG; se devuelve el original:', e);
     return svgContent;
   }
 }
@@ -445,7 +445,7 @@ Your images should have:
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(
-        errorData.error?.message || `Image generation failed: ${response.status}`
+        errorData.error?.message || `Falló la generación de la imagen: ${response.status}`
       );
     }
 
@@ -453,7 +453,7 @@ Your images should have:
 
     // Extract image data from response
     if (!data.candidates || data.candidates.length === 0) {
-      throw new Error('No image generated from Gemini');
+      throw new Error('Gemini no generó ninguna imagen');
     }
 
     const imagePart = data.candidates[0]?.content?.parts?.find(
@@ -461,7 +461,7 @@ Your images should have:
     );
 
     if (!imagePart || !imagePart.inlineData) {
-      throw new Error('No image data in response');
+      throw new Error('La respuesta no contiene datos de imagen');
     }
 
     // Convert base64 to Blob
@@ -477,9 +477,9 @@ Your images should have:
     return new Blob([bytes], { type: mimeType });
   } catch (error) {
     if (error instanceof Error) {
-      throw new Error(`Image generation error: ${error.message}`);
+      throw new Error(`Error al generar la imagen: ${error.message}`);
     }
-    throw new Error('Unknown error during image generation');
+    throw new Error('Error desconocido durante la generación de la imagen');
   }
 }
 
@@ -488,7 +488,7 @@ Your images should have:
  */
 export function saveAPIKey(apiKey: string): void {
   if (!apiKey || apiKey.trim() === '') {
-    throw new Error('API key cannot be empty');
+    throw new Error('La clave de API no puede estar vacía');
   }
   localStorage.setItem('gemini_api_key', apiKey.trim());
 

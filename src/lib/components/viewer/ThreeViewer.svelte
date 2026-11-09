@@ -14,7 +14,7 @@
   export let buildPlateSize = 200;
   // Legacy viewers remain editable; document-owned previews explicitly opt out.
   export let allowObjectDeletion: boolean = true;
-  const deletionUnavailableReason = 'La géométrie générée est un aperçu en lecture seule. La modification permanente des pièces n’est pas disponible dans la V1.';
+  const deletionUnavailableReason = 'La geometría generada es una vista previa de solo lectura. La modificación permanente de las piezas no está disponible en la V1.';
   export let viewport: import('../../domain/designDocument').ViewportPreferences = { showGrid: true, showAxes: false, showWallThickness: false };
   export let onViewportChange: (value: import('../../domain/designDocument').ViewportPreferences) => void = () => {};
 
@@ -284,7 +284,7 @@
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.domElement.setAttribute('role', 'img');
-    renderer.domElement.setAttribute('aria-label', 'Aperçu 3D du modèle. Glissez pour tourner ; utilisez les boutons pour zoomer.');
+    renderer.domElement.setAttribute('aria-label', 'Vista previa 3D del modelo. Arrastrá para girar; usá los botones para acercar o alejar.');
     container.appendChild(renderer.domElement);
 
     controls = new OrbitControls(camera, renderer.domElement);
@@ -465,50 +465,50 @@
 
   <!-- Selection controls overlay -->
   <div class="controls-overlay">
-    <label class="heatmap-toggle"><input type="checkbox" aria-label="Afficher la grille" checked={viewport.showGrid}
-      on:change={event => userViewportChange({ showGrid: event.currentTarget.checked })} />Grille</label>
-    <label class="heatmap-toggle"><input type="checkbox" aria-label="Afficher les axes" checked={viewport.showAxes}
-      on:change={event => userViewportChange({ showAxes: event.currentTarget.checked })} />Axes</label>
+    <label class="heatmap-toggle"><input type="checkbox" aria-label="Mostrar la grilla" checked={viewport.showGrid}
+      on:change={event => userViewportChange({ showGrid: event.currentTarget.checked })} />Grilla</label>
+    <label class="heatmap-toggle"><input type="checkbox" aria-label="Mostrar los ejes" checked={viewport.showAxes}
+      on:change={event => userViewportChange({ showAxes: event.currentTarget.checked })} />Ejes</label>
     <button
       class="control-btn"
       class:active={selectionMode}
       on:click={toggleSelectionMode}
-      title={selectionMode ? 'Quitter le mode sélection' : 'Activer le mode sélection'}
-      aria-label={selectionMode ? 'Quitter le mode sélection' : 'Activer le mode sélection'}
+      title={selectionMode ? 'Salir del modo de selección' : 'Activar el modo de selección'}
+      aria-label={selectionMode ? 'Salir del modo de selección' : 'Activar el modo de selección'}
       aria-pressed={selectionMode}
     >
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z" />
       </svg>
-      <span class="control-label">{selectionMode ? 'Terminer la sélection' : 'Sélectionner une pièce'}</span>
+      <span class="control-label">{selectionMode ? 'Terminar la selección' : 'Seleccionar una pieza'}</span>
     </button>
 
     <button
       class="control-btn"
       on:click={fitCurrentView}
-      title="Ajuster le modèle à la vue"
-      aria-label="Ajuster le modèle à la vue"
+      title="Ajustar el modelo a la vista"
+      aria-label="Ajustar el modelo a la vista"
     >
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5" />
       </svg>
-      <span class="control-label">Ajuster la vue</span>
+      <span class="control-label">Ajustar la vista</span>
     </button>
 
-    <div class="zoom-controls" role="group" aria-label="Zoom de l’aperçu 3D">
+    <div class="zoom-controls" role="group" aria-label="Zoom de la vista previa 3D">
       <button type="button" class="control-btn" on:click={() => zoomView(0.8)}
-        disabled={!displayedMesh} title="Rapprocher le modèle" aria-label="Rapprocher le modèle">
+        disabled={!displayedMesh} title="Acercar el modelo" aria-label="Acercar el modelo">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <path d="M12 5v14M5 12h14" />
         </svg>
-        <span class="control-label">Zoom +</span>
+        <span class="control-label">Acercar +</span>
       </button>
       <button type="button" class="control-btn" on:click={() => zoomView(1.25)}
-        disabled={!displayedMesh} title="Éloigner le modèle" aria-label="Éloigner le modèle">
+        disabled={!displayedMesh} title="Alejar el modelo" aria-label="Alejar el modelo">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <path d="M5 12h14" />
         </svg>
-        <span class="control-label">Zoom −</span>
+        <span class="control-label">Alejar −</span>
       </button>
     </div>
 
@@ -517,8 +517,8 @@
       class:active={wallHeatmapEnabled}
       class:disabled={!wallHeatmapAvailable}
       title={wallHeatmapAvailable
-        ? 'Colorer l’emporte-pièce selon l’épaisseur mesurée de ses parois'
-        : 'La carte d’épaisseur des parois n’est disponible que pour les emporte-pièces'}
+        ? 'Colorear el cortador según el espesor medido de sus paredes'
+        : 'El mapa de espesor de las paredes solo está disponible para cortadores'}
     >
       <input
         type="checkbox"
@@ -528,24 +528,24 @@
         aria-describedby={wallHeatmapEnabled ? 'wall-heatmap-legend' : undefined}
       />
       <span class="heatmap-swatch" aria-hidden="true"></span>
-      <span class="control-label">Carte d’épaisseur</span>
+      <span class="control-label">Mapa de espesor</span>
     </label>
 
     {#if wallHeatmapEnabled && wallHeatmapRange && wallHeatmapTarget !== null}
       <div
         id="wall-heatmap-legend"
         class="heatmap-legend"
-        aria-label={`Épaisseur mesurée des parois : de ${wallHeatmapRange.min.toFixed(2)} à ${wallHeatmapRange.max.toFixed(2)} millimètres. Cible : ${wallHeatmapTarget.toFixed(2)} millimètres.`}
+        aria-label={`Espesor medido de las paredes: de ${wallHeatmapRange.min.toFixed(2)} a ${wallHeatmapRange.max.toFixed(2)} milímetros. Objetivo: ${wallHeatmapTarget.toFixed(2)} milímetros.`}
       >
-        <div class="heatmap-target">Cible : {wallHeatmapTarget.toFixed(2)} mm</div>
+        <div class="heatmap-target">Objetivo: {wallHeatmapTarget.toFixed(2)} mm</div>
         <div
           class="heatmap-scale"
           style={`--heatmap-target-position: ${wallHeatmapTargetPosition}%`}
           aria-hidden="true"
         ></div>
         <div class="heatmap-values">
-          <span>Min {wallHeatmapRange.min.toFixed(2)} mm</span>
-          <span>Max {wallHeatmapRange.max.toFixed(2)} mm</span>
+          <span>Mín. {wallHeatmapRange.min.toFixed(2)} mm</span>
+          <span>Máx. {wallHeatmapRange.max.toFixed(2)} mm</span>
         </div>
       </div>
     {/if}
@@ -556,14 +556,14 @@
         on:click={deleteSelected}
         disabled={!allowObjectDeletion}
         aria-describedby={!allowObjectDeletion ? 'viewer-deletion-reason' : undefined}
-        title={!allowObjectDeletion ? deletionUnavailableReason : 'Supprimer l’élément sélectionné'}
-        aria-label="Supprimer l’élément sélectionné"
+        title={!allowObjectDeletion ? deletionUnavailableReason : 'Eliminar el elemento seleccionado'}
+        aria-label="Eliminar el elemento seleccionado"
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polyline points="3 6 5 6 21 6" />
           <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
         </svg>
-        <span class="control-label">Supprimer</span>
+        <span class="control-label">Eliminar</span>
       </button>
       {#if !allowObjectDeletion}
         <p id="viewer-deletion-reason" class="selection-hint">{deletionUnavailableReason}</p>
@@ -572,7 +572,7 @@
 
     {#if selectionMode}
       <div class="selection-hint">
-        Cliquez sur un élément pour le sélectionner
+        Hacé clic en un elemento para seleccionarlo
       </div>
     {/if}
   </div>

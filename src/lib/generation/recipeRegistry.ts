@@ -29,17 +29,17 @@ export type ResolvedGenerationRecipe<K extends string> = string extends K
 function registryErrorMessage(code: RecipeRegistryErrorCode, kind: string): string {
   switch (code) {
     case 'UNKNOWN_KIND':
-      return `Kind de conception inconnu : ${kind}.`;
+      return `Tipo de diseño desconocido: ${kind}.`;
     case 'UNIMPLEMENTED_KIND':
-      return `Aucune recette implémentée n’est disponible pour le kind : ${kind}.`;
+      return `No hay una receta implementada para el tipo: ${kind}.`;
     case 'DUPLICATE_REGISTRATION':
-      return `Une recette est déjà enregistrée pour le kind : ${kind}.`;
+      return `Ya hay una receta registrada para el tipo: ${kind}.`;
     case 'LOAD_FAILED':
-      return `Le chargement de la recette a échoué pour le kind : ${kind}.`;
+      return `Falló la carga de la receta para el tipo: ${kind}.`;
     case 'KIND_MISMATCH':
-      return `La recette chargée ne correspond pas au kind demandé : ${kind}.`;
+      return `La receta cargada no coincide con el tipo solicitado: ${kind}.`;
     case 'INVALID_RECIPE':
-      return `La recette chargée est structurellement invalide pour le kind : ${kind}.`;
+      return `La receta cargada es estructuralmente inválida para el tipo: ${kind}.`;
   }
 }
 

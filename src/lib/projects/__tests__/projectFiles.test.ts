@@ -76,12 +76,12 @@ describe('fichiers projet : import strict', () => {
 
   it('rejette le JSON invalide par le codec', async () => {
     await expect(readProjectFile(new Blob(['{']))).rejects.toBeInstanceOf(ProjectCodecError);
-    await expect(readProjectFile(new Blob(['{']))).rejects.toThrow('JSON invalide');
+    await expect(readProjectFile(new Blob(['{']))).rejects.toThrow('JSON inválido');
   });
 
   it('rejette une version future', async () => {
     const json = JSON.stringify({ format: PROJECT_FORMAT, version: 5, document: documentFixture() });
-    await expect(readProjectFile(new Blob([json]))).rejects.toThrow('version future');
+    await expect(readProjectFile(new Blob([json]))).rejects.toThrow('versión futura');
   });
 
   it('rejette les champs inconnus et un SVG actif sans insertion HTML', async () => {
@@ -109,7 +109,7 @@ describe('fichiers projet : import strict', () => {
   it('rejette un octet au-dessus de la limite avant text()', async () => {
     const file = new Blob([' '.repeat(MAX_PROJECT_FILE_BYTES + 1)]);
     const text = vi.spyOn(file, 'text').mockRejectedValue(new Error('ne doit pas lire'));
-    await expect(readProjectFile(file)).rejects.toThrow(/taille|10 Mio/);
+    await expect(readProjectFile(file)).rejects.toThrow(/tamaño|10 MiB/);
     expect(text).not.toHaveBeenCalled();
   });
 

@@ -21,7 +21,7 @@ export function extensionMime(name: string): ImageMime | null {
 }
 /** No implicit batch and no silent first-file choice. Empty picker cancellation is a no-op. */
 export function selectSingleImage(files: ArrayLike<File>): File | null {
-  if (files.length > 1) throw new Error('Choose one image at a time; multiple files are not imported.');
+  if (files.length > 1) throw new Error('Elegí una sola imagen a la vez; no se importan varios archivos.');
   return files[0] ?? null;
 }
 export function clipboardImageFiles(data: DataTransfer): File[] {
@@ -52,7 +52,7 @@ export function isEditablePasteTarget(target: EventTarget | null): boolean {
   return false;
 }
 function checkCancellation(signal?: AbortSignal): void {
-  if (signal?.aborted) throw new DOMException('Image import was cancelled.', 'AbortError');
+  if (signal?.aborted) throw new DOMException('Se canceló la importación de la imagen.', 'AbortError');
 }
 /** Conversion only: the caller owns session validity and guarded publication. */
 export async function importImage(file: File, signal?: AbortSignal, preset: TracingPresetId = DEFAULT_TRACING_PRESET): Promise<{ svg: string; source: DesignSource }> {

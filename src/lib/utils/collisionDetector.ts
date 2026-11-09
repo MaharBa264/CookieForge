@@ -53,12 +53,12 @@ export function detectCollisions(
 
   // Generate warnings
   if (collisions.length > 0) {
-    warnings.push(`Found ${collisions.length} collision(s) between objects`);
+    warnings.push(`Se encontraron ${collisions.length} colisión(es) entre objetos`);
     collisions.forEach(c => {
       if (c.overlap > 0) {
-        warnings.push(`${c.object1} and ${c.object2} overlap by ${c.overlap.toFixed(2)}mm`);
+        warnings.push(`${c.object1} y ${c.object2} se superponen ${c.overlap.toFixed(2)} mm`);
       } else {
-        warnings.push(`${c.object1} and ${c.object2} are too close (${c.distance.toFixed(2)}mm separation)`);
+        warnings.push(`${c.object1} y ${c.object2} están demasiado cerca (separación de ${c.distance.toFixed(2)} mm)`);
       }
     });
   }
@@ -184,19 +184,19 @@ export function checkBuildPlateBounds(
   let inBounds = true;
 
   if (box.min.x < -halfSize) {
-    warnings.push(`Object extends ${Math.abs(box.min.x + halfSize).toFixed(1)}mm beyond left edge`);
+    warnings.push(`El objeto se extiende ${Math.abs(box.min.x + halfSize).toFixed(1)}mm más allá del borde izquierdo`);
     inBounds = false;
   }
   if (box.max.x > halfSize) {
-    warnings.push(`Object extends ${(box.max.x - halfSize).toFixed(1)}mm beyond right edge`);
+    warnings.push(`El objeto se extiende ${(box.max.x - halfSize).toFixed(1)}mm más allá del borde derecho`);
     inBounds = false;
   }
   if (box.min.z < -halfSize) {
-    warnings.push(`Object extends ${Math.abs(box.min.z + halfSize).toFixed(1)}mm beyond front edge`);
+    warnings.push(`El objeto se extiende ${Math.abs(box.min.z + halfSize).toFixed(1)}mm más allá del borde frontal`);
     inBounds = false;
   }
   if (box.max.z > halfSize) {
-    warnings.push(`Object extends ${(box.max.z - halfSize).toFixed(1)}mm beyond back edge`);
+    warnings.push(`El objeto se extiende ${(box.max.z - halfSize).toFixed(1)}mm más allá del borde trasero`);
     inBounds = false;
   }
 

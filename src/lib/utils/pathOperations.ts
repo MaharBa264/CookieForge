@@ -86,7 +86,7 @@ function validateAndNormalizeInput(
   if (points.length > GENERATION_LIMITS.maxPointsPerContour) {
     throw new CutterGenerationError(
       'CONTOUR_TOO_COMPLEX',
-      'The contour contains too many points for a safe offset.',
+      'El contorno tiene demasiados puntos para un desplazamiento seguro.',
       {
         field: 'pointsPerContour',
         actual: points.length,
@@ -96,7 +96,7 @@ function validateAndNormalizeInput(
   }
 
   if (points.length < 3) {
-    invalidGeometry('A closed contour needs at least three points.', {
+    invalidGeometry('Un contorno cerrado necesita al menos tres puntos.', {
       field: 'points',
       actual: points.length,
       min: 3
@@ -111,7 +111,7 @@ function validateAndNormalizeInput(
       Math.abs(point.x) > MAX_INPUT_COORDINATE ||
       Math.abs(point.y) > MAX_INPUT_COORDINATE
     ) {
-      invalidGeometry('The contour contains an unsafe coordinate.', {
+      invalidGeometry('El contorno contiene una coordenada no segura.', {
         field: 'points',
         index,
         maxAbsoluteCoordinate: MAX_INPUT_COORDINATE
@@ -121,7 +121,7 @@ function validateAndNormalizeInput(
 
   const normalized = normalizeContourPoints(points);
   if (!normalized) {
-    invalidGeometry('The contour is degenerate after normalization.', {
+    invalidGeometry('El contorno es degenerado tras la normalización.', {
       field: 'points'
     });
   }
@@ -138,7 +138,7 @@ function svgToClipperPath(points: ReadonlyArray<Readonly<Point2D>>): Path {
 
   const uniqueScaledPoints = new Set(scaled.map(({ x, y }) => `${x}:${y}`));
   if (uniqueScaledPoints.size < 3 || Math.abs(signedArea(scaled)) < 1) {
-    invalidGeometry('The contour collapses at Clipper precision.', {
+    invalidGeometry('El contorno colapsa a la precisión de Clipper.', {
       field: 'points',
       scale: CLIPPER_SCALE
     });
@@ -153,7 +153,7 @@ function svgToClipperPaths(
   if (paths.length > GENERATION_LIMITS.maxContours) {
     throw new CutterGenerationError(
       'CONTOUR_TOO_COMPLEX',
-      'The operation contains too many contours.',
+      'La operación contiene demasiados contornos.',
       {
         field: 'contours',
         actual: paths.length,
@@ -182,7 +182,7 @@ function normalizeOutputPaths(
   if (paths.length > GENERATION_LIMITS.maxContours) {
     throw new CutterGenerationError(
       'CONTOUR_TOO_COMPLEX',
-      'The offset produced too many contours.',
+      'El desplazamiento produjo demasiados contornos.',
       {
         field: 'contours',
         actual: paths.length,
@@ -198,7 +198,7 @@ function normalizeOutputPaths(
     if (path.length > GENERATION_LIMITS.maxPointsPerContour) {
       throw new CutterGenerationError(
         'CONTOUR_TOO_COMPLEX',
-        'An offset contour contains too many points.',
+        'Un contorno desplazado contiene demasiados puntos.',
         {
           field: 'pointsPerContour',
           actual: path.length,
@@ -211,7 +211,7 @@ function normalizeOutputPaths(
     if (totalPoints > GENERATION_LIMITS.maxTotalPoints) {
       throw new CutterGenerationError(
         'CONTOUR_TOO_COMPLEX',
-        'The offsets contain too many points in total.',
+        'Los desplazamientos contienen demasiados puntos en total.',
         {
           field: 'totalPoints',
           actual: totalPoints,
@@ -239,7 +239,7 @@ function normalizeOutputPaths(
 function throwOffsetFailure(operation: string): never {
   throw new CutterGenerationError(
     'OFFSET_FAILED',
-    'Clipper could not compute a safe polygon offset.',
+    'Clipper no pudo calcular un desplazamiento de polígono seguro.',
     { operation }
   );
 }
@@ -254,13 +254,13 @@ export async function offsetPath(
   joinType: JoinStyle = 'round'
 ): Promise<ReadonlyArray<NormalizedContour>> {
   if (!Number.isFinite(offsetDistance)) {
-    invalidGeometry('The offset distance must be finite.', {
+    invalidGeometry('La distancia de desplazamiento debe ser finita.', {
       field: 'offsetDistance'
     });
   }
 
   if (!JOIN_STYLES.includes(joinType)) {
-    invalidGeometry('The offset join type is invalid.', {
+    invalidGeometry('El tipo de unión del desplazamiento es inválido.', {
       field: 'joinType'
     });
   }
@@ -299,6 +299,26 @@ export async function unionPaths(
   const result = lib.clipToPaths({
     clipType: api.ClipType.Union,
     subjectFillType: api.PolyFillType.NonZero,
+    subjectInputs: [{ data: svgToClipperPaths(paths), closed: true }]
+  });
+
+  return normalizeOutputPaths(result);
+}
+
+/**
+ * Región definida por la regla par-impar: una zona está rellena si está dentro de un número
+ * impar de contornos. Equivale a «regiones de profundidad par menos sus huecos» y no depende
+ * del sentido de giro de cada contorno.
+ */
+export async function evenOddRegionPaths(
+  paths: ReadonlyArray<ReadonlyArray<Readonly<Point2D>>>
+): Promise<ReadonlyArray<NormalizedContour>> {
+  if (paths.length === 0) return Object.freeze([]);
+
+  const { api, lib } = await initClipper();
+  const result = lib.clipToPaths({
+    clipType: api.ClipType.Union,
+    subjectFillType: api.PolyFillType.EvenOdd,
     subjectInputs: [{ data: svgToClipperPaths(paths), closed: true }]
   });
 
@@ -349,7 +369,7 @@ export async function simplifyPath(
   fillType: FillRule = 'nonzero'
 ): Promise<ReadonlyArray<NormalizedContour>> {
   if (!FILL_RULES.includes(fillType)) {
-    invalidGeometry('The polygon fill rule is invalid.', { field: 'fillType' });
+    invalidGeometry('La regla de relleno del polígono es inválida.', { field: 'fillType' });
   }
 
   const { api, lib } = await initClipper();
@@ -370,7 +390,7 @@ export async function createCutterWalls(
   wallThickness: number
 ): Promise<Readonly<CutterWallPaths>> {
   if (!Number.isFinite(wallThickness) || wallThickness <= 0) {
-    invalidGeometry('Wall thickness must be a positive finite number.', {
+    invalidGeometry('El espesor de pared debe ser un número finito positivo.', {
       field: 'wallThickness',
       value: wallThickness
     });
@@ -384,7 +404,7 @@ export async function createCutterWalls(
   if (outer.length === 0) {
     throw new CutterGenerationError(
       'OFFSET_FAILED',
-      'The outer cutter wall could not be generated.',
+      'No se pudo generar la pared exterior del cortador.',
       { side: 'outer', wallThickness }
     );
   }
@@ -392,7 +412,7 @@ export async function createCutterWalls(
   if (inner.length === 0) {
     throw new CutterGenerationError(
       'OFFSET_FAILED',
-      'The contour is too small for the requested wall thickness.',
+      'El contorno es demasiado pequeño para el espesor de pared pedido.',
       { side: 'inner', wallThickness }
     );
   }

@@ -19,7 +19,7 @@ describe('cookieCutterStore generationState', () => {
     const unsubscribe = generationState.subscribe(snapshots);
     const mutableError = {
       revision: 4,
-      message: 'La génération a échoué.'
+      message: 'La generación falló.'
     };
     const next: GenerationState = {
       phase: 'error',
@@ -34,7 +34,7 @@ describe('cookieCutterStore generationState', () => {
     mutableError.message = 'Mutation après publication';
 
     expect(published).not.toBe(next);
-    expect(published.error?.message).toBe('La génération a échoué.');
+    expect(published.error?.message).toBe('La generación falló.');
     expect(Object.isFrozen(published)).toBe(true);
     expect(Object.isFrozen(published.error)).toBe(true);
     expect(snapshots).toHaveBeenCalledTimes(2);

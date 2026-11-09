@@ -96,7 +96,7 @@ function requireParamsRecord(value: unknown): Record<string, unknown> {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) {
     invalidParameter(
       'params',
-      'Cutter parameters (params) must be provided as a complete object.',
+      'Los parámetros del cortador (params) deben entregarse como un objeto completo.',
       value
     );
   }
@@ -105,7 +105,7 @@ function requireParamsRecord(value: unknown): Record<string, unknown> {
 
   for (const key of PARAM_KEYS) {
     if (!Object.prototype.hasOwnProperty.call(record, key)) {
-      invalidParameter(key, `The required ${key} parameter is missing.`);
+      invalidParameter(key, `Falta el parámetro obligatorio ${key}.`);
     }
   }
 
@@ -113,7 +113,7 @@ function requireParamsRecord(value: unknown): Record<string, unknown> {
   if (unknownField !== undefined) {
     invalidParameter(
       unknownField,
-      `The ${unknownField} parameter is not recognized.`,
+      `El parámetro ${unknownField} no es reconocido.`,
       record[unknownField]
     );
   }
@@ -124,7 +124,7 @@ function requireParamsRecord(value: unknown): Record<string, unknown> {
 function readFiniteNumber(record: Record<string, unknown>, field: string): number {
   const value = record[field];
   if (typeof value !== 'number' || !Number.isFinite(value)) {
-    invalidParameter(field, `The ${field} parameter must be a finite number.`, value);
+    invalidParameter(field, `El parámetro ${field} debe ser un número finito.`, value);
   }
 
   return value;
@@ -133,7 +133,7 @@ function readFiniteNumber(record: Record<string, unknown>, field: string): numbe
 function readBoolean(record: Record<string, unknown>, field: string): boolean {
   const value = record[field];
   if (typeof value !== 'boolean') {
-    invalidParameter(field, `The ${field} parameter must be true or false.`, value);
+    invalidParameter(field, `El parámetro ${field} debe ser true o false.`, value);
   }
 
   return value;
@@ -148,7 +148,7 @@ function readEnum<T extends string>(
   if (typeof value !== 'string' || !allowedValues.includes(value as T)) {
     invalidParameter(
       field,
-      `The ${field} parameter must be one of: ${allowedValues.join(', ')}.`,
+      `El parámetro ${field} debe ser uno de: ${allowedValues.join(', ')}.`,
       value
     );
   }
@@ -160,7 +160,7 @@ function requireRange(field: string, value: number, minimum: number, maximum: nu
   if (value < minimum || value > maximum) {
     invalidParameter(
       field,
-      `The ${field} parameter must be between ${minimum} and ${maximum}.`,
+      `El parámetro ${field} debe estar entre ${minimum} y ${maximum}.`,
       value
     );
   }
@@ -243,7 +243,7 @@ export function validateCookieCutterParams(value: unknown): Readonly<CookieCutte
   if (mode === 'cutter' && totalHeight < cuttingHeight) {
     invalidParameter(
       'totalHeight',
-      'The totalHeight parameter must be greater than or equal to cuttingHeight.',
+      'El parámetro totalHeight debe ser mayor o igual que cuttingHeight.',
       totalHeight
     );
   }
@@ -256,7 +256,7 @@ export function validateCookieCutterParams(value: unknown): Readonly<CookieCutte
   ) {
     invalidParameter(
       'totalHeight',
-      'The totalHeight parameter must be greater than or equal to cuttingHeight + handleHeight when the handle is active.',
+      'El parámetro totalHeight debe ser mayor o igual que cuttingHeight + handleHeight cuando el asa está activa.',
       totalHeight
     );
   }
@@ -264,7 +264,7 @@ export function validateCookieCutterParams(value: unknown): Readonly<CookieCutte
   if (enableHandle && handleHeight <= 0) {
     invalidParameter(
       'handleHeight',
-      'The handleHeight parameter must be greater than zero when the handle is enabled.',
+      'El parámetro handleHeight debe ser mayor que cero cuando el asa está habilitada.',
       handleHeight
     );
   }
@@ -272,7 +272,7 @@ export function validateCookieCutterParams(value: unknown): Readonly<CookieCutte
   if (mode === 'stamp' && !stampBase) {
     invalidParameter(
       'stampBase',
-      'The stampBase parameter is required in Stamp mode to connect every relief region.',
+      'El parámetro stampBase es obligatorio en modo sello para conectar cada región de relieve.',
       stampBase
     );
   }
@@ -280,7 +280,7 @@ export function validateCookieCutterParams(value: unknown): Readonly<CookieCutte
   if (enableEmbossing) {
     invalidParameter(
       'enableEmbossing',
-      'The enableEmbossing option is not available. Use Stamp mode for raised relief.',
+      'La opción enableEmbossing no está disponible. Usá el modo sello para el relieve.',
       enableEmbossing
     );
   }

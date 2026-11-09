@@ -462,7 +462,7 @@ describe('cookieCutterStore parameter safety', () => {
     expect(updateParam('enableEmbossing', true)).toBe(false);
 
     expect(get(params)).toBe(before);
-    expect(get(parameterError)).toMatch(/embossing.*not available|not available.*embossing/i);
+    expect(get(parameterError)).toMatch(/enableEmbossing.*no está disponible/i);
   });
 
   it('applies a valid optimizer patch atomically without fallback values', () => {
@@ -554,9 +554,9 @@ describe('cookieCutterStore parameter safety', () => {
 
     expect(thinWall.isValid).toBe(false);
     expect(thinWall.warnings).toContain(
-      'Wall thickness is below recommended minimum (0.8mm)'
+      'El espesor de pared está por debajo del mínimo recomendado (0,8 mm)'
     );
-    expect(thinWall.recommendations).toContain('Print upside down (cutting edge facing up)');
-    expect(thinWall.recommendations).toContain('Use PLA or PETG filament');
+    expect(thinWall.recommendations).toContain('Imprimí boca abajo (con el filo de corte hacia arriba)');
+    expect(thinWall.recommendations).toContain('Usá filamento PLA o PETG');
   });
 });

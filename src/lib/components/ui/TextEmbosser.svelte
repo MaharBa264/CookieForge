@@ -31,7 +31,7 @@
 
   function handleAddText() {
     if (!text.trim()) {
-      alert('Saisissez du texte.');
+      alert('Escribí un texto.');
       return;
     }
 
@@ -46,23 +46,23 @@
 </script>
 
 <div class="text-embosser">
-  <h3>Texte en relief</h3>
-  <p class="description">Ajoutez du texte à votre emporte-pièce</p>
+  <h3>Texto en relieve</h3>
+  <p class="description">Agregá texto a tu cortador</p>
 
   <div class="form-group">
-    <label for="text-input">Text</label>
+    <label for="text-input">Texto</label>
     <input
       id="text-input"
       type="text"
       bind:value={text}
-      placeholder="Saisissez votre texte…"
+      placeholder="Escribí tu texto…"
       maxlength="50"
     />
     <span class="char-count">{text.length}/50</span>
   </div>
 
   <div class="form-group">
-    <label for="font-select">Police</label>
+    <label for="font-select">Fuente</label>
     <select id="font-select" bind:value={selectedFont}>
       {#each fonts as font}
         <option value={font} style="font-family: {font}">{font}</option>
@@ -72,7 +72,7 @@
 
   <div class="form-group">
     <label for="font-size">
-      Taille de police : {fontSize}mm
+      Tamaño de fuente: {fontSize}mm
     </label>
     <input
       id="font-size"
@@ -86,7 +86,7 @@
 
   <div class="form-group">
     <label for="emboss-depth">
-      Profondeur du relief : {embossDepth.toFixed(1)}mm
+      Profundidad del relieve: {embossDepth.toFixed(1)}mm
     </label>
     <input
       id="emboss-depth"
@@ -105,17 +105,17 @@
       bind:checked={mirrorText}
     />
     <label for="mirror-text">
-      Inverser le texte (pour le tampon)
-      <span class="hint">Recommandé pour les tampons à biscuits</span>
+      Invertir el texto (para el sello)
+      <span class="hint">Recomendado para sellos de galletas</span>
     </label>
   </div>
 
   <div class="preview" style="font-family: {selectedFont}; font-size: {fontSize}px; transform: scaleX({mirrorText ? -1 : 1})">
-    {text || 'Aperçu'}
+    {text || 'Vista previa'}
   </div>
 
   <button class="add-text-btn" on:click={handleAddText} disabled={!text.trim()}>
-    Ajouter le texte au dessin
+    Agregar el texto al dibujo
   </button>
 </div>
 

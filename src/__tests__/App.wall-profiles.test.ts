@@ -67,7 +67,7 @@ it.each([1, 2] as const)('V%s profiles use one history step and the same documen
   const records = new Map<string, DesignDocument>();
   let session = setup(fixture(version), records);
   await ready(session);
-  await click('Réglages');
+  await click('Ajustes');
   for (const profile of [
     { id: 'thin', wallThickness: 0.8, taperAngle: 5 },
     { id: 'standard', wallThickness: 1, taperAngle: 7 },
@@ -97,30 +97,30 @@ it.each([1, 2] as const)('V%s profiles use one history step and the same documen
     const binary = stl();
     expect(binary.byteLength).toBe(84 + 50 * new DataView(binary.buffer).getUint32(80, true));
     const codec = encodeProject(current);
-    await click('Annuler');
+    await click('Deshacer');
     expect(encodeProject(session.getDocument())).toBe(previousCodec);
     await ready(session);
-    await click('Rétablir');
+    await click('Rehacer');
     expect(encodeProject(session.getDocument())).toBe(codec);
     await ready(session);
     expect(stl()).toEqual(binary);
   }
   const saved = session.getDocument()!;
   const savedStl = stl();
-  await click('Projets locaux');
-  await click('Enregistrer le projet');
-  await vi.waitFor(() => expect(document.querySelector('.project-manager [role="status"]')?.textContent).toBe('Enregistré localement'));
+  await click('Proyectos locales');
+  await click('Guardar el proyecto');
+  await vi.waitFor(() => expect(document.querySelector('.project-manager [role="status"]')?.textContent).toBe('Guardado localmente'));
   expect(records.get(saved.id)).toEqual(saved);
   await unmount(app!);
   app = undefined;
   document.body.innerHTML = '';
   session = setup(null, records);
-  await click('Projets locaux');
-  await vi.waitFor(() => expect(document.querySelector(`button[aria-label="Ouvrir Wall V${version}"]`)).not.toBeNull());
-  await click(`Ouvrir Wall V${version}`);
+  await click('Proyectos locales');
+  await vi.waitFor(() => expect(document.querySelector(`button[aria-label="Abrir Wall V${version}"]`)).not.toBeNull());
+  await click(`Abrir Wall V${version}`);
   await ready(session);
   expect(encodeProject(session.getDocument())).toBe(encodeProject(saved));
   expect(stl()).toEqual(savedStl);
-  await click('Réglages');
+  await click('Ajustes');
   expect(document.querySelector('[data-wall-profile="robust"]')?.getAttribute('aria-pressed')).toBe('true');
 }, 30_000);

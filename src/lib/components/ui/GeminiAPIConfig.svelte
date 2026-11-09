@@ -17,7 +17,7 @@
   async function handleSave(): Promise<void> {
     const trimmedKey = apiKey.trim();
     if (!trimmedKey) {
-      errorMessage = 'Collez une clé API pour continuer.';
+      errorMessage = 'Pegá una clave de API para continuar.';
       return;
     }
 
@@ -27,7 +27,7 @@
     try {
       const valid = await validateAPIKey(trimmedKey);
       if (!valid) {
-        errorMessage = 'Cette clé API n’a pas pu être validée. Vérifiez-la et réessayez.';
+        errorMessage = 'No se pudo validar esta clave de API. Revisala y volvé a intentar.';
         isValid = false;
         return;
       }
@@ -38,7 +38,7 @@
       apiKey = '';
       showKey = false;
     } catch (error) {
-      errorMessage = error instanceof Error ? error.message : 'Impossible de valider la clé API';
+      errorMessage = error instanceof Error ? error.message : 'No se pudo validar la clave de API';
       isValid = false;
     } finally {
       isValidating = false;
@@ -57,31 +57,31 @@
 
 <section class="gemini-config" aria-labelledby="gemini-config-title">
   <header class="header">
-    <h3 id="gemini-config-title">Connexion à Gemini</h3>
-    <p class="subtitle">Connectez une clé API gratuite de Google AI Studio.</p>
+    <h3 id="gemini-config-title">Conexión con Gemini</h3>
+    <p class="subtitle">Conectá una clave de API gratuita de Google AI Studio.</p>
   </header>
 
   <div class="privacy-note" id="gemini-key-privacy">
-    <strong>Utilisation de votre clé</strong>
+    <strong>Uso de tu clave</strong>
     <p>
-      La clé est conservée dans ce navigateur jusqu’à sa suppression. Elle est envoyée directement à Google
-      lors de sa validation ou de l’utilisation de Gemini. Selon la fonctionnalité, des données pertinentes
-      du dessin ou du SVG peuvent aussi être envoyées. Aucun serveur applicatif de Cookie Cutter Designer ne reçoit votre clé.
+      La clave se guarda en este navegador hasta que la elimines. Se envía directamente a Google
+      al validarla o al usar Gemini. Según la función, también pueden enviarse datos pertinentes
+      del dibujo o del SVG. Ningún servidor de la aplicación Cookie Cutter Designer recibe tu clave.
     </p>
   </div>
 
   {#if !hasSavedKey}
     <details class="info-box">
-      <summary>Obtenir une clé API gratuite</summary>
+      <summary>Obtener una clave de API gratuita</summary>
       <ol>
         <li>
-          Ouvrez
+          Abrí
           <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">
-            Google AI Studio <span class="external-hint">(s’ouvre dans un nouvel onglet)</span>
+            Google AI Studio <span class="external-hint">(se abre en una pestaña nueva)</span>
           </a>
         </li>
-        <li>Connectez-vous et créez une clé API.</li>
-        <li>Revenez ici et collez la clé ci-dessous.</li>
+        <li>Iniciá sesión y creá una clave de API.</li>
+        <li>Volvé acá y pegá la clave abajo.</li>
       </ol>
     </details>
   {/if}
@@ -99,7 +99,7 @@
         id="api-key"
         type={showKey ? 'text' : 'password'}
         bind:value={apiKey}
-        placeholder={hasSavedKey ? 'Collez une nouvelle clé' : 'Collez votre clé API Gemini'}
+        placeholder={hasSavedKey ? 'Pegá una clave nueva' : 'Pegá tu clave de API de Gemini'}
         disabled={isValidating}
         aria-describedby="gemini-key-privacy gemini-key-help"
         aria-invalid={Boolean(errorMessage)}
@@ -111,10 +111,10 @@
         type="button"
         class="toggle-visibility"
         onclick={() => showKey = !showKey}
-        aria-label={showKey ? 'Masquer la clé API' : 'Afficher la clé API'}
+        aria-label={showKey ? 'Ocultar la clave de API' : 'Mostrar la clave de API'}
         aria-pressed={showKey}
       >
-        {showKey ? 'Masquer' : 'Afficher'}
+        {showKey ? 'Ocultar' : 'Mostrar'}
       </button>
     </div>
 
@@ -122,7 +122,7 @@
       <p class="error-message" role="alert">{errorMessage}</p>
     {:else}
       <p class="field-help" id="gemini-key-help">
-        {hasSavedKey ? 'Votre clé enregistrée ne sera plus affichée.' : 'Collez une clé pour activer le bouton de connexion.'}
+        {hasSavedKey ? 'Tu clave guardada ya no se mostrará.' : 'Pegá una clave para activar el botón de conexión.'}
       </p>
     {/if}
   </div>
@@ -133,28 +133,28 @@
       onclick={handleSave}
       disabled={isValidating || !apiKey.trim()}
     >
-      {isValidating ? 'Validation…' : hasSavedKey ? 'Remplacer la clé' : 'Connecter Gemini'}
+      {isValidating ? 'Validando…' : hasSavedKey ? 'Reemplazar la clave' : 'Conectar Gemini'}
     </button>
 
     {#if hasSavedKey}
-      <button class="remove-button" onclick={handleClear}>Supprimer la clé</button>
+      <button class="remove-button" onclick={handleClear}>Eliminar la clave</button>
     {/if}
   </div>
 
   {#if isValid}
     <div class="success-box" role="status">
       <strong>Gemini connecté</strong>
-      <p>L’assistant est prêt. Votre clé reste enregistrée localement dans ce navigateur.</p>
+      <p>El asistente está listo. Tu clave queda guardada localmente en este navegador.</p>
     </div>
   {/if}
 
   <div class="features-list">
-    <p class="features-title">Disponible après connexion</p>
+    <p class="features-title">Disponible tras conectarse</p>
     <ul>
-      <li>Optimisation et simplification des SVG</li>
-      <li>Suggestions pour améliorer le dessin</li>
-      <li>Variantes créatives du dessin</li>
-      <li>Recommandations intelligentes de paramètres</li>
+      <li>Optimización y simplificación de SVG</li>
+      <li>Sugerencias para mejorar el dibujo</li>
+      <li>Variantes creativas del dibujo</li>
+      <li>Recomendaciones inteligentes de parámetros</li>
     </ul>
   </div>
 </section>

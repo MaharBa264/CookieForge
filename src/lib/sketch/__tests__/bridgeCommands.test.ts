@@ -52,8 +52,8 @@ describe('bridge editing command', () => {
     expect(onIncomplete).toHaveBeenCalledTimes(1);
     const pending = session.getDocument()!;
     expect(pending).toMatchObject({ schemaVersion: 2, bridges: [first] });
-    await expect(generateCookieCutter(svg, baseline.parameters, [first])).rejects.toThrow(/disconnected/);
-    await expect(commitBridgeEdit(session, pending, epoch, [first, { ...first, id: 'overlap' }])).rejects.toThrow(/intersect/);
+    await expect(generateCookieCutter(svg, baseline.parameters, [first])).rejects.toThrow(/desconectad/);
+    await expect(commitBridgeEdit(session, pending, epoch, [first, { ...first, id: 'overlap' }])).rejects.toThrow(/se cruzan/);
     expect(session.getDocument()).toBe(pending);
     expect(await commitBridgeEdit(session, pending, epoch, [first, second])).toBe(true);
     expect(onIncomplete).toHaveBeenCalledTimes(1);

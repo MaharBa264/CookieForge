@@ -37,7 +37,7 @@
   function addRegion() {
     const newRegion: ColorRegion = {
       id: `region-${regions.length}`,
-      name: `Pièce ${regions.length + 1}`,
+      name: `Pieza ${regions.length + 1}`,
       material: selectedMaterial,
       meshName: `part-${regions.length}`
     };
@@ -57,7 +57,7 @@
 
 <div class="material-manager">
   <div class="panel-header">
-    <h3>🎨 Matériaux et couleurs</h3>
+    <h3>🎨 Materiales y colores</h3>
     <button class="toggle-btn" on:click={() => showPanel = !showPanel}>
       {showPanel ? '▼' : '▶'}
     </button>
@@ -99,11 +99,11 @@
         </div>
         <div class="properties-grid">
           <div class="property">
-            <span class="property-label">Température d’impression :</span>
+            <span class="property-label">Temperatura de impresión:</span>
             <span class="property-value">{selectedMaterial.properties.printTemp}°C</span>
           </div>
           <div class="property">
-            <span class="property-label">Température du plateau :</span>
+            <span class="property-label">Temperatura de la cama:</span>
             <span class="property-value">{selectedMaterial.properties.bedTemp}°C</span>
           </div>
           <div class="property">
@@ -111,8 +111,8 @@
             <span class="property-value">{selectedMaterial.properties.density} g/cm³</span>
           </div>
           <div class="property">
-            <span class="property-label">Type :</span>
-            <span class="property-value">{selectedMaterial.properties.flexible ? 'Flexible' : 'Rigide'}</span>
+            <span class="property-label">Tipo:</span>
+            <span class="property-value">{selectedMaterial.properties.flexible ? 'Flexible' : 'Rígido'}</span>
           </div>
         </div>
       </div>
@@ -120,9 +120,9 @@
       <!-- Multi-Material Regions -->
       <div class="regions-section">
         <div class="section-header">
-          <h4>Pièces multimatériaux</h4>
+          <h4>Piezas multimaterial</h4>
           <button class="add-region-btn" on:click={addRegion}>
-            + Ajouter une pièce
+            + Agregar una pieza
           </button>
         </div>
 
@@ -150,35 +150,35 @@
           <!-- Compatibility Check -->
           {#if !compatibility.compatible}
             <div class="compatibility-warnings">
-              <div class="warning-header">⚠️ Avertissements de compatibilité</div>
+              <div class="warning-header">⚠️ Advertencias de compatibilidad</div>
               {#each compatibility.warnings as warning}
                 <div class="warning-item">{warning}</div>
               {/each}
             </div>
           {/if}
 
-          <!-- Réglages recommandés -->
+          <!-- Ajustes recomendados -->
           <div class="recommended-settings">
-            <h5>Réglages recommandés</h5>
+            <h5>Ajustes recomendados</h5>
             <div class="settings-grid">
               <div class="setting">
-                <span class="setting-label">Température d’impression :</span>
+                <span class="setting-label">Temperatura de impresión:</span>
                 <span class="setting-value">{recommendedSettings.printTemp}°C</span>
               </div>
               <div class="setting">
-                <span class="setting-label">Température du plateau :</span>
+                <span class="setting-label">Temperatura de la cama:</span>
                 <span class="setting-value">{recommendedSettings.bedTemp}°C</span>
               </div>
               <div class="setting">
-                <span class="setting-label">Volume de purge :</span>
+                <span class="setting-label">Volumen de purga:</span>
                 <span class="setting-value">{recommendedSettings.purgeVolume}mm³</span>
               </div>
             </div>
           </div>
         {:else}
           <div class="no-regions">
-            <p>Aucune pièce multimatériau ajoutée.</p>
-            <p class="hint">Ajoutez des pièces pour utiliser différentes couleurs ou différents matériaux.</p>
+            <p>Todavía no agregaste ninguna pieza multimaterial.</p>
+            <p class="hint">Agregá piezas para usar distintos colores o materiales.</p>
           </div>
         {/if}
       </div>

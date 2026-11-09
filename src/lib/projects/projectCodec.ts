@@ -68,7 +68,7 @@ function hasOwn(record: UnknownRecord, key: string): boolean {
 
 function requireRecord(value: unknown): UnknownRecord {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) {
-    invalid('$', 'l’enveloppe projet doit être un objet.');
+    invalid('$', 'la envoltura del proyecto debe ser un objeto.');
   }
   return value as UnknownRecord;
 }
@@ -76,7 +76,7 @@ function requireRecord(value: unknown): UnknownRecord {
 function requireEnvelopeHeaderKeys(record: UnknownRecord): void {
   for (const key of ENVELOPE_HEADER_KEYS) {
     if (!hasOwn(record, key)) {
-      invalid(key, 'est requis dans l’enveloppe projet.');
+      invalid(key, 'es obligatorio en la envoltura del proyecto.');
     }
   }
 }
@@ -86,16 +86,16 @@ function requireExactEnvelopeKeys(record: UnknownRecord): void {
 
   for (const key of ENVELOPE_KEYS) {
     if (!hasOwn(record, key)) {
-      invalid(key, 'est requis dans l’enveloppe projet.');
+      invalid(key, 'es obligatorio en la envoltura del proyecto.');
     }
   }
 
   for (const key of Reflect.ownKeys(record)) {
     if (typeof key !== 'string') {
-      invalid('$', 'contient une propriété symbole inconnue.');
+      invalid('$', 'contiene una propiedad de tipo símbolo desconocida.');
     }
     if (!expected.has(key)) {
-      invalid(key, 'n’est pas un champ d’enveloppe reconnu.');
+      invalid(key, 'no es un campo de envoltura reconocido.');
     }
   }
 }
@@ -104,7 +104,7 @@ function parseJson(json: string): unknown {
   try {
     return JSON.parse(json) as unknown;
   } catch (cause: unknown) {
-    invalid('$', 'JSON invalide.', cause);
+    invalid('$', 'JSON inválido.', cause);
   }
 }
 
@@ -116,7 +116,7 @@ function validateEnvelopeHeader(record: UnknownRecord): void {
   if (record.format !== PROJECT_FORMAT) {
     invalid(
       'format',
-      `doit être exactement « ${PROJECT_FORMAT} ».`
+      `debe ser exactamente «${PROJECT_FORMAT}».`
     );
   }
 
@@ -128,10 +128,10 @@ function validateEnvelopeHeader(record: UnknownRecord): void {
     ) {
       invalid(
         'version',
-        `version future ${record.version} non prise en charge.`
+        `la versión futura ${record.version} no es compatible.`
       );
     }
-    invalid('version', 'version inconnue ; seules les versions 1, 2, 3 et 4 sont prises en charge.');
+    invalid('version', 'versión desconocida; solo se admiten las versiones 1, 2, 3 y 4.');
   }
 }
 
@@ -167,6 +167,6 @@ export function decodeProject(
   requireExactEnvelopeKeys(record);
 
   const document = parseDesignDocument(record.document);
-  if (record.version !== document.schemaVersion) invalid('document.schemaVersion', 'doit correspondre à la version de l’enveloppe.');
+  if (record.version !== document.schemaVersion) invalid('document.schemaVersion', 'debe coincidir con la versión de la envoltura.');
   return { document, warnings: EMPTY_WARNINGS };
 }

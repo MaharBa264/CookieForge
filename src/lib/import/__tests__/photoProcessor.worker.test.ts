@@ -68,7 +68,7 @@ describe('real installed ImageTracer, topology and deterministic black/white SVG
     const tracer = vi.spyOn(ImageTracer.prototype, 'imageDataToTracedata');
     const result = traceProcessedPhoto({ ...pixels, traceable: false, diagnostics: { ...pixels.diagnostics, canApply: false } });
     expect(tracer).not.toHaveBeenCalled(); expect(result.diagnostics.canApply).toBe(false);
-    expect(result.diagnostics.warnings.join(' ')).toMatch(/traçage|trace/i);
+    expect(result.diagnostics.warnings.join(' ')).toMatch(/trazado|componentes/i);
   });
   it('blocks publication if the tracer unexpectedly drops holes instead of trusting a plausible SVG', () => {
     const pixels = processPhotoPixels(source(), { ...DEFAULT_PHOTO_SETTINGS, minComponentArea: 1 });
@@ -96,7 +96,7 @@ describe('worker-side decode and bounded canvas ownership', () => {
   });
   it('checks original dimensions before allocating any canvas even with a tiny crop', async () => {
     bitmap.width = 4000; bitmap.height = 4001;
-    await expect(preparePhotoInWorker(file(), { ...DEFAULT_PHOTO_SETTINGS, crop: { x: 0, y: 0, width: 0.01, height: 0.01 } })).rejects.toThrow(/16 megapixels/);
+    await expect(preparePhotoInWorker(file(), { ...DEFAULT_PHOTO_SETTINGS, crop: { x: 0, y: 0, width: 0.01, height: 0.01 } })).rejects.toThrow(/16 megapíxeles/);
     expect(Canvas.instances).toHaveLength(0); expect(bitmap.close).toHaveBeenCalledTimes(1);
     bitmap.width = 8193; bitmap.height = 1; await expect(preparePhotoInWorker(file(), DEFAULT_PHOTO_SETTINGS)).rejects.toThrow(/8192/);
     expect(Canvas.instances).toHaveLength(0); expect(bitmap.close).toHaveBeenCalledTimes(2);
@@ -132,7 +132,7 @@ describe('worker-side decode and bounded canvas ownership', () => {
     await expect(preparePhotoInWorker(file(), { ...DEFAULT_PHOTO_SETTINGS, threshold: -1 })).rejects.toThrow();
     expect(decode).not.toHaveBeenCalled();
     vi.stubGlobal('OffscreenCanvas', undefined);
-    await expect(preparePhotoInWorker(file(), DEFAULT_PHOTO_SETTINGS)).rejects.toThrow(/navigateur|browser/i);
+    await expect(preparePhotoInWorker(file(), DEFAULT_PHOTO_SETTINGS)).rejects.toThrow(/navegador/i);
     expect(decode).not.toHaveBeenCalled();
   });
 });

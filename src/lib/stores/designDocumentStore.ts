@@ -81,7 +81,7 @@ export function createDesignDocumentStore(
 
     if (!Number.isFinite(nextEpoch) || nextEpoch < currentEpoch) {
       throw new RangeError(
-        'Le nouvel horodatage updatedAt doit être valide et postérieur ou égal au snapshot courant.'
+        'La nueva marca de tiempo updatedAt debe ser válida y posterior o igual a la instantánea actual.'
       );
     }
 
@@ -124,7 +124,7 @@ export function createDesignDocumentStore(
 
     updateBridges(bridges: readonly Bridge[]): void {
       const current = get(internal);
-      if (current.kind !== 'cutter' && current.kind !== 'multi-cutter') throw new Error('Les ponts sont réservés aux emporte-pièces.');
+      if (current.kind !== 'cutter' && current.kind !== 'multi-cutter') throw new Error('Los puentes son exclusivos de los cortadores.');
       if (current.schemaVersion === 1 && bridges.length === 0) return;
       if (current.schemaVersion !== 1 && JSON.stringify(current.bridges) === JSON.stringify(bridges)) return;
       const base = current.schemaVersion === 1 ? migrateV1ToV2(current) : current;
@@ -139,7 +139,7 @@ export function createDesignDocumentStore(
     },
     updateStampImprintMode(imprintMode: StampImprintMode): void {
       const current = get(internal);
-      if (current.kind !== 'stamp') throw new Error('Le mode d’empreinte est réservé aux tampons.');
+      if (current.kind !== 'stamp') throw new Error('El modo de impronta es exclusivo de los sellos.');
       if (stampImprintMode(current) === imprintMode) return;
       publishMutation(current, { ...current, schemaVersion: 4, bridges: [], imprintMode });
     },
@@ -158,7 +158,7 @@ export function createDesignDocumentStore(
       const current = get(internal);
       if (current.kind !== kind) {
         throw new TypeError(
-          `Le document courant est ${current.kind}, mais le patch cible ${kind}.`
+          `El documento actual es ${current.kind}, pero el parche apunta a ${kind}.`
         );
       }
 
@@ -184,7 +184,7 @@ export function createDesignDocumentStore(
         return;
       }
       if (current.schemaVersion !== 1 && current.bridges.length > 0) {
-        throw new Error('Supprimez explicitement les ponts avant de changer de type de design.');
+        throw new Error('Eliminá explícitamente los puentes antes de cambiar el tipo de diseño.');
       }
 
       if (current.schemaVersion === 4) {

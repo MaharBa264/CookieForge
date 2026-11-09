@@ -49,7 +49,7 @@ async function ready(session: ReturnType<typeof setup>) {
 }
 function bytes() { const data = serializeSTL(get(model)!.mesh, true) as DataView; return new Uint8Array(data.buffer, data.byteOffset, data.byteLength).slice(); }
 async function exportPanel() {
-  await click('Exporter le dessin');
+  await click('Exportar el dibujo');
   await vi.waitFor(() => expect(document.querySelector('.advanced-export .toggle-btn')).not.toBeNull());
   document.querySelector<HTMLButtonElement>('.advanced-export .toggle-btn')!.click(); await tick();
   return document.querySelector<HTMLButtonElement>('.advanced-export .export-btn')!;
@@ -57,43 +57,43 @@ async function exportPanel() {
 it.each(['circle', 'heart'] as const)('%s selects a session-owned mode with one Undo step and reopens exact JSON, preview and STL', async shape => {
   const original = fixture(shape === 'heart' ? 3 : 2, shape), records = new Map<string, DesignDocument>();
   let session = setup(original, records); await ready(session); const raised = bytes(), originalJson = encodeProject(session.getDocument());
-  await click('Réglages'); const length = historyStore.getLength(), epoch = session.sessionEpoch;
-  await click('Creux');
+  await click('Ajustes'); const length = historyStore.getLength(), epoch = session.sessionEpoch;
+  await click('Hueco');
   expect(session.getDocument()).toMatchObject({ schemaVersion: 4, imprintMode: 'recessed', id: original.id, source: original.source, sketch: original.sketch });
   expect(historyStore.getLength()).toBe(length + 1); expect(session.sessionEpoch).toBe(epoch);
-  expect(button('Creux').getAttribute('aria-pressed')).toBe('true');
+  expect(button('Hueco').getAttribute('aria-pressed')).toBe('true');
   expect(document.querySelector<HTMLInputElement>('#stampDepth')!.max).toBe('3');
   await ready(session); const recessed = bytes(), recessedJson = encodeProject(session.getDocument());
   expect(recessed).not.toEqual(raised);
   expect(get(generationState).result?.document).toMatchObject({ schemaVersion: 4, imprintMode: 'recessed' });
   const report = get(generationState).result!.artifacts[0].validation;
   expect(report.valid).toBe(true); expect(report.shells).toBe(1); expect(report.bounds!.max.y).toBe(4);
-  await click('Annuler'); expect(encodeProject(session.getDocument())).toBe(originalJson); await ready(session); expect(bytes()).toEqual(raised);
-  await click('Rétablir'); expect(encodeProject(session.getDocument())).toBe(recessedJson); await ready(session); expect(bytes()).toEqual(recessed);
+  await click('Deshacer'); expect(encodeProject(session.getDocument())).toBe(originalJson); await ready(session); expect(bytes()).toEqual(raised);
+  await click('Rehacer'); expect(encodeProject(session.getDocument())).toBe(recessedJson); await ready(session); expect(bytes()).toEqual(recessed);
   const depth = document.querySelector<HTMLInputElement>('#stampDepth')!;
   // Exercise an actual depth change even when the Heart starts at the 3 mm boundary.
   for (const value of ['2.5', '3']) {
     depth.value = value; depth.dispatchEvent(new Event('input', { bubbles: true })); await tick(); await ready(session);
   }
   const saved = session.getDocument()!, savedBytes = bytes(), savedJson = encodeProject(saved);
-  await click('Projets locaux'); await click('Enregistrer le projet'); await vi.waitFor(() => expect(records.get(saved.id)).toEqual(saved));
+  await click('Proyectos locales'); await click('Guardar el proyecto'); await vi.waitFor(() => expect(records.get(saved.id)).toEqual(saved));
   await unmount(app!); app = undefined; document.body.innerHTML = '';
-  session = setup(null, records); await click('Projets locaux'); await vi.waitFor(() => expect(document.querySelector('[aria-label="Ouvrir Tampon local"]')).not.toBeNull());
-  await click('Ouvrir Tampon local'); await ready(session);
+  session = setup(null, records); await click('Proyectos locales'); await vi.waitFor(() => expect(document.querySelector('[aria-label="Abrir Tampon local"]')).not.toBeNull());
+  await click('Abrir Tampon local'); await ready(session);
   expect(encodeProject(session.getDocument())).toBe(savedJson); expect(bytes()).toEqual(savedBytes);
-  await click('Réglages'); expect(button('Creux').getAttribute('aria-pressed')).toBe('true');
+  await click('Ajustes'); expect(button('Hueco').getAttribute('aria-pressed')).toBe('true');
   const action = await exportPanel(); expect(action.disabled).toBe(false); action.click();
   expect(boundary.stl).toHaveBeenCalledTimes(1); expect(boundary.stl.mock.calls[0][0]).toBe(get(model)!.mesh);
 }, 40000);
 it('refuses deep raised settings without loss and offers an explicit reduction action', async () => {
-  const session = setup(fixture(5)); await ready(session); await click('Réglages');
+  const session = setup(fixture(5)); await ready(session); await click('Ajustes');
   const before = session.getDocument(), length = historyStore.getLength();
-  await click('Creux'); expect(session.getDocument()).toBe(before); expect(historyStore.getLength()).toBe(length);
-  expect(button('Relief').getAttribute('aria-pressed')).toBe('true');
+  await click('Hueco'); expect(session.getDocument()).toBe(before); expect(historyStore.getLength()).toBe(length);
+  expect(button('Relieve').getAttribute('aria-pressed')).toBe('true');
   expect(document.querySelector('#stampImprint-error')?.textContent).toContain('3 mm');
-  expect(button('Creux').getAttribute('aria-describedby')).toContain('stampImprint-error');
-  await click('Réduire la profondeur à 3 mm'); expect(session.getDocument()?.parameters.stampDepth).toBe(3);
-  expect(session.getDocument()?.schemaVersion).toBe(1); await click('Creux'); await ready(session);
+  expect(button('Hueco').getAttribute('aria-describedby')).toContain('stampImprint-error');
+  await click('Reducir la profundidad a 3 mm'); expect(session.getDocument()?.parameters.stampDepth).toBe(3);
+  expect(session.getDocument()?.schemaVersion).toBe(1); await click('Hueco'); await ready(session);
   expect(session.getDocument()).toMatchObject({ schemaVersion: 4, imprintMode: 'recessed' });
 }, 20000);
 it('blocks a retained raised mesh synchronously even if generation is cancelled back to ready', async () => {
@@ -104,7 +104,7 @@ it('blocks a retained raised mesh synchronously even if generation is cancelled 
   boundary.owner!.cancel(); expect(get(generationState).phase).toBe('ready'); expect(get(model)!.mesh).toBe(mesh);
   action.dispatchEvent(new MouseEvent('click', { bubbles: true })); expect(boundary.stl).not.toHaveBeenCalled();
   await tick(); expect(action.disabled).toBe(true);
-  await click('Projets locaux'); expect(button('Exporter le projet').disabled).toBe(false);
+  await click('Proyectos locales'); expect(button('Exportar el proyecto').disabled).toBe(false);
   session.updateParameters('stamp', { stampDepth: 1.5 }); await ready(session);
   const fresh = await exportPanel(); expect(fresh.disabled).toBe(false); fresh.click();
   expect(boundary.stl.mock.calls[0][0]).toBe(get(model)!.mesh); expect(get(model)!.mesh).not.toBe(mesh);

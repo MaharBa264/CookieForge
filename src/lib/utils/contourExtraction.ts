@@ -80,8 +80,8 @@ export function normalizeContourPoints(
 function svgParseFailed(): CutterGenerationError {
   return new CutterGenerationError(
     'SVG_PARSE_FAILED',
-    'The SVG data could not be parsed.',
-    { reason: 'Invalid SVG markup or path data.' }
+    'No se pudieron interpretar los datos del SVG.',
+    { reason: 'Marcado SVG o datos de trazado inválidos.' }
   );
 }
 
@@ -121,7 +121,7 @@ function assertCurveSegments(curveSegments: number): void {
   ) {
     throw new CutterGenerationError(
       'INVALID_PARAMS',
-      'The curveSegments parameter must be a positive safe integer.',
+      'El parámetro curveSegments debe ser un entero seguro positivo.',
       { field: 'curveSegments', value: curveSegments }
     );
   }
@@ -131,10 +131,34 @@ function assertComplexity(field: string, actual: number, max: number): void {
   if (actual > max) {
     throw new CutterGenerationError(
       'CONTOUR_TOO_COMPLEX',
-      `The SVG contains too many ${field} to generate safely.`,
+      `El SVG contiene demasiados ${field} para generarse de forma segura.`,
       { field, actual, max }
     );
   }
+}
+
+/**
+ * Igual que `extractClosedContours`, pero si el trazado supera el límite de puntos reintenta
+ * con menos segmentos por curva. Las imágenes muy detalladas (miles de curvas cortas, como una
+ * ilustración vectorizada) no caben con 48 segmentos por curva, y el vectorizador ya entrega
+ * tramos suficientemente cortos como para que 2 segmentos conserven la forma.
+ */
+export function extractClosedContoursAdaptive(
+  svgString: string,
+  preferredSegments = 48
+): ReadonlyArray<NormalizedContour> {
+  const candidates = [preferredSegments, 24, 12, 6, 3, 2].filter(
+    (segments, index, all) => segments <= preferredSegments && all.indexOf(segments) === index
+  );
+  for (let index = 0; index < candidates.length; index += 1) {
+    try {
+      return extractClosedContours(svgString, candidates[index]);
+    } catch (error) {
+      const retryable = error instanceof CutterGenerationError && error.code === 'CONTOUR_TOO_COMPLEX';
+      if (!retryable || index === candidates.length - 1) throw error;
+    }
+  }
+  return extractClosedContours(svgString, 2);
 }
 
 /**
@@ -150,7 +174,7 @@ export function extractClosedContours(
   if (typeof svgString !== 'string') {
     throw new CutterGenerationError(
       'INVALID_PARAMS',
-      'The svgString parameter must be a string.',
+      'El parámetro svgString debe ser una cadena.',
       { field: 'svgString', actualType: typeof svgString }
     );
   }
@@ -159,7 +183,7 @@ export function extractClosedContours(
   if (svgBytes > GENERATION_LIMITS.maxSvgBytes) {
     throw new CutterGenerationError(
       'SVG_TOO_LARGE',
-      'The SVG file is too large to generate safely.',
+      'El archivo SVG es demasiado grande para generarse de forma segura.',
       {
         field: 'svgBytes',
         actual: svgBytes,
@@ -264,7 +288,7 @@ export function extractClosedContours(
   if (contours.length === 0) {
     throw new CutterGenerationError(
       'NO_VALID_CONTOURS',
-      'The SVG does not contain a valid closed contour.',
+      'El SVG no contiene ningún contorno cerrado válido.',
       { rejectedOpen, rejectedDegenerate }
     );
   }

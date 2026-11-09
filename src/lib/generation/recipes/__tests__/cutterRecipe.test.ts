@@ -210,7 +210,7 @@ describe('cutterRecipe', () => {
         {
           path: 'parameters',
           code: 'UNEXPECTED_VALIDATION_ERROR',
-          message: 'An unexpected error occurred while validating Cutter parameters.'
+          message: 'Ocurrió un error inesperado al validar los parámetros del cortador.'
         }
       ]
     });

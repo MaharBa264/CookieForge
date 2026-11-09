@@ -57,7 +57,7 @@
   onMount(() => {
     const cancelChoice = choices.find((choice) => choice.id === 'cancel');
     if (!cancelChoice || cancelChoice.destructive) {
-      throw new Error('ProjectConfirmDialog requires a non-destructive "cancel" choice.');
+      throw new Error('ProjectConfirmDialog requiere una opción «cancel» no destructiva.');
     }
     const initiator = document.activeElement;
     dialog.showModal();

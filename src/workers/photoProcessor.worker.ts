@@ -26,7 +26,7 @@ export function traceProcessedPhoto(pixels: ProcessedPhoto): PhotoTraceResult {
   const diagnostics = { ...pixels.diagnostics, warnings: [...pixels.diagnostics.warnings] };
   if (!pixels.traceable) {
     diagnostics.canApply = false;
-    diagnostics.warnings.push('Traçage non exécuté pour ce masque vide ou trop complexe : ajustez les réglages avant de l’appliquer.');
+    diagnostics.warnings.push('No se ejecutó el trazado para esta máscara vacía o demasiado compleja: ajustá los parámetros antes de aplicarla.');
     return { svg: emptySVG(width, height), diagnostics };
   }
   const tracer = new ImageTracer();
@@ -39,13 +39,13 @@ export function traceProcessedPhoto(pixels: ProcessedPhoto): PhotoTraceResult {
   const linkedHoles = foreground.reduce((total, path) => total + path.holechildren.length, 0);
   if (components !== diagnostics.components || holes !== diagnostics.holes || linkedHoles !== holes || foreground.some(path => !path.segments.length)) {
     diagnostics.canApply = false;
-    diagnostics.warnings.push('La topologie du traçage ne correspond pas au masque (composants ou trous). Ajustez le seuil ou recadrez : ce résultat ne peut pas être appliqué.');
+    diagnostics.warnings.push('La topología del trazado no coincide con la máscara (componentes o agujeros). Ajustá el umbral o recortá: este resultado no se puede aplicar.');
   }
   const blackOnly = { ...traced, layers: [foreground], palette: [traced.palette[0]] };
   const svg = getSvgString(blackOnly, options);
   if (svg.length > 2_000_000) {
     diagnostics.canApply = false;
-    diagnostics.warnings.push('SVG trop complexe (limite de 2 millions de caractères). Recadrez le sujet ou choisissez un nettoyage explicite.');
+    diagnostics.warnings.push('SVG demasiado complejo (límite de 2 millones de caracteres). Recortá el sujeto o elegí una limpieza explícita.');
     return { svg: emptySVG(width, height), diagnostics };
   }
   return { svg, diagnostics };
@@ -58,22 +58,22 @@ function checkCancellation(signal?: AbortSignal): void {
 export async function preparePhotoInWorker(file: File, requestedSettings: PhotoSettings = DEFAULT_PHOTO_SETTINGS, signal?: AbortSignal): Promise<PhotoTraceResult> {
   checkCancellation(signal);
   const mime = validateImageFile(file);
-  if (mime === 'image/svg+xml') throw new Error('Choisissez une photo PNG, JPEG ou WebP, pas un SVG.');
+  if (mime === 'image/svg+xml') throw new Error('Elegí una foto PNG, JPEG o WebP, no un SVG.');
   const settings = parsePhotoSettings(requestedSettings);
   if (typeof createImageBitmap !== 'function' || typeof OffscreenCanvas !== 'function') {
     // No fallback full-size DOM canvas: it would put CPU processing back on the UI thread.
-    throw new Error('Ce navigateur ne permet pas le décodage photo hors interface. Utilisez un navigateur récent avec OffscreenCanvas et ImageBitmap.');
+    throw new Error('Este navegador no permite decodificar fotos fuera de la interfaz. Usá un navegador reciente con OffscreenCanvas e ImageBitmap.');
   }
   let bitmap: ImageBitmap;
   try { bitmap = await createImageBitmap(file); }
-  catch { throw new Error('Photo illisible : réexportez-la en PNG, JPEG ou WebP puis réessayez.'); }
+  catch { throw new Error('No se puede leer la foto: volvé a exportarla como PNG, JPEG o WebP e intentá de nuevo.'); }
   let canvas: OffscreenCanvas | null = null;
   try {
     checkCancellation(signal);
     const plan = getPhotoRasterPlan(bitmap.width, bitmap.height, settings.crop);
     canvas = new OffscreenCanvas(plan.width, plan.height);
     const context = canvas.getContext('2d', { willReadFrequently: true });
-    if (!context) throw new Error('Impossible de lire les pixels photo dans le Worker. Utilisez un navigateur récent.');
+    if (!context) throw new Error('No se pudieron leer los píxeles de la foto en el Worker. Usá un navegador reciente.');
     context.imageSmoothingEnabled = false;
     const { x, y, width, height } = plan.source;
     context.drawImage(bitmap, x, y, width, height, 0, 0, plan.width, plan.height);
@@ -82,7 +82,7 @@ export async function preparePhotoInWorker(file: File, requestedSettings: PhotoS
     const processed = processPhotoPixels(imageData, { ...settings, crop: DEFAULT_PHOTO_SETTINGS.crop });
     if (width !== plan.width || height !== plan.height) {
       processed.diagnostics.warnings = [
-        `Image réduite à ${plan.width} × ${plan.height} : de très petits détails peuvent disparaître. Recadrez plus près pour les conserver.`,
+        `Imagen reducida a ${plan.width} × ${plan.height}: pueden desaparecer detalles muy pequeños. Recortá más cerca para conservarlos.`,
         ...processed.diagnostics.warnings
       ];
     }
@@ -105,11 +105,11 @@ if (typeof self !== 'undefined') {
     scope.onmessage = null;
     try {
       const request = event.data;
-      if (!request || request.type !== 'prepare') throw new Error('Requête photo invalide. Réessayez.');
+      if (!request || request.type !== 'prepare') throw new Error('Solicitud de foto inválida. Reintentá.');
       const result = await preparePhotoInWorker(request.file, request.settings);
       scope.postMessage({ type: 'success', result });
     } catch (error) {
-      scope.postMessage({ type: 'error', message: error instanceof Error ? error.message : 'La préparation photo a échoué. Réessayez.' });
+      scope.postMessage({ type: 'error', message: error instanceof Error ? error.message : 'Falló la preparación de la foto. Reintentá.' });
     }
   };
 }

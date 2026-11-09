@@ -58,7 +58,7 @@ function assertFinitePositive(value: number, field: string): void {
   if (!Number.isFinite(value) || value <= 0) {
     throw generationError(
       'INVALID_GEOMETRY',
-      `${field} must be a positive finite number.`,
+      `${field} debe ser un número finito positivo.`,
       { field, value }
     );
   }
@@ -74,7 +74,7 @@ function scaleContour(
   if (!normalized) {
     throw generationError(
       'INVALID_GEOMETRY',
-      'The scaled contour is degenerate.',
+      'El contorno escalado es degenerado.',
       { field: 'contour', scale }
     );
   }
@@ -145,7 +145,7 @@ function classifyRegions(
     if (!containing) {
       throw generationError(
         'OFFSET_FAILED',
-        'An inner offset is not contained by any outer offset.',
+        'Un desplazamiento interior no está contenido en ningún desplazamiento exterior.',
         { layer, reason: 'uncontained-inner-ring' }
       );
     }
@@ -175,7 +175,7 @@ function matchContours(
   if (bottom.length !== top.length) {
     throw generationError(
       'OFFSET_FAILED',
-      'The polygon offset changes topology between height layers.',
+      'El desplazamiento del polígono cambia de topología entre capas de altura.',
       { context, bottomComponents: bottom.length, topComponents: top.length }
     );
   }
@@ -191,7 +191,7 @@ function matchContours(
     const bottomCenter = polygonCentroid(bottomContour);
     const bottomArea = Math.abs(signedArea(bottomContour));
     if (matchByArea && (!Number.isFinite(bottomArea) || bottomArea <= 1e-12)) {
-      throw generationError('OFFSET_FAILED', 'A bridged hole has no measurable area.', { context });
+      throw generationError('OFFSET_FAILED', 'Un agujero con puente no tiene un área medible.', { context });
     }
     let bestPosition = 0;
     let bestScore = Number.POSITIVE_INFINITY;
@@ -204,7 +204,7 @@ function matchContours(
       // Match their areas first. Keep legacy centroid-only pairing unchanged.
       const candidateArea = matchByArea ? Math.abs(signedArea(available[position].contour)) : 0;
       if (matchByArea && (!Number.isFinite(candidateArea) || candidateArea <= 1e-12)) {
-        throw generationError('OFFSET_FAILED', 'A bridged hole has no measurable area.', { context });
+        throw generationError('OFFSET_FAILED', 'Un agujero con puente no tiene un área medible.', { context });
       }
       const score = matchByArea
         ? Math.abs(Math.log(candidateArea / bottomArea))
@@ -241,7 +241,7 @@ function matchRegions(
       if (!bottomRegion || !topRegion) {
         throw generationError(
           'OFFSET_FAILED',
-          'The offset regions could not be paired.',
+          'No se pudieron emparejar las regiones desplazadas.',
           { context: 'regions' }
         );
       }
@@ -321,7 +321,7 @@ function addOrientedTriangle(
   if (!Number.isFinite(normal.lengthSq()) || normal.lengthSq() <= TRIANGLE_EPSILON_SQUARED) {
     throw generationError(
       'INVALID_GEOMETRY',
-      'The wall triangulation produced a degenerate triangle.',
+      'La triangulación de la pared produjo un triángulo degenerado.',
       { triangle: indices.length / 3 }
     );
   }
@@ -374,7 +374,7 @@ function distanceToContours(
   if (!Number.isFinite(distance) || distance <= 0) {
     throw generationError(
       'INVALID_GEOMETRY',
-      'The wall thickness could not be measured from the generated contours.',
+      'No se pudo medir el espesor de pared a partir de los contornos generados.',
       { field: 'wallThickness', value: distance }
     );
   }
@@ -477,7 +477,7 @@ function addCap(
   if (faces.length === 0) {
     throw generationError(
       'INVALID_GEOMETRY',
-      'The wall cap could not be triangulated.',
+      'No se pudo triangular la tapa de la pared.',
       { surface: top ? 'top' : 'bottom' }
     );
   }
@@ -493,7 +493,7 @@ function addCap(
       if (value === undefined) {
         throw generationError(
           'INVALID_GEOMETRY',
-          'The wall cap is missing thickness metadata.',
+          'A la tapa de la pared le faltan los metadatos de espesor.',
           { surface: top ? 'top' : 'bottom', vertexIndex }
         );
       }
@@ -733,7 +733,7 @@ function validateGeometry(geometry: THREE.BufferGeometry): void {
   if (!positions || positions.count < 3 || !index || index.count < 3) {
     throw generationError(
       'INVALID_GEOMETRY',
-      'The generated wall geometry is empty.',
+      'La geometría de pared generada está vacía.',
       { field: 'geometry' }
     );
   }
@@ -742,7 +742,7 @@ function validateGeometry(geometry: THREE.BufferGeometry): void {
     if (!Number.isFinite(positions.array[item])) {
       throw generationError(
         'INVALID_GEOMETRY',
-        'The generated wall contains a non-finite coordinate.',
+        'La pared generada contiene una coordenada no finita.',
         { field: 'position', index: item }
       );
     }
@@ -761,7 +761,7 @@ function validateGeometry(geometry: THREE.BufferGeometry): void {
   ) {
     throw generationError(
       'INVALID_GEOMETRY',
-      'The generated wall has invalid bounds.',
+      'La pared generada tiene límites inválidos.',
       { field: 'bounds' }
     );
   }
@@ -804,7 +804,7 @@ export async function createTaperedWallGeometry(
   if (!Number.isFinite(topHalfThickness)) {
     throw generationError(
       'INVALID_GEOMETRY',
-      'The taper produces a non-finite wall width.',
+      'La conicidad produce un ancho de pared no finito.',
       { field: 'taperAngle', value: options.taperAngle }
     );
   }
@@ -826,7 +826,7 @@ export async function createTaperedWallGeometry(
     if (paths.length === 0) {
       throw generationError(
         'OFFSET_FAILED',
-        'The contour is too small for the requested wall and taper.',
+        'El contorno es demasiado pequeño para la pared y la conicidad pedidas.',
         { layer, wallThickness: options.wallThickness, taperAngle: options.taperAngle }
       );
     }
@@ -877,7 +877,7 @@ export async function createBridgedWallGeometry(
   }>
 ): Promise<THREE.BufferGeometry> {
   if (!Number.isFinite(options.height) || options.height <= 0 || !Number.isFinite(options.baseHeight) || options.baseHeight < 0) {
-    throw generationError('INVALID_GEOMETRY', 'Invalid bridged wall height.', { field: 'height' });
+    throw generationError('INVALID_GEOMETRY', 'Altura de pared con puente inválida.', { field: 'height' });
   }
   const [bottom, top] = await Promise.all([
     createConnectedRegions(contours, bridges, options.scale, options.bottomWidthMm, options.bottomBridgeGrowthMm),

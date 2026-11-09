@@ -1,3 +1,4 @@
+import { generateUuid } from '../utils/uuid';
 import type { Readable, Subscriber, Unsubscriber } from 'svelte/store';
 import type { DesignDocument } from '../domain/designDocument';
 import { parseDesignDocument } from '../domain/documentValidation';
@@ -55,7 +56,7 @@ interface Slot {
 }
 interface Timer { handle?: unknown; fired: boolean; }
 function failure(operation: ProjectRecoveryError['operation'], cause: unknown): ProjectRecoveryError {
-  let message = 'Recovery operation failed';
+  let message = 'Falló la operación de recuperación';
   try {
     const detail = cause instanceof Error ? cause.message : undefined;
     if (typeof detail === 'string') message = detail;
@@ -69,9 +70,9 @@ function failure(operation: ProjectRecoveryError['operation'], cause: unknown): 
  */
 export function createProjectRecovery(storage: ProjectRecoveryStorage, deps: ProjectRecoveryDependencies = {}): ProjectRecovery {
   const delay = deps.debounceMs ?? 750;
-  if (!Number.isFinite(delay) || delay < 0) throw new Error('Invalid recovery debounce');
+  if (!Number.isFinite(delay) || delay < 0) throw new Error('Retardo de recuperación inválido');
   const now = deps.now ?? (() => new Date());
-  const createId = deps.createId ?? (() => globalThis.crypto.randomUUID());
+  const createId = deps.createId ?? generateUuid;
   const schedule = deps.schedule ?? ((callback: () => void, ms: number) => setTimeout(callback, ms));
   const cancel = deps.cancel ?? ((handle: unknown) => clearTimeout(handle as ReturnType<typeof setTimeout>));
   let closing = false, operation = 0, epoch: number | null = null, listSequence = 0;
@@ -169,7 +170,7 @@ export function createProjectRecovery(storage: ProjectRecoveryStorage, deps: Pro
       status(); if (current()?.pending) startTimer(token); return;
     }
     try {
-      if (!Number.isSafeInteger(nextEpoch) || nextEpoch < 0) throw new Error('Invalid session epoch');
+      if (!Number.isSafeInteger(nextEpoch) || nextEpoch < 0) throw new Error('Época de sesión inválida');
       // Treat getters, UUID factory and clock as reentrant boundaries; no state adoption before validation.
       const detached = parseDesignDocument(document);
       if (closing || token !== operation) return;
